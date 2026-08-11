@@ -1,5 +1,5 @@
 // ======================================================
-// DAILY EXPENSES - COMPLETE APP.JS
+// DAILY EXPENSES V3
 // ======================================================
 
 const STORAGE_KEY = "dailyExpensesV2";
@@ -58,16 +58,13 @@ function $(id) {
     return document.getElementById(id);
 }
 
-
 function cloneObject(object) {
     return JSON.parse(JSON.stringify(object));
 }
 
-
 function loadJSON(key, fallback) {
 
     try {
-
         const data = localStorage.getItem(key);
 
         if (data) {
@@ -75,14 +72,11 @@ function loadJSON(key, fallback) {
         }
 
     } catch (error) {
-
-        console.error("Load error:", error);
-
+        console.error(error);
     }
 
     return cloneObject(fallback);
 }
-
 
 function saveExpenses() {
 
@@ -90,9 +84,7 @@ function saveExpenses() {
         STORAGE_KEY,
         JSON.stringify(expenses)
     );
-
 }
-
 
 function saveSettings() {
 
@@ -100,16 +92,11 @@ function saveSettings() {
         SETTINGS_KEY,
         JSON.stringify(settings)
     );
-
 }
-
 
 function pad(number) {
-
     return String(number).padStart(2, "0");
-
 }
-
 
 function getToday() {
 
@@ -122,9 +109,7 @@ function getToday() {
         "-" +
         pad(date.getDate())
     );
-
 }
-
 
 function getCurrentTime() {
 
@@ -135,9 +120,7 @@ function getCurrentTime() {
         ":" +
         pad(date.getMinutes())
     );
-
 }
-
 
 function formatDate(dateString) {
 
@@ -158,9 +141,7 @@ function formatDate(dateString) {
         "/" +
         parts[0]
     );
-
 }
-
 
 function formatMoney(value) {
 
@@ -171,18 +152,16 @@ function formatMoney(value) {
             maximumFractionDigits: 2
         }
     ) + " €";
-
 }
-
 
 function escapeHtml(text) {
 
     const div = document.createElement("div");
 
-    div.textContent = text == null ? "" : String(text);
+    div.textContent =
+        text == null ? "" : String(text);
 
     return div.innerHTML;
-
 }
 
 
@@ -205,7 +184,12 @@ let expenses = loadJSON(
 // SELECTS
 // ======================================================
 
-function fillSelect(select, items, allText = null) {
+function fillSelect(
+    select,
+    items,
+    placeholder = null,
+    allText = null
+) {
 
     if (!select) {
         return;
@@ -213,78 +197,101 @@ function fillSelect(select, items, allText = null) {
 
     select.innerHTML = "";
 
+    if (placeholder !== null) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = "";
+        option.textContent = placeholder;
+        option.selected = true;
+
+        select.appendChild(option);
+    }
+
     if (allText !== null) {
 
-        const option = document.createElement("option");
+        const option =
+            document.createElement("option");
 
         option.value = "all";
         option.textContent = allText;
 
         select.appendChild(option);
-
     }
 
     items.forEach(item => {
 
-        const option = document.createElement("option");
+        const option =
+            document.createElement("option");
 
         option.value = item;
         option.textContent = item;
 
         select.appendChild(option);
-
     });
-
 }
 
 
 function refreshSelects() {
 
+    // Πληρωμή: Κάρτα προεπιλεγμένη
     fillSelect(
         $("paymentMethod"),
         settings.payments
     );
 
+    // Κατηγορία: ΚΕΝΟ
     fillSelect(
         $("category"),
-        settings.categories
+        settings.categories,
+        "Επιλέξτε κατηγορία"
     );
 
+    // Για ποιον: ΚΕΝΟ
     fillSelect(
         $("person"),
-        settings.persons
+        settings.persons,
+        "Επιλέξτε για ποιον"
     );
 
+    // Οχήματα: κενό
     fillSelect(
         $("vehicle"),
-        settings.vehicles
+        settings.vehicles,
+        "Επιλέξτε όχημα"
     );
 
+    // Υποκατηγορία: κενό
     fillSelect(
         $("subcategory"),
-        settings.subcategories
+        settings.subcategories,
+        "Επιλέξτε υποκατηγορία"
     );
 
+    // Reports
     fillSelect(
         $("reportCategory"),
         settings.categories,
+        null,
         "Όλες"
     );
 
     fillSelect(
         $("reportPerson"),
         settings.persons,
+        null,
         "Όλοι"
     );
 
     fillSelect(
         $("reportPayment"),
         settings.payments,
+        null,
         "Όλοι"
     );
 
     updateConditionalFields();
-
 }
 
 
@@ -294,7 +301,8 @@ function refreshSelects() {
 
 function updateConditionalFields() {
 
-    const category = $("category")?.value || "";
+    const category =
+        $("category")?.value || "";
 
     const isFuel =
         category === "Βενζίνη";
@@ -307,7 +315,7 @@ function updateConditionalFields() {
         category === "Αγορές";
 
     const purchaseMethod =
-        $("purchaseMethod")?.value || "store";
+        $("purchaseMethod")?.value || "";
 
     const isInternet =
         purchaseMethod === "internet";
@@ -342,7 +350,6 @@ function updateConditionalFields() {
         "hidden",
         !isInternet
     );
-
 }
 
 
@@ -352,10 +359,10 @@ function updateConditionalFields() {
 
 function addExpense() {
 
-    const amount = Number(
-        $("amount").value
-    );
+    const amount =
+        Number($("amount").value);
 
+    // ΜΟΝΟ ΤΟ ΠΟΣΟ ΕΙΝΑΙ ΥΠΟΧΡΕΩΤΙΚΟ
     if (!amount || amount <= 0) {
 
         alert(
@@ -365,9 +372,8 @@ function addExpense() {
         return;
     }
 
-
     const category =
-        $("category").value;
+        $("category").value || "";
 
     const isFuel =
         category === "Βενζίνη";
@@ -387,21 +393,21 @@ function addExpense() {
         amount: amount,
 
         payment:
-            $("paymentMethod").value,
+            $("paymentMethod").value || "",
 
         category:
             category,
 
         subcategory:
             category === "Αγορές"
-                ? $("subcategory").value
+                ? ($("subcategory").value || "")
                 : "",
 
         person:
-            $("person").value,
+            $("person").value || "",
 
         purchaseMethod:
-            $("purchaseMethod").value,
+            $("purchaseMethod").value || "",
 
         shop:
             $("shop").value.trim(),
@@ -419,26 +425,21 @@ function addExpense() {
         vehicle:
             category === "Βενζίνη" ||
             category === "Συντήρηση οχήματος"
-                ? $("vehicle").value
+                ? ($("vehicle").value || "")
                 : "",
 
         liters:
             isFuel
-                ? Number(
-                    $("liters").value || 0
-                  )
+                ? Number($("liters").value || 0)
                 : 0,
 
         odometer:
             isFuel
-                ? Number(
-                    $("odometer").value || 0
-                  )
+                ? Number($("odometer").value || 0)
                 : 0,
 
         description:
             $("description").value.trim()
-
     };
 
 
@@ -451,12 +452,13 @@ function addExpense() {
     $("selectedDate").value =
         expense.date;
 
-    renderDay(expense.date);
+    renderDay(
+        expense.date
+    );
 
     alert(
         "Το έξοδο καταχωρήθηκε."
     );
-
 }
 
 
@@ -478,13 +480,14 @@ function clearForm() {
 
     $("description").value = "";
 
-    $("purchaseMethod").value = "store";
 
+    // Κενά πεδία
     $("category").selectedIndex = 0;
 
-    $("paymentMethod").selectedIndex = 0;
-
     $("person").selectedIndex = 0;
+
+    $("purchaseMethod").value = "";
+
 
     if ($("vehicle")) {
         $("vehicle").selectedIndex = 0;
@@ -498,8 +501,14 @@ function clearForm() {
         $("orderStatus").selectedIndex = 0;
     }
 
-    updateConditionalFields();
 
+    // Κάρτα παραμένει προεπιλεγμένη
+    if ($("paymentMethod")) {
+        $("paymentMethod").value = "Κάρτα";
+    }
+
+
+    updateConditionalFields();
 }
 
 
@@ -509,32 +518,34 @@ function clearForm() {
 
 function deleteExpense(id) {
 
-    const expense = expenses.find(
-        item => item.id === id
-    );
+    const expense =
+        expenses.find(
+            item => item.id === id
+        );
 
     if (!expense) {
         return;
     }
 
-    const confirmed = confirm(
-        "Θέλετε να διαγράψετε αυτό το έξοδο;"
-    );
+    const confirmed =
+        confirm(
+            "Θέλετε να διαγράψετε αυτό το έξοδο;"
+        );
 
     if (!confirmed) {
         return;
     }
 
-    expenses = expenses.filter(
-        item => item.id !== id
-    );
+    expenses =
+        expenses.filter(
+            item => item.id !== id
+        );
 
     saveExpenses();
 
     renderDay(
         $("selectedDate").value
     );
-
 }
 
 
@@ -544,15 +555,18 @@ function deleteExpense(id) {
 
 function renderDay(date) {
 
-    const list = expenses
-        .filter(
-            expense =>
-                expense.date === date
-        )
-        .sort(
-            (a, b) =>
-                a.time.localeCompare(b.time)
-        );
+    const list =
+        expenses
+            .filter(
+                expense =>
+                    expense.date === date
+            )
+            .sort(
+                (a, b) =>
+                    a.time.localeCompare(
+                        b.time
+                    )
+            );
 
 
     let cash = 0;
@@ -563,18 +577,23 @@ function renderDay(date) {
     list.forEach(expense => {
 
         const amount =
-            Number(expense.amount || 0);
+            Number(
+                expense.amount || 0
+            );
 
         total += amount;
 
-        if (expense.payment === "Κάρτα") {
+        if (
+            expense.payment === "Κάρτα"
+        ) {
             card += amount;
         }
 
-        if (expense.payment === "Μετρητά") {
+        if (
+            expense.payment === "Μετρητά"
+        ) {
             cash += amount;
         }
-
     });
 
 
@@ -604,7 +623,6 @@ function renderDay(date) {
             </div>
 
         </div>
-
     `;
 
 
@@ -621,154 +639,174 @@ function renderDay(date) {
     }
 
 
-    $("expenseList").innerHTML = list
-        .map(expense => {
+    $("expenseList").innerHTML =
+        list
+            .map(expense => {
 
-            let details =
-                `${expense.time} — ` +
-                `${escapeHtml(expense.payment)} — ` +
-                `${escapeHtml(expense.category)} — ` +
-                `${escapeHtml(expense.person)}`;
-
-
-            if (expense.subcategory) {
-
-                details +=
-                    ` — ${escapeHtml(
-                        expense.subcategory
+                let details =
+                    `${expense.time} — ` +
+                    `${escapeHtml(
+                        expense.payment
                     )}`;
 
-            }
+
+                if (expense.category) {
+
+                    details +=
+                        ` — ${escapeHtml(
+                            expense.category
+                        )}`;
+                }
 
 
-            if (expense.vehicle) {
+                if (expense.person) {
 
-                details +=
-                    ` — ${escapeHtml(
-                        expense.vehicle
-                    )}`;
-
-            }
-
-
-            if (expense.liters) {
-
-                details +=
-                    ` — ${expense.liters} L`;
-
-            }
+                    details +=
+                        ` — ${escapeHtml(
+                            expense.person
+                        )}`;
+                }
 
 
-            if (expense.odometer) {
+                if (expense.subcategory) {
 
-                details +=
-                    ` — ${expense.odometer} km`;
+                    details +=
+                        ` — ${escapeHtml(
+                            expense.subcategory
+                        )}`;
+                }
 
-            }
+
+                if (expense.vehicle) {
+
+                    details +=
+                        ` — ${escapeHtml(
+                            expense.vehicle
+                        )}`;
+                }
 
 
-            if (
-                expense.purchaseMethod ===
-                "internet"
-            ) {
+                if (expense.liters) {
 
-                details += " — Internet";
+                    details +=
+                        ` — ${expense.liters} L`;
+                }
 
-                if (expense.shop) {
+
+                if (expense.odometer) {
+
+                    details +=
+                        ` — ${expense.odometer} km`;
+                }
+
+
+                if (
+                    expense.purchaseMethod ===
+                    "internet"
+                ) {
+
+                    details +=
+                        " — Internet";
+
+
+                    if (expense.shop) {
+
+                        details +=
+                            ` — ${escapeHtml(
+                                expense.shop
+                            )}`;
+                    }
+
+
+                    if (expense.orderNumber) {
+
+                        details +=
+                            ` — #${escapeHtml(
+                                expense.orderNumber
+                            )}`;
+                    }
+
+
+                    if (expense.orderStatus) {
+
+                        details +=
+                            ` — ${escapeHtml(
+                                expense.orderStatus
+                            )}`;
+                    }
+
+                } else if (
+                    expense.shop
+                ) {
 
                     details +=
                         ` — ${escapeHtml(
                             expense.shop
                         )}`;
-
                 }
 
-                if (expense.orderNumber) {
 
-                    details +=
-                        ` — #${escapeHtml(
-                            expense.orderNumber
-                        )}`;
-
-                }
-
-                if (expense.orderStatus) {
+                if (expense.description) {
 
                     details +=
                         ` — ${escapeHtml(
-                            expense.orderStatus
+                            expense.description
                         )}`;
-
                 }
 
-            } else if (expense.shop) {
 
-                details +=
-                    ` — ${escapeHtml(
-                        expense.shop
-                    )}`;
+                return `
 
-            }
+                    <div class="expense-item">
 
+                        <div class="expense-main">
 
-            if (expense.description) {
+                            <div class="expense-details">
+                                ${details}
+                            </div>
 
-                details +=
-                    ` — ${escapeHtml(
-                        expense.description
-                    )}`;
+                            <div class="expense-amount">
+                                ${formatMoney(
+                                    expense.amount
+                                )}
+                            </div>
 
-            }
-
-
-            return `
-
-                <div class="expense-item">
-
-                    <div class="expense-main">
-
-                        <div class="expense-details">
-                            ${details}
                         </div>
 
-                        <div class="expense-amount">
-                            ${formatMoney(
-                                expense.amount
-                            )}
-                        </div>
+                        <button
+                            class="danger delete-expense"
+                            data-id="${expense.id}"
+                        >
+                            Διαγραφή
+                        </button>
 
                     </div>
+                `;
 
-                    <button
-                        class="danger delete-expense"
-                        data-id="${expense.id}"
-                    >
-                        Διαγραφή
-                    </button>
-
-                </div>
-
-            `;
-
-        })
-        .join("");
+            })
+            .join("");
 
 
     document
-        .querySelectorAll(".delete-expense")
+        .querySelectorAll(
+            ".delete-expense"
+        )
         .forEach(button => {
 
             button.addEventListener(
                 "click",
                 () => {
+
                     deleteExpense(
-                        Number(button.dataset.id)
+                        Number(
+                            button.dataset.id
+                        )
                     );
+
                 }
             );
 
         });
-
 }
 
 
@@ -776,9 +814,22 @@ function renderDay(date) {
 // REPORT DATES
 // ======================================================
 
+function formatDateInput(date) {
+
+    return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate())
+    );
+}
+
+
 function updateReportDates() {
 
-    const today = new Date();
+    const today =
+        new Date();
 
     const type =
         $("reportType").value;
@@ -792,9 +843,11 @@ function updateReportDates() {
 
     if (type === "day") {
 
-        start = new Date(today);
-        end = new Date(today);
+        start =
+            new Date(today);
 
+        end =
+            new Date(today);
     }
 
 
@@ -804,7 +857,9 @@ function updateReportDates() {
             today.getDay();
 
         const diff =
-            day === 0 ? 6 : day - 1;
+            day === 0
+                ? 6
+                : day - 1;
 
         start =
             new Date(today);
@@ -819,41 +874,42 @@ function updateReportDates() {
         end.setDate(
             start.getDate() + 6
         );
-
     }
 
 
     if (type === "month") {
 
-        start = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            1
-        );
+        start =
+            new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                1
+            );
 
-        end = new Date(
-            today.getFullYear(),
-            today.getMonth() + 1,
-            0
-        );
-
+        end =
+            new Date(
+                today.getFullYear(),
+                today.getMonth() + 1,
+                0
+            );
     }
 
 
     if (type === "year") {
 
-        start = new Date(
-            today.getFullYear(),
-            0,
-            1
-        );
+        start =
+            new Date(
+                today.getFullYear(),
+                0,
+                1
+            );
 
-        end = new Date(
-            today.getFullYear(),
-            11,
-            31
-        );
-
+        end =
+            new Date(
+                today.getFullYear(),
+                11,
+                31
+            );
     }
 
 
@@ -864,22 +920,7 @@ function updateReportDates() {
 
         $("reportEndDate").value =
             formatDateInput(end);
-
     }
-
-}
-
-
-function formatDateInput(date) {
-
-    return (
-        date.getFullYear() +
-        "-" +
-        pad(date.getMonth() + 1) +
-        "-" +
-        pad(date.getDate())
-    );
-
 }
 
 
@@ -905,58 +946,69 @@ function getReportExpenses() {
         $("reportPayment").value;
 
 
-    return expenses.filter(expense => {
+    return expenses
+        .filter(expense => {
 
-        if (start && expense.date < start) {
-            return false;
-        }
+            if (
+                start &&
+                expense.date < start
+            ) {
+                return false;
+            }
 
-        if (end && expense.date > end) {
-            return false;
-        }
+            if (
+                end &&
+                expense.date > end
+            ) {
+                return false;
+            }
 
-        if (
-            category !== "all" &&
-            expense.category !== category
-        ) {
-            return false;
-        }
+            if (
+                category !== "all" &&
+                category &&
+                expense.category !== category
+            ) {
+                return false;
+            }
 
-        if (
-            person !== "all" &&
-            expense.person !== person
-        ) {
-            return false;
-        }
+            if (
+                person !== "all" &&
+                person &&
+                expense.person !== person
+            ) {
+                return false;
+            }
 
-        if (
-            payment !== "all" &&
-            expense.payment !== payment
-        ) {
-            return false;
-        }
+            if (
+                payment !== "all" &&
+                payment &&
+                expense.payment !== payment
+            ) {
+                return false;
+            }
 
-        return true;
+            return true;
 
-    }).sort(
-        (a, b) => {
+        })
+        .sort(
+            (a, b) => {
 
-            const first =
-                `${a.date} ${a.time}`;
+                const first =
+                    `${a.date} ${a.time}`;
 
-            const second =
-                `${b.date} ${b.time}`;
+                const second =
+                    `${b.date} ${b.time}`;
 
-            return first.localeCompare(second);
-
-        }
-    );
-
+                return first.localeCompare(
+                    second
+                );
+            }
+        );
 }
 
 
 // ======================================================
-// CREATE REPORT
+// REPORT
 // ======================================================
 
 function createReport() {
@@ -971,14 +1023,16 @@ function createReport() {
         );
 
         return;
-
     }
 
 
     const total =
         list.reduce(
             (sum, expense) =>
-                sum + Number(expense.amount || 0),
+                sum +
+                Number(
+                    expense.amount || 0
+                ),
             0
         );
 
@@ -997,61 +1051,63 @@ function createReport() {
         );
 
         return;
-
     }
 
 
-    const rows = list
-        .map(expense => {
+    const rows =
+        list
+            .map(expense => {
 
-            return `
+                return `
 
-                <tr>
+                    <tr>
 
-                    <td>
-                        ${formatDate(expense.date)}
-                    </td>
+                        <td>
+                            ${formatDate(
+                                expense.date
+                            )}
+                        </td>
 
-                    <td>
-                        ${escapeHtml(expense.time)}
-                    </td>
+                        <td>
+                            ${escapeHtml(
+                                expense.time
+                            )}
+                        </td>
 
-                    <td>
-                        ${escapeHtml(
-                            expense.category
-                        )}
-                    </td>
+                        <td>
+                            ${escapeHtml(
+                                expense.category || ""
+                            )}
+                        </td>
 
-                    <td>
-                        ${escapeHtml(
-                            expense.payment
-                        )}
-                    </td>
+                        <td>
+                            ${escapeHtml(
+                                expense.payment || ""
+                            )}
+                        </td>
 
-                    <td>
-                        ${escapeHtml(
-                            expense.person
-                        )}
-                    </td>
+                        <td>
+                            ${escapeHtml(
+                                expense.person || ""
+                            )}
+                        </td>
 
-                    <td>
-                        ${escapeHtml(
-                            expense.shop || ""
-                        )}
-                    </td>
+                        <td>
+                            ${escapeHtml(
+                                expense.shop || ""
+                            )}
+                        </td>
 
-                    <td class="amount">
-                        ${formatMoney(
-                            expense.amount
-                        )}
-                    </td>
+                        <td class="amount">
+                            ${formatMoney(
+                                expense.amount
+                            )}
+                        </td>
 
-                </tr>
-
-            `;
-
-        })
-        .join("");
+                    </tr>
+                `;
+            })
+            .join("");
 
 
     reportWindow.document.write(`
@@ -1078,15 +1134,6 @@ function createReport() {
 
                 h1 {
                     margin-bottom: 5px;
-                }
-
-                h2 {
-                    margin-top: 30px;
-                }
-
-                .info {
-                    margin: 15px 0;
-                    line-height: 1.6;
                 }
 
                 table {
@@ -1116,11 +1163,12 @@ function createReport() {
                     font-weight: bold;
                 }
 
-                @media print {
+                button {
+                    padding: 10px 20px;
+                    font-size: 16px;
+                }
 
-                    body {
-                        margin: 10mm;
-                    }
+                @media print {
 
                     button {
                         display: none;
@@ -1138,23 +1186,20 @@ function createReport() {
                 Daily Expenses
             </h1>
 
-            <div class="info">
+            <p>
 
-                <strong>Αναφορά εξόδων</strong><br>
-
-                Από:
+                Αναφορά από
                 ${formatDate(
                     $("reportStartDate").value
                 )}
 
-                <br>
+                έως
 
-                Έως:
                 ${formatDate(
                     $("reportEndDate").value
                 )}
 
-            </div>
+            </p>
 
             <table>
 
@@ -1163,17 +1208,11 @@ function createReport() {
                     <tr>
 
                         <th>Ημερομηνία</th>
-
                         <th>Ώρα</th>
-
                         <th>Κατηγορία</th>
-
                         <th>Πληρωμή</th>
-
                         <th>Για ποιον</th>
-
                         <th>Κατάστημα</th>
-
                         <th>Ποσό</th>
 
                     </tr>
@@ -1206,12 +1245,9 @@ function createReport() {
         </body>
 
         </html>
-
     `);
 
-
     reportWindow.document.close();
-
 }
 
 
@@ -1233,7 +1269,6 @@ function openSettings() {
     modal.classList.remove(
         "hidden"
     );
-
 }
 
 
@@ -1249,7 +1284,6 @@ function closeSettings() {
     modal.classList.add(
         "hidden"
     );
-
 }
 
 
@@ -1288,7 +1322,6 @@ function renderSettings() {
         settings.subcategories,
         "subcategories"
     );
-
 }
 
 
@@ -1327,12 +1360,9 @@ function renderSettingList(
                 <button
                     type="button"
                     class="danger"
-                    data-type="${type}"
-                    data-index="${index}"
                 >
                     ✕
                 </button>
-
             `;
 
 
@@ -1352,10 +1382,8 @@ function renderSettingList(
 
 
             container.appendChild(row);
-
         }
     );
-
 }
 
 
@@ -1378,7 +1406,6 @@ function deleteSettingItem(
         );
 
         return;
-
     }
 
 
@@ -1402,13 +1429,11 @@ function deleteSettingItem(
         1
     );
 
-
     saveSettings();
 
     refreshSelects();
 
     renderSettings();
-
 }
 
 
@@ -1440,32 +1465,30 @@ function addSetting(
         );
 
         return;
-
     }
 
 
-    if (
-        settings[type]
-            .some(
-                item =>
-                    item.toLowerCase() ===
-                    value.toLowerCase()
-            )
-    ) {
+    const exists =
+        settings[type].some(
+            item =>
+                item.toLowerCase() ===
+                value.toLowerCase()
+        );
+
+
+    if (exists) {
 
         alert(
             "Αυτή η επιλογή υπάρχει ήδη."
         );
 
         return;
-
     }
 
 
     settings[type].push(
         value
     );
-
 
     saveSettings();
 
@@ -1474,7 +1497,6 @@ function addSetting(
     refreshSelects();
 
     renderSettings();
-
 }
 
 
@@ -1499,13 +1521,11 @@ function resetSettings() {
             defaultSettings
         );
 
-
     saveSettings();
 
     refreshSelects();
 
     renderSettings();
-
 }
 
 
@@ -1517,7 +1537,7 @@ function exportData() {
 
     const data = {
 
-        version: 2,
+        version: 3,
 
         exportedAt:
             new Date().toISOString(),
@@ -1527,7 +1547,6 @@ function exportData() {
 
         expenses:
             expenses
-
     };
 
 
@@ -1541,7 +1560,8 @@ function exportData() {
                 )
             ],
             {
-                type: "application/json"
+                type:
+                    "application/json"
             }
         );
 
@@ -1566,7 +1586,6 @@ function exportData() {
     document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
-
 }
 
 
@@ -1607,7 +1626,6 @@ function importData(file) {
                     throw new Error(
                         "Invalid backup"
                     );
-
                 }
 
 
@@ -1624,7 +1642,6 @@ function importData(file) {
 
                 expenses =
                     data.expenses;
-
 
                 settings =
                     data.settings;
@@ -1647,31 +1664,23 @@ function importData(file) {
                     "Τα δεδομένα εισήχθησαν επιτυχώς."
                 );
 
-
             } catch (error) {
 
-                console.error(
-                    error
-                );
+                console.error(error);
 
                 alert(
                     "Το αρχείο δεν είναι έγκυρο backup της εφαρμογής."
                 );
-
             }
-
         };
 
 
-    reader.readAsText(
-        file
-    );
-
+    reader.readAsText(file);
 }
 
 
 // ======================================================
-// CURRENT DATE / TIME
+// DATE / TIME
 // ======================================================
 
 function updateCurrentDateTime() {
@@ -1696,7 +1705,6 @@ function updateCurrentDateTime() {
                 timeStyle: "short"
             }
         );
-
 }
 
 
@@ -1707,7 +1715,7 @@ function updateCurrentDateTime() {
 function initializeApp() {
 
     // ------------------------------
-    // BUTTONS
+    // MAIN BUTTONS
     // ------------------------------
 
     $("addExpenseButton")
@@ -1753,7 +1761,6 @@ function initializeApp() {
                 renderDay(
                     event.target.value
                 );
-
             }
         );
 
@@ -1773,7 +1780,7 @@ function initializeApp() {
 
 
     // ------------------------------
-    // SETTINGS - ADD BUTTONS
+    // SETTINGS BUTTONS
     // ------------------------------
 
     $("addPayment")
@@ -1785,7 +1792,6 @@ function initializeApp() {
                     "payments",
                     "newPayment"
                 );
-
             }
         );
 
@@ -1799,7 +1805,6 @@ function initializeApp() {
                     "categories",
                     "newCategory"
                 );
-
             }
         );
 
@@ -1813,7 +1818,6 @@ function initializeApp() {
                     "persons",
                     "newPerson"
                 );
-
             }
         );
 
@@ -1827,7 +1831,6 @@ function initializeApp() {
                     "vehicles",
                     "newVehicle"
                 );
-
             }
         );
 
@@ -1841,14 +1844,9 @@ function initializeApp() {
                     "subcategories",
                     "newSubcategory"
                 );
-
             }
         );
 
-
-    // ------------------------------
-    // SETTINGS - DATA
-    // ------------------------------
 
     $("exportData")
         ?.addEventListener(
@@ -1879,7 +1877,6 @@ function initializeApp() {
                 importData(file);
 
                 event.target.value = "";
-
             }
         );
 
@@ -1892,8 +1889,7 @@ function initializeApp() {
 
 
     // ------------------------------
-    // CLOSE MODAL WHEN CLICKING
-    // OUTSIDE THE CONTENT
+    // CLOSE MODAL
     // ------------------------------
 
     $("settingsModal")
@@ -1907,15 +1903,13 @@ function initializeApp() {
                 ) {
 
                     closeSettings();
-
                 }
-
             }
         );
 
 
     // ------------------------------
-    // INITIAL DATA
+    // START
     // ------------------------------
 
     refreshSelects();
@@ -1929,17 +1923,12 @@ function initializeApp() {
 
         $("selectedDate").value =
             today;
-
     }
 
 
     updateReportDates();
 
-
-    renderDay(
-        today
-    );
-
+    renderDay(today);
 
     updateCurrentDateTime();
 
@@ -1948,12 +1937,11 @@ function initializeApp() {
         updateCurrentDateTime,
         30000
     );
-
 }
 
 
 // ======================================================
-// START APP
+// START
 // ======================================================
 
 if (
@@ -1969,5 +1957,4 @@ if (
 } else {
 
     initializeApp();
-
 }
