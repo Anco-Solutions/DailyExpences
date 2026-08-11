@@ -1,1 +1,161 @@
- 
+ * {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f4f7;
+    color: #222;
+}
+
+.app {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.app-header {
+    background: #1f2937;
+    color: white;
+    padding: 22px;
+    border-radius: 14px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.app-header h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+}
+
+#currentDateTime {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+section {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 21px;
+}
+
+label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #cfd4da;
+    border-radius: 8px;
+    background: white;
+}
+
+button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.hidden {
+    display: none;
+}
+
+#daySummary {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f3f4f6;
+    border-radius: 10px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+}
+
+.summary-total {
+    font-size: 20px;
+    font-weight: bold;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.expense-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.expense-item:last-child {
+    border-bottom: none;
+}
+
+.expense-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.expense-amount {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.expense-details {
+    margin-top: 5px;
+    color: #666;
+    font-size: 14px;
+}
+
+#expenseList {
+    margin-top: 15px;
+}
+
+#reportDates {
+    margin-top: 10px;
+}
+
+@media (max-width: 480px) {
+
+    .app {
+        padding: 10px;
+    }
+
+    .app-header {
+        padding: 18px;
+    }
+
+    .app-header h1 {
+        font-size: 26px;
+    }
+
+    section {
+        padding: 16px;
+    }
+}
