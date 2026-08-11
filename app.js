@@ -1,9 +1,9 @@
+"use strict";
+
 /* =========================================================
    DAILY EXPENSES
    app.js
    ========================================================= */
-
-"use strict";
 
 
 /* =========================================================
@@ -91,15 +91,13 @@ function loadData(key, fallback) {
             localStorage.getItem(key);
 
         if (stored !== null) {
-
             return JSON.parse(stored);
-
         }
 
     } catch (error) {
 
         console.error(
-            "Σφάλμα φόρτωσης:",
+            "Σφάλμα φόρτωσης δεδομένων:",
             error
         );
 
@@ -134,13 +132,9 @@ function today() {
     return (
         d.getFullYear() +
         "-" +
-        String(
-            d.getMonth() + 1
-        ).padStart(2, "0") +
+        String(d.getMonth() + 1).padStart(2, "0") +
         "-" +
-        String(
-            d.getDate()
-        ).padStart(2, "0")
+        String(d.getDate()).padStart(2, "0")
     );
 }
 
@@ -150,13 +144,9 @@ function nowTime() {
     const d = new Date();
 
     return (
-        String(
-            d.getHours()
-        ).padStart(2, "0") +
+        String(d.getHours()).padStart(2, "0") +
         ":" +
-        String(
-            d.getMinutes()
-        ).padStart(2, "0")
+        String(d.getMinutes()).padStart(2, "0")
     );
 }
 
@@ -186,9 +176,7 @@ function formatDate(value) {
 
 function money(value) {
 
-    return Number(
-        value || 0
-    ).toLocaleString(
+    return Number(value || 0).toLocaleString(
         "el-GR",
         {
             minimumFractionDigits: 2,
@@ -200,9 +188,7 @@ function money(value) {
 
 function number(value) {
 
-    return Number(
-        value || 0
-    ).toLocaleString(
+    return Number(value || 0).toLocaleString(
         "el-GR",
         {
             maximumFractionDigits: 2
@@ -214,14 +200,10 @@ function number(value) {
 function escapeHTML(value) {
 
     const div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     div.textContent =
-        value == null
-            ? ""
-            : String(value);
+        value == null ? "" : String(value);
 
     return div.innerHTML;
 }
@@ -251,30 +233,21 @@ function migrateSettings() {
         !settings ||
         typeof settings !== "object"
     ) {
-
         settings =
-            clone(
-                DEFAULT_SETTINGS
-            );
-
+            clone(DEFAULT_SETTINGS);
     }
 
 
     const ensureArray =
-        function(
-            property,
-            fallback
-        ) {
+        function(property, fallback) {
 
             if (
                 !Array.isArray(
                     settings[property]
                 )
             ) {
-
                 settings[property] =
                     clone(fallback);
-
             }
 
         };
@@ -311,80 +284,71 @@ function migrateSettings() {
 
 
     settings.vehicles =
-        settings.vehicles
-            .map(
-                function(vehicle) {
+        settings.vehicles.map(
+            function(vehicle) {
 
-                    if (
-                        typeof vehicle ===
-                        "string"
-                    ) {
-
-                        return {
-
-                            id:
-                                createId(
-                                    "vehicle"
-                                ),
-
-                            type:
-                                "Αυτοκίνητο",
-
-                            make:
-                                vehicle,
-
-                            model:
-                                "",
-
-                            plate:
-                                ""
-
-                        };
-
-                    }
-
+                if (
+                    typeof vehicle === "string"
+                ) {
 
                     return {
 
                         id:
-                            vehicle.id ||
-                            createId(
-                                "vehicle"
-                            ),
+                            createId("vehicle"),
 
                         type:
-                            vehicle.type ||
                             "Αυτοκίνητο",
 
                         make:
-                            vehicle.make ||
-                            "",
+                            vehicle,
 
                         model:
-                            vehicle.model ||
                             "",
 
                         plate:
-                            vehicle.plate ||
                             ""
 
                     };
 
                 }
-            );
 
 
-    /*
-     * Ensure the new categories exist.
-     */
+                return {
+
+                    id:
+                        vehicle.id ||
+                        createId("vehicle"),
+
+                    type:
+                        vehicle.type ||
+                        "Αυτοκίνητο",
+
+                    make:
+                        vehicle.make ||
+                        "",
+
+                    model:
+                        vehicle.model ||
+                        "",
+
+                    plate:
+                        vehicle.plate ||
+                        ""
+
+                };
+
+            }
+        );
+
 
     DEFAULT_SETTINGS.categories
         .forEach(
             function(category) {
 
                 if (
-                    !settings.categories
-                        .includes(category)
+                    !settings.categories.includes(
+                        category
+                    )
                 ) {
 
                     settings.categories.push(
@@ -402,12 +366,14 @@ function migrateSettings() {
             function(item) {
 
                 if (
-                    !settings.shoppingSubcategories
-                        .includes(item)
+                    !settings.shoppingSubcategories.includes(
+                        item
+                    )
                 ) {
 
-                    settings.shoppingSubcategories
-                        .push(item);
+                    settings.shoppingSubcategories.push(
+                        item
+                    );
 
                 }
 
@@ -416,23 +382,27 @@ function migrateSettings() {
 
 
     if (
-        !settings.paymentMethods
-            .includes("Κάρτα")
+        !settings.paymentMethods.includes(
+            "Κάρτα"
+        )
     ) {
 
-        settings.paymentMethods
-            .unshift("Κάρτα");
+        settings.paymentMethods.unshift(
+            "Κάρτα"
+        );
 
     }
 
 
     if (
-        !settings.persons
-            .includes("Εμένα")
+        !settings.persons.includes(
+            "Εμένα"
+        )
     ) {
 
-        settings.persons
-            .unshift("Εμένα");
+        settings.persons.unshift(
+            "Εμένα"
+        );
 
     }
 
@@ -466,18 +436,14 @@ function fillSelect(
     if (placeholder !== null) {
 
         const first =
-            document.createElement(
-                "option"
-            );
+            document.createElement("option");
 
         first.value = "";
 
         first.textContent =
             placeholder;
 
-        select.appendChild(
-            first
-        );
+        select.appendChild(first);
 
     }
 
@@ -485,14 +451,11 @@ function fillSelect(
     if (includeAll) {
 
         const all =
-            document.createElement(
-                "option"
-            );
+            document.createElement("option");
 
         all.value = "all";
 
-        all.textContent =
-            "Όλα";
+        all.textContent = "Όλα";
 
         select.appendChild(all);
 
@@ -503,19 +466,13 @@ function fillSelect(
         function(value) {
 
             const option =
-                document.createElement(
-                    "option"
-                );
+                document.createElement("option");
 
-            option.value =
-                value;
+            option.value = value;
 
-            option.textContent =
-                value;
+            option.textContent = value;
 
-            select.appendChild(
-                option
-            );
+            select.appendChild(option);
 
         }
     );
@@ -577,15 +534,13 @@ function populateMainSelects() {
 
 
     populateShoppingSubcategories();
-
     populateReportVehicles();
-
 
     setDefaultValues();
 
     updateCategoryInterface();
-
     updatePurchaseInterface();
+    updateReportInterface();
 }
 
 
@@ -596,33 +551,23 @@ function populateMainSelects() {
 function setDefaultValues() {
 
     if ($("paymentMethod")) {
-
-        $("paymentMethod").value =
-            "Κάρτα";
-
+        $("paymentMethod").value = "Κάρτα";
     }
 
 
     if ($("person")) {
-
-        $("person").value =
-            "Εμένα";
-
+        $("person").value = "Εμένα";
     }
 
 
     if ($("purchaseMethod")) {
-
-        $("purchaseMethod").value =
-            "store";
-
+        $("purchaseMethod").value = "store";
     }
-
 }
 
 
 /* =========================================================
-   SHOPPING SUBCATEGORIES
+   SHOPPING
    ========================================================= */
 
 function populateShoppingSubcategories() {
@@ -646,20 +591,12 @@ function vehicleDisplayName(vehicle) {
 
 
     if (vehicle.make) {
-
-        parts.push(
-            vehicle.make
-        );
-
+        parts.push(vehicle.make);
     }
 
 
     if (vehicle.model) {
-
-        parts.push(
-            vehicle.model
-        );
-
+        parts.push(vehicle.model);
     }
 
 
@@ -673,8 +610,7 @@ function vehicleDisplayName(vehicle) {
             result += " - ";
         }
 
-        result +=
-            vehicle.plate;
+        result += vehicle.plate;
 
     }
 
@@ -688,18 +624,26 @@ function vehicleDisplayName(vehicle) {
 
 function getVehiclesByType(type) {
 
-    return settings.vehicles
-        .filter(
-            function(vehicle) {
+    return settings.vehicles.filter(
+        function(vehicle) {
 
-                return vehicle.type === type;
+            return vehicle.type === type;
 
-            }
-        );
+        }
+    );
 }
 
 
-function populateVehicles() {
+/*
+ * ΣΗΜΑΝΤΙΚΟ:
+ * Η προηγούμενη έκδοση ανανέωνε το select
+ * αφού είχε πάρει την επιλογή του χρήστη.
+ *
+ * Τώρα πρώτα δημιουργούμε τη λίστα
+ * και ΜΕΤΑ επιλέγουμε το όχημα.
+ */
+
+function populateVehicles(selectedId = "") {
 
     const select =
         $("vehicle");
@@ -716,230 +660,108 @@ function populateVehicles() {
             : "";
 
 
-    const previous =
-        select.value;
-
-
     select.innerHTML = "";
 
 
     const first =
-        document.createElement(
-            "option"
-        );
+        document.createElement("option");
 
 
     first.value = "";
 
 
-    first.textContent =
-        type === "Αυτοκίνητο"
-            ? "Επιλέξτε αυτοκίνητο"
-            : type === "Μηχανή"
-                ? "Επιλέξτε μηχανή"
-                : "Επιλέξτε όχημα";
+    if (type === "Αυτοκίνητο") {
+
+        first.textContent =
+            "Επιλέξτε αυτοκίνητο";
+
+    } else if (type === "Μηχανή") {
+
+        first.textContent =
+            "Επιλέξτε μηχανή";
+
+    } else {
+
+        first.textContent =
+            "Επιλέξτε όχημα";
+
+    }
 
 
     select.appendChild(first);
 
 
     if (!type) {
-        return;
-    }
 
-
-    getVehiclesByType(type)
-        .forEach(
-            function(vehicle) {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-                option.value =
-                    vehicle.id;
-
-                option.textContent =
-                    vehicleDisplayName(
-                        vehicle
-                    );
-
-                select.appendChild(
-                    option
-                );
-
-            }
+        toggle(
+            "vehicleEmptyMessage",
+            false
         );
 
-
-    if (
-        previous &&
-        settings.vehicles.some(
-            function(vehicle) {
-
-                return (
-                    vehicle.id ===
-                    previous
-                );
-
-            }
-        )
-    ) {
-
-        select.value =
-            previous;
+        return;
 
     }
+
+
+    const vehicles =
+        getVehiclesByType(type);
+
+
+    vehicles.forEach(
+        function(vehicle) {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                vehicle.id;
+
+            option.textContent =
+                vehicleDisplayName(
+                    vehicle
+                );
+
+            select.appendChild(option);
+
+        }
+    );
+
+
+    if (selectedId) {
+
+        const exists =
+            vehicles.some(
+                function(vehicle) {
+
+                    return (
+                        vehicle.id ===
+                        selectedId
+                    );
+
+                }
+            );
+
+
+        if (exists) {
+
+            select.value =
+                selectedId;
+
+        }
+
+    }
+
+
+    toggle(
+        "vehicleEmptyMessage",
+        vehicles.length === 0
+    );
 }
 
 
 /* =========================================================
-   REPORT VEHICLES
+   VEHICLE INTERFACE
    ========================================================= */
-
-function populateReportVehicles() {
-
-    const select =
-        $("reportVehicle");
-
-
-    if (!select) {
-        return;
-    }
-
-
-    const previous =
-        select.value;
-
-
-    select.innerHTML = "";
-
-
-    const all =
-        document.createElement(
-            "option"
-        );
-
-
-    all.value =
-        "all";
-
-
-    all.textContent =
-        "Όλα τα οχήματα";
-
-
-    select.appendChild(all);
-
-
-    settings.vehicles
-        .forEach(
-            function(vehicle) {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-                option.value =
-                    vehicle.id;
-
-                option.textContent =
-                    vehicleDisplayName(
-                        vehicle
-                    );
-
-                select.appendChild(
-                    option
-                );
-
-            }
-        );
-
-
-    if (previous) {
-
-        select.value =
-            previous;
-
-    }
-}
-
-
-/* =========================================================
-   CATEGORY INTERFACE
-   ========================================================= */
-
-function updateCategoryInterface() {
-
-    const category =
-        $("category")
-            ? $("category").value
-            : "";
-
-
-    const isShopping =
-        category === "Αγορές";
-
-
-    const isVehicle =
-        category === "Οχήματα";
-
-
-    toggle(
-        "subcategoryWrap",
-        isShopping
-    );
-
-
-    toggle(
-        "vehicleTypeWrap",
-        isVehicle
-    );
-
-
-    if (!isShopping) {
-
-        if ($("subcategory")) {
-
-            $("subcategory").value =
-                "";
-
-        }
-
-    }
-
-
-    if (!isVehicle) {
-
-        if ($("vehicleType")) {
-
-            $("vehicleType").value =
-                "";
-
-        }
-
-        if ($("vehicle")) {
-
-            $("vehicle").value =
-                "";
-
-        }
-
-        if ($("vehicleExpenseType")) {
-
-            $("vehicleExpenseType").value =
-                "";
-
-        }
-
-    }
-
-
-    updateVehicleInterface();
-}
-
 
 function updateVehicleInterface() {
 
@@ -973,9 +795,15 @@ function updateVehicleInterface() {
         );
 
 
-    const hasVehicle =
-        hasType &&
-        vehicleId !== "";
+    /*
+     * Πρώτα εμφανίζουμε/κρύβουμε
+     * τον τύπο οχήματος.
+     */
+
+    toggle(
+        "vehicleTypeWrap",
+        isVehicleCategory
+    );
 
 
     toggle(
@@ -985,23 +813,51 @@ function updateVehicleInterface() {
 
 
     /*
-     * Είδος δαπάνης εμφανίζεται
-     * ΜΟΝΟ αφού επιλεγεί συγκεκριμένο όχημα.
+     * Μόνο αφού υπάρχει τύπος,
+     * γεμίζουμε τη λίστα.
      */
+
+    if (hasType) {
+
+        populateVehicles(
+            vehicleId
+        );
+
+    } else {
+
+        if ($("vehicle")) {
+            $("vehicle").innerHTML = "";
+        }
+
+        toggle(
+            "vehicleEmptyMessage",
+            false
+        );
+
+    }
+
+
+    /*
+     * Ξαναδιαβάζουμε την πραγματική
+     * επιλογή μετά το populate.
+     */
+
+    const actualVehicleId =
+        $("vehicle")
+            ? $("vehicle").value
+            : "";
+
+
+    const hasVehicle =
+        hasType &&
+        actualVehicleId !== "";
+
 
     toggle(
         "vehicleExpenseTypeWrap",
         hasVehicle
     );
 
-
-    /*
-     * Το κοντέρ εμφανίζεται μόνο
-     * αφού επιλεγεί συγκεκριμένο όχημα
-     * και είδος δαπάνης.
-     *
-     * Είναι ΠΑΝΤΑ προαιρετικό.
-     */
 
     const expenseType =
         $("vehicleExpenseType")
@@ -1020,14 +876,84 @@ function updateVehicleInterface() {
     );
 
 
-    populateVehicles();
+    /*
+     * Αν δεν υπάρχει συγκεκριμένο όχημα,
+     * καθαρίζουμε τα επόμενα πεδία.
+     */
+
+    if (!hasVehicle) {
+
+        if ($("vehicleExpenseType")) {
+            $("vehicleExpenseType").value = "";
+        }
+
+        if ($("odometer")) {
+            $("odometer").value = "";
+        }
+
+    }
 }
 
 
-function updateCategoryAndVehicle() {
+function updateCategoryInterface() {
 
-    updateCategoryInterface();
+    const category =
+        $("category")
+            ? $("category").value
+            : "";
 
+
+    const isShopping =
+        category === "Αγορές";
+
+
+    const isVehicle =
+        category === "Οχήματα";
+
+
+    toggle(
+        "subcategoryWrap",
+        isShopping
+    );
+
+
+    toggle(
+        "vehicleTypeWrap",
+        isVehicle
+    );
+
+
+    if (!isShopping) {
+
+        if ($("subcategory")) {
+            $("subcategory").value = "";
+        }
+
+    }
+
+
+    if (!isVehicle) {
+
+        if ($("vehicleType")) {
+            $("vehicleType").value = "";
+        }
+
+        if ($("vehicle")) {
+            $("vehicle").value = "";
+        }
+
+        if ($("vehicleExpenseType")) {
+            $("vehicleExpenseType").value = "";
+        }
+
+        if ($("odometer")) {
+            $("odometer").value = "";
+        }
+
+    }
+
+
+    updateVehicleInterface();
 }
 
 
@@ -1057,7 +983,92 @@ function updatePurchaseInterface() {
         "orderStatusWrap",
         internet
     );
+}
 
+
+/* =========================================================
+   REPORT INTERFACE
+   ========================================================= */
+
+function updateReportInterface() {
+
+    const category =
+        $("reportCategory")
+            ? $("reportCategory").value
+            : "all";
+
+
+    const isVehicleReport =
+        category === "Οχήματα";
+
+
+    /*
+     * Όταν δεν έχουμε επιλέξει Οχήματα,
+     * κανένα στοιχείο οχήματος δεν πρέπει
+     * να φορτώνει άσκοπα την οθόνη.
+     */
+
+    toggle(
+        "reportVehicleWrap",
+        isVehicleReport
+    );
+
+
+    toggle(
+        "reportVehicleExpenseWrap",
+        isVehicleReport &&
+        $("reportVehicle") &&
+        $("reportVehicle").value !== "all"
+    );
+
+
+    /*
+     * Τα checkbox που αφορούν αποκλειστικά
+     * οχήματα γίνονται επίσης δυναμικά.
+     */
+
+    const vehicleOptions =
+        document.querySelectorAll(
+            ".vehicle-report-option"
+        );
+
+
+    vehicleOptions.forEach(
+        function(element) {
+
+            element.classList.toggle(
+                "hidden",
+                !isVehicleReport
+            );
+
+        }
+    );
+
+
+    /*
+     * Αν φύγουμε από τα Οχήματα,
+     * αποεπιλέγουμε τα vehicle-only options.
+     */
+
+    if (!isVehicleReport) {
+
+        [
+            "reportShowVehicles",
+            "reportShowOdometer",
+            "reportShowCostPerKm",
+            "reportShowTotalVehicleCost"
+        ]
+        .forEach(
+            function(id) {
+
+                if ($(id)) {
+                    $(id).checked = false;
+                }
+
+            }
+        );
+
+    }
 }
 
 
@@ -1092,9 +1103,7 @@ function getLocation() {
     return new Promise(
         function(resolve) {
 
-            if (
-                !navigator.geolocation
-            ) {
+            if (!navigator.geolocation) {
 
                 resolve(null);
 
@@ -1102,66 +1111,53 @@ function getLocation() {
             }
 
 
-            navigator.geolocation
-                .getCurrentPosition(
+            navigator.geolocation.getCurrentPosition(
 
-                    function(position) {
+                function(position) {
 
-                        resolve({
+                    resolve({
 
-                            latitude:
-                                position.coords
-                                    .latitude,
+                        latitude:
+                            position.coords.latitude,
 
-                            longitude:
-                                position.coords
-                                    .longitude,
+                        longitude:
+                            position.coords.longitude,
 
-                            accuracy:
-                                position.coords
-                                    .accuracy || 0,
+                        accuracy:
+                            position.coords.accuracy || 0,
 
-                            timestamp:
-                                new Date(
-                                    position.timestamp ||
-                                    Date.now()
-                                ).toISOString()
+                        timestamp:
+                            new Date(
+                                position.timestamp ||
+                                Date.now()
+                            ).toISOString()
 
-                        });
+                    });
 
-                    },
+                },
 
-                    function(error) {
+                function(error) {
 
-                        console.log(
-                            "GPS:",
-                            error.message
-                        );
+                    console.log(
+                        "GPS μη διαθέσιμο:",
+                        error.message
+                    );
 
+                    resolve(null);
 
-                        /*
-                         * GPS is OPTIONAL.
-                         * Never block a payment.
-                         */
+                },
 
-                        resolve(null);
+                {
 
-                    },
+                    enableHighAccuracy: true,
 
-                    {
+                    timeout: 5000,
 
-                        enableHighAccuracy:
-                            true,
+                    maximumAge: 60000
 
-                        timeout:
-                            5000,
+                }
 
-                        maximumAge:
-                            60000
-
-                    }
-
-                );
+            );
 
         }
     );
@@ -1197,9 +1193,7 @@ function validatePayment() {
 
 
         if ($("amount")) {
-
             $("amount").focus();
-
         }
 
 
@@ -1228,13 +1222,7 @@ async function addPayment() {
         );
 
 
-    /*
-     * GPS is attempted, but never
-     * prevents saving the payment.
-     */
-
-    let location =
-        null;
+    let location = null;
 
 
     try {
@@ -1244,8 +1232,7 @@ async function addPayment() {
 
     } catch (error) {
 
-        location =
-            null;
+        location = null;
 
     }
 
@@ -1301,71 +1288,49 @@ async function addPayment() {
                 amount.toFixed(2)
             ),
 
-
         paymentMethod:
-            $("paymentMethod")
-                ?.value ||
+            $("paymentMethod")?.value ||
             "Κάρτα",
 
-
         person:
-            $("person")
-                ?.value ||
+            $("person")?.value ||
             "Εμένα",
 
-
         purchaseMethod:
-            $("purchaseMethod")
-                ?.value ||
+            $("purchaseMethod")?.value ||
             "store",
-
 
         category:
             category,
 
-
         shoppingSubcategory:
             category === "Αγορές"
                 ? (
-                    $("subcategory")
-                        ?.value ||
+                    $("subcategory")?.value ||
                     ""
                 )
                 : "",
 
-
         vehicleType:
             vehicleType,
-
 
         vehicleId:
             vehicle
                 ? vehicle.id
                 : "",
 
-
         vehicleName:
             vehicle
-                ? vehicleDisplayName(
-                    vehicle
-                )
+                ? vehicleDisplayName(vehicle)
                 : "",
-
 
         vehicleExpenseType:
             category === "Οχήματα"
                 ? (
-                    $("vehicleExpenseType")
-                        ?.value ||
+                    $("vehicleExpenseType")?.value ||
                     ""
                 )
                 : "",
-
-
-        /*
-         * Κοντέρ:
-         * optional.
-         */
 
         odometer:
             (
@@ -1378,37 +1343,24 @@ async function addPayment() {
                 )
                 : null,
 
-
         shop:
-            $("shop")
-                ?.value
-                .trim() ||
+            $("shop")?.value.trim() ||
             "",
-
 
         orderNumber:
-            $("orderNumber")
-                ?.value
-                .trim() ||
+            $("orderNumber")?.value.trim() ||
             "",
-
 
         orderStatus:
-            $("orderStatus")
-                ?.value ||
+            $("orderStatus")?.value ||
             "",
-
 
         description:
-            $("description")
-                ?.value
-                .trim() ||
+            $("description")?.value.trim() ||
             "",
-
 
         location:
             location,
-
 
         createdAt:
             new Date().toISOString()
@@ -1424,9 +1376,7 @@ async function addPayment() {
 
                     return (
                         String(item.id) ===
-                        String(
-                            editingExpenseId
-                        )
+                        String(editingExpenseId)
                     );
 
                 }
@@ -1434,11 +1384,6 @@ async function addPayment() {
 
 
         if (index >= 0) {
-
-            /*
-             * If GPS is unavailable while editing,
-             * preserve the old location.
-             */
 
             if (
                 !payment.location &&
@@ -1471,12 +1416,12 @@ async function addPayment() {
 
     renderDay();
 
+
     alert(
         editingExpenseId
             ? "Η πληρωμή ενημερώθηκε."
             : "Η πληρωμή καταχωρήθηκε."
     );
-
 }
 
 
@@ -1486,12 +1431,10 @@ async function addPayment() {
 
 function clearPaymentForm() {
 
-    editingExpenseId =
-        null;
+    editingExpenseId = null;
 
 
-    const fields = [
-
+    [
         "amount",
         "category",
         "subcategory",
@@ -1502,21 +1445,14 @@ function clearPaymentForm() {
         "shop",
         "orderNumber",
         "description"
-
-    ];
-
-
-    fields.forEach(
+    ]
+    .forEach(
         function(id) {
 
-            const element =
-                $(id);
+            const element = $(id);
 
             if (element) {
-
-                element.value =
-                    "";
-
+                element.value = "";
             }
 
         }
@@ -1527,17 +1463,14 @@ function clearPaymentForm() {
 
 
     if ($("orderStatus")) {
-
         $("orderStatus").value =
             "Παραγγέλθηκε";
-
     }
 
 
     updateCategoryInterface();
 
     updatePurchaseInterface();
-
 }
 
 
@@ -1551,10 +1484,7 @@ function getPaymentsForDate(date) {
         .filter(
             function(item) {
 
-                return (
-                    item.date ===
-                    date
-                );
+                return item.date === date;
 
             }
         )
@@ -1564,9 +1494,7 @@ function getPaymentsForDate(date) {
                 return String(
                     a.time || ""
                 ).localeCompare(
-                    String(
-                        b.time || ""
-                    )
+                    String(b.time || "")
                 );
 
             }
@@ -1577,15 +1505,12 @@ function getPaymentsForDate(date) {
 function renderDay() {
 
     const date =
-        $("selectedDate")
-            ?.value ||
+        $("selectedDate")?.value ||
         today();
 
 
     const list =
-        getPaymentsForDate(
-            date
-        );
+        getPaymentsForDate(date);
 
 
     const total =
@@ -1594,9 +1519,7 @@ function renderDay() {
 
                 return (
                     sum +
-                    Number(
-                        item.amount || 0
-                    )
+                    Number(item.amount || 0)
                 );
 
             },
@@ -1661,13 +1584,10 @@ function renderDay() {
             </div>
 
         `;
-
     }
 
 
-    renderPaymentList(
-        list
-    );
+    renderPaymentList(list);
 }
 
 
@@ -1710,9 +1630,7 @@ function renderPaymentList(list) {
         function(payment) {
 
             const item =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
 
             item.className =
@@ -1722,121 +1640,74 @@ function renderPaymentList(list) {
             const details = [];
 
 
-            if (
-                payment.category
-            ) {
-
+            if (payment.category) {
                 details.push(
                     payment.category
                 );
-
             }
 
 
-            if (
-                payment.shoppingSubcategory
-            ) {
-
+            if (payment.shoppingSubcategory) {
                 details.push(
                     payment.shoppingSubcategory
                 );
-
             }
 
 
-            if (
-                payment.vehicleName
-            ) {
-
+            if (payment.vehicleName) {
                 details.push(
                     payment.vehicleName
                 );
-
             }
 
 
-            if (
-                payment.vehicleExpenseType
-            ) {
-
+            if (payment.vehicleExpenseType) {
                 details.push(
                     payment.vehicleExpenseType
                 );
-
             }
 
 
             if (
-                payment.odometer !==
-                null &&
-                payment.odometer !==
-                undefined
+                payment.odometer !== null &&
+                payment.odometer !== undefined
             ) {
 
                 details.push(
                     "Κοντέρ: " +
-                    number(
-                        payment.odometer
-                    ) +
+                    number(payment.odometer) +
                     " km"
                 );
 
             }
 
 
-            if (
-                payment.person
-            ) {
-
+            if (payment.person) {
                 details.push(
                     "Για: " +
                     payment.person
                 );
-
             }
 
 
-            if (
-                payment.paymentMethod
-            ) {
-
+            if (payment.paymentMethod) {
                 details.push(
                     payment.paymentMethod
                 );
-
             }
 
 
-            if (
-                payment.shop
-            ) {
-
+            if (payment.shop) {
                 details.push(
                     payment.shop
                 );
-
             }
 
 
-            if (
-                payment.description
-            ) {
-
+            if (payment.description) {
                 details.push(
                     payment.description
                 );
-
-            }
-
-
-            if (
-                payment.location
-            ) {
-
-                details.push(
-                    "Τοποθεσία καταχωρημένη"
-                );
-
             }
 
 
@@ -1849,8 +1720,7 @@ function renderPaymentList(list) {
                         <strong>
 
                             ${escapeHTML(
-                                payment.time ||
-                                ""
+                                payment.time || ""
                             )}
 
                             —
@@ -1865,21 +1735,17 @@ function renderPaymentList(list) {
 
                         <div class="expense-details">
 
-                            ${details
-                                .map(
-                                    function(detail) {
+                            ${details.map(
+                                function(detail) {
 
-                                        return `
-                                            <div>
-                                                ${escapeHTML(
-                                                    detail
-                                                )}
-                                            </div>
-                                        `;
+                                    return `
+                                        <div>
+                                            ${escapeHTML(detail)}
+                                        </div>
+                                    `;
 
-                                    }
-                                )
-                                .join("")}
+                                }
+                            ).join("")}
 
                         </div>
 
@@ -1888,9 +1754,7 @@ function renderPaymentList(list) {
 
                     <div class="expense-amount">
 
-                        ${money(
-                            payment.amount
-                        )}
+                        ${money(payment.amount)}
 
                     </div>
 
@@ -1902,9 +1766,7 @@ function renderPaymentList(list) {
                     <button
                         type="button"
                         class="secondary edit-payment"
-                        data-id="${escapeHTML(
-                            payment.id
-                        )}">
+                        data-id="${escapeHTML(payment.id)}">
 
                         Επεξεργασία
 
@@ -1914,9 +1776,7 @@ function renderPaymentList(list) {
                     <button
                         type="button"
                         class="danger delete-payment"
-                        data-id="${escapeHTML(
-                            payment.id
-                        )}">
+                        data-id="${escapeHTML(payment.id)}">
 
                         Διαγραφή
 
@@ -1927,18 +1787,14 @@ function renderPaymentList(list) {
             `;
 
 
-            container.appendChild(
-                item
-            );
+            container.appendChild(item);
 
         }
     );
 
 
     container
-        .querySelectorAll(
-            ".edit-payment"
-        )
+        .querySelectorAll(".edit-payment")
         .forEach(
             function(button) {
 
@@ -1958,9 +1814,7 @@ function renderPaymentList(list) {
 
 
     container
-        .querySelectorAll(
-            ".delete-payment"
-        )
+        .querySelectorAll(".delete-payment")
         .forEach(
             function(button) {
 
@@ -1981,7 +1835,7 @@ function renderPaymentList(list) {
 
 
 /* =========================================================
-   EDIT PAYMENT
+   EDIT
    ========================================================= */
 
 function editPayment(id) {
@@ -2009,91 +1863,66 @@ function editPayment(id) {
 
 
     if ($("selectedDate")) {
-
         $("selectedDate").value =
-            payment.date ||
-            today();
-
+            payment.date || today();
     }
 
 
     if ($("amount")) {
-
         $("amount").value =
             payment.amount || "";
-
     }
 
 
     if ($("paymentMethod")) {
-
         $("paymentMethod").value =
             payment.paymentMethod ||
             "Κάρτα";
-
     }
 
 
     if ($("person")) {
-
         $("person").value =
             payment.person ||
             "Εμένα";
-
     }
 
 
     if ($("purchaseMethod")) {
-
         $("purchaseMethod").value =
             payment.purchaseMethod ||
             "store";
-
     }
 
 
     if ($("shop")) {
-
         $("shop").value =
-            payment.shop ||
-            "";
-
+            payment.shop || "";
     }
 
 
     if ($("orderNumber")) {
-
         $("orderNumber").value =
-            payment.orderNumber ||
-            "";
-
+            payment.orderNumber || "";
     }
 
 
     if ($("orderStatus")) {
-
         $("orderStatus").value =
             payment.orderStatus ||
             "Παραγγέλθηκε";
-
     }
 
 
     if ($("description")) {
-
         $("description").value =
-            payment.description ||
-            "";
-
+            payment.description || "";
     }
 
 
     if ($("category")) {
-
         $("category").value =
-            payment.category ||
-            "";
-
+            payment.category || "";
     }
 
 
@@ -2101,20 +1930,14 @@ function editPayment(id) {
 
 
     if ($("subcategory")) {
-
         $("subcategory").value =
-            payment.shoppingSubcategory ||
-            "";
-
+            payment.shoppingSubcategory || "";
     }
 
 
     if ($("vehicleType")) {
-
         $("vehicleType").value =
-            payment.vehicleType ||
-            "";
-
+            payment.vehicleType || "";
     }
 
 
@@ -2123,31 +1946,26 @@ function editPayment(id) {
 
     if ($("vehicle")) {
 
-        $("vehicle").value =
-            payment.vehicleId ||
-            "";
+        populateVehicles(
+            payment.vehicleId || ""
+        );
 
+    }
+
+
+    if ($("vehicleExpenseType")) {
+        $("vehicleExpenseType").value =
+            payment.vehicleExpenseType || "";
     }
 
 
     updateVehicleInterface();
 
 
-    if ($("vehicleExpenseType")) {
-
-        $("vehicleExpenseType").value =
-            payment.vehicleExpenseType ||
-            "";
-
-    }
-
-
     if (
         $("odometer") &&
-        payment.odometer !==
-        null &&
-        payment.odometer !==
-        undefined
+        payment.odometer !== null &&
+        payment.odometer !== undefined
     ) {
 
         $("odometer").value =
@@ -2166,7 +1984,6 @@ function editPayment(id) {
         behavior: "smooth"
 
     });
-
 }
 
 
@@ -2199,7 +2016,6 @@ function deletePayment(id) {
             "Να διαγραφεί αυτή η πληρωμή;"
         )
     ) {
-
         return;
     }
 
@@ -2220,54 +2036,99 @@ function deletePayment(id) {
     saveExpenses();
 
     renderDay();
-
 }
 
 
 /* =========================================================
-   REPORT DATE CALCULATION
+   REPORT VEHICLES
+   ========================================================= */
+
+function populateReportVehicles() {
+
+    const select =
+        $("reportVehicle");
+
+
+    if (!select) {
+        return;
+    }
+
+
+    const previous =
+        select.value;
+
+
+    select.innerHTML = "";
+
+
+    const all =
+        document.createElement("option");
+
+
+    all.value = "all";
+
+    all.textContent =
+        "Όλα τα οχήματα";
+
+    select.appendChild(all);
+
+
+    settings.vehicles.forEach(
+        function(vehicle) {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                vehicle.id;
+
+            option.textContent =
+                vehicleDisplayName(vehicle);
+
+            select.appendChild(option);
+
+        }
+    );
+
+
+    if (previous) {
+        select.value = previous;
+    }
+}
+
+
+/* =========================================================
+   REPORT DATES
    ========================================================= */
 
 function updateReportDates() {
 
     const type =
-        $("reportType")
-            ?.value ||
+        $("reportType")?.value ||
         "day";
 
 
     const selected =
-        $("selectedDate")
-            ?.value ||
+        $("selectedDate")?.value ||
         today();
 
 
-    if (
-        type === "custom"
-    ) {
-
+    if (type === "custom") {
         return;
     }
 
 
     const date =
         new Date(
-            selected +
-            "T12:00:00"
+            selected + "T12:00:00"
         );
 
 
-    let start =
-        selected;
+    let start = selected;
+    let end = selected;
 
 
-    let end =
-        selected;
-
-
-    if (
-        type === "week"
-    ) {
+    if (type === "week") {
 
         const day =
             date.getDay();
@@ -2284,8 +2145,7 @@ function updateReportDates() {
 
 
         monday.setDate(
-            date.getDate() +
-            offset
+            date.getDate() + offset
         );
 
 
@@ -2294,28 +2154,21 @@ function updateReportDates() {
 
 
         sunday.setDate(
-            monday.getDate() +
-            6
+            monday.getDate() + 6
         );
 
 
         start =
-            localDateString(
-                monday
-            );
+            localDateString(monday);
 
 
         end =
-            localDateString(
-                sunday
-            );
+            localDateString(sunday);
 
     }
 
 
-    if (
-        type === "month"
-    ) {
+    if (type === "month") {
 
         const first =
             new Date(
@@ -2334,22 +2187,16 @@ function updateReportDates() {
 
 
         start =
-            localDateString(
-                first
-            );
+            localDateString(first);
 
 
         end =
-            localDateString(
-                last
-            );
+            localDateString(last);
 
     }
 
 
-    if (
-        type === "year"
-    ) {
+    if (type === "year") {
 
         start =
             date.getFullYear() +
@@ -2364,20 +2211,13 @@ function updateReportDates() {
 
 
     if ($("reportStartDate")) {
-
-        $("reportStartDate").value =
-            start;
-
+        $("reportStartDate").value = start;
     }
 
 
     if ($("reportEndDate")) {
-
-        $("reportEndDate").value =
-            end;
-
+        $("reportEndDate").value = end;
     }
-
 }
 
 
@@ -2386,13 +2226,9 @@ function localDateString(date) {
     return (
         date.getFullYear() +
         "-" +
-        String(
-            date.getMonth() + 1
-        ).padStart(2, "0") +
+        String(date.getMonth() + 1).padStart(2, "0") +
         "-" +
-        String(
-            date.getDate()
-        ).padStart(2, "0")
+        String(date.getDate()).padStart(2, "0")
     );
 }
 
@@ -2404,44 +2240,37 @@ function localDateString(date) {
 function getReportData() {
 
     const start =
-        $("reportStartDate")
-            ?.value ||
+        $("reportStartDate")?.value ||
         today();
 
 
     const end =
-        $("reportEndDate")
-            ?.value ||
+        $("reportEndDate")?.value ||
         start;
 
 
     const category =
-        $("reportCategory")
-            ?.value ||
+        $("reportCategory")?.value ||
         "all";
 
 
     const vehicle =
-        $("reportVehicle")
-            ?.value ||
+        $("reportVehicle")?.value ||
         "all";
 
 
     const vehicleExpense =
-        $("reportVehicleExpense")
-            ?.value ||
+        $("reportVehicleExpense")?.value ||
         "all";
 
 
     const person =
-        $("reportPerson")
-            ?.value ||
+        $("reportPerson")?.value ||
         "all";
 
 
     const payment =
-        $("reportPayment")
-            ?.value ||
+        $("reportPayment")?.value ||
         "all";
 
 
@@ -2452,64 +2281,49 @@ function getReportData() {
                 item.date < start ||
                 item.date > end
             ) {
-
                 return false;
-
             }
 
 
             if (
                 category !== "all" &&
-                item.category !==
-                category
+                item.category !== category
             ) {
-
                 return false;
-
             }
 
 
             if (
+                category === "Οχήματα" &&
                 vehicle !== "all" &&
-                item.vehicleId !==
-                vehicle
+                item.vehicleId !== vehicle
             ) {
-
                 return false;
-
             }
 
 
             if (
+                category === "Οχήματα" &&
                 vehicleExpense !== "all" &&
-                item.vehicleExpenseType !==
-                vehicleExpense
+                item.vehicleExpenseType !== vehicleExpense
             ) {
-
                 return false;
-
             }
 
 
             if (
                 person !== "all" &&
-                item.person !==
-                person
+                item.person !== person
             ) {
-
                 return false;
-
             }
 
 
             if (
                 payment !== "all" &&
-                item.paymentMethod !==
-                payment
+                item.paymentMethod !== payment
             ) {
-
                 return false;
-
             }
 
 
@@ -2517,25 +2331,14 @@ function getReportData() {
 
         }
     );
-
 }
 
 
 /* =========================================================
-   COST PER KM
+   VEHICLE METRICS
    ========================================================= */
 
-/*
- * Βρίσκουμε τις καταχωρήσεις με κοντέρ
- * για το συγκεκριμένο όχημα.
- *
- * Δεν απαιτούμε κοντέρ σε κάθε πληρωμή.
- */
-
-
-function calculateVehicleMetrics(
-    list
-) {
+function calculateVehicleMetrics(list) {
 
     const result = [];
 
@@ -2545,18 +2348,12 @@ function calculateVehicleMetrics(
             list
                 .filter(
                     function(item) {
-
-                        return (
-                            item.vehicleId
-                        );
-
+                        return item.vehicleId;
                     }
                 )
                 .map(
                     function(item) {
-
                         return item.vehicleId;
-
                     }
                 )
         )
@@ -2569,12 +2366,10 @@ function calculateVehicleMetrics(
             const vehicle =
                 settings.vehicles.find(
                     function(item) {
-
                         return (
                             item.id ===
                             vehicleId
                         );
-
                     }
                 );
 
@@ -2583,32 +2378,24 @@ function calculateVehicleMetrics(
                 list
                     .filter(
                         function(item) {
-
                             return (
                                 item.vehicleId ===
                                 vehicleId
                             );
-
                         }
                     )
                     .sort(
                         function(a, b) {
 
                             return (
-                                String(
-                                    a.date
-                                ).localeCompare(
-                                    String(
-                                        b.date
+                                String(a.date)
+                                    .localeCompare(
+                                        String(b.date)
+                                    ) ||
+                                String(a.time || "")
+                                    .localeCompare(
+                                        String(b.time || "")
                                     )
-                                ) ||
-                                String(
-                                    a.time || ""
-                                ).localeCompare(
-                                    String(
-                                        b.time || ""
-                                    )
-                                )
                             );
 
                         }
@@ -2621,28 +2408,10 @@ function calculateVehicleMetrics(
                         function(item) {
 
                             return (
-                                item.odometer !==
-                                null &&
-                                item.odometer !==
-                                undefined &&
+                                item.odometer !== null &&
+                                item.odometer !== undefined &&
                                 Number.isFinite(
-                                    Number(
-                                        item.odometer
-                                    )
-                                )
-                            );
-
-                        }
-                    )
-                    .sort(
-                        function(a, b) {
-
-                            return (
-                                Number(
-                                    a.odometer
-                                ) -
-                                Number(
-                                    b.odometer
+                                    Number(item.odometer)
                                 )
                             );
 
@@ -2650,38 +2419,23 @@ function calculateVehicleMetrics(
                     );
 
 
-            let totalDistance =
-                0;
+            let totalDistance = 0;
 
+            let totalCost = 0;
 
-            let totalCost =
-                0;
+            let fuelCost = 0;
 
+            let maintenanceCost = 0;
 
-            let fuelCost =
-                0;
-
-
-            let maintenanceCost =
-                0;
-
-
-            /*
-             * Συνολικά χρήματα που έχουν
-             * καταχωρηθεί για το όχημα.
-             */
 
             vehiclePayments.forEach(
                 function(item) {
 
                     const amount =
-                        Number(
-                            item.amount || 0
-                        );
+                        Number(item.amount || 0);
 
 
-                    totalCost +=
-                        amount;
+                    totalCost += amount;
 
 
                     if (
@@ -2689,8 +2443,7 @@ function calculateVehicleMetrics(
                         "Βενζίνη"
                     ) {
 
-                        fuelCost +=
-                            amount;
+                        fuelCost += amount;
 
                     }
 
@@ -2700,8 +2453,7 @@ function calculateVehicleMetrics(
                         "Έξοδα συντήρησης"
                     ) {
 
-                        maintenanceCost +=
-                            amount;
+                        maintenanceCost += amount;
 
                     }
 
@@ -2709,21 +2461,13 @@ function calculateVehicleMetrics(
             );
 
 
-            /*
-             * Απόσταση μεταξύ της
-             * πρώτης και τελευταίας
-             * διαθέσιμης ένδειξης.
-             */
-
             if (
-                odometerEntries.length >=
-                2
+                odometerEntries.length >= 2
             ) {
 
                 const first =
                     Number(
-                        odometerEntries[0]
-                            .odometer
+                        odometerEntries[0].odometer
                     );
 
 
@@ -2735,53 +2479,35 @@ function calculateVehicleMetrics(
                     );
 
 
-                totalDistance =
-                    last -
-                    first;
+                if (last >= first) {
+
+                    totalDistance =
+                        last - first;
+
+                }
 
             }
 
 
-            let costPerKm =
-                null;
-
-
-            if (
+            const costPerKm =
                 totalDistance > 0
-            ) {
-
-                costPerKm =
-                    totalCost /
-                    totalDistance;
-
-            }
+                    ? totalCost / totalDistance
+                    : null;
 
 
-            let fuelCostPerKm =
-                null;
-
-
-            if (
+            const fuelCostPerKm =
                 totalDistance > 0
-            ) {
-
-                fuelCostPerKm =
-                    fuelCost /
-                    totalDistance;
-
-            }
+                    ? fuelCost / totalDistance
+                    : null;
 
 
             result.push({
 
-                vehicleId:
-                    vehicleId,
+                vehicleId,
 
                 vehicleName:
                     vehicle
-                        ? vehicleDisplayName(
-                            vehicle
-                        )
+                        ? vehicleDisplayName(vehicle)
                         : "Άγνωστο όχημα",
 
                 vehicleType:
@@ -2789,23 +2515,18 @@ function calculateVehicleMetrics(
                         ? vehicle.type
                         : "",
 
-                totalCost:
-                    totalCost,
+                totalCost,
 
-                fuelCost:
-                    fuelCost,
+                fuelCost,
 
-                maintenanceCost:
-                    maintenanceCost,
+                maintenanceCost,
 
                 distance:
                     totalDistance,
 
-                costPerKm:
-                    costPerKm,
+                costPerKm,
 
-                fuelCostPerKm:
-                    fuelCostPerKm,
+                fuelCostPerKm,
 
                 odometerEntries:
                     odometerEntries.length
@@ -2821,7 +2542,7 @@ function calculateVehicleMetrics(
 
 
 /* =========================================================
-   REPORT CREATION
+   REPORT
    ========================================================= */
 
 function generateReport() {
@@ -2841,14 +2562,12 @@ function generateReport() {
 
 
     const start =
-        $("reportStartDate")
-            ?.value ||
+        $("reportStartDate")?.value ||
         today();
 
 
     const end =
-        $("reportEndDate")
-            ?.value ||
+        $("reportEndDate")?.value ||
         start;
 
 
@@ -2858,9 +2577,7 @@ function generateReport() {
 
                 return (
                     sum +
-                    Number(
-                        item.amount || 0
-                    )
+                    Number(item.amount || 0)
                 );
 
             },
@@ -2869,50 +2586,38 @@ function generateReport() {
 
 
     const showPayments =
-        $("reportShowPayments")
-            ?.checked;
+        $("reportShowPayments")?.checked;
 
 
     const showCategories =
-        $("reportShowCategories")
-            ?.checked;
+        $("reportShowCategories")?.checked;
 
 
     const showSubcategories =
-        $("reportShowSubcategories")
-            ?.checked;
+        $("reportShowSubcategories")?.checked;
 
 
     const showVehicles =
-        $("reportShowVehicles")
-            ?.checked;
+        $("reportShowVehicles")?.checked;
 
 
     const showOdometer =
-        $("reportShowOdometer")
-            ?.checked;
+        $("reportShowOdometer")?.checked;
 
 
     const showCostPerKm =
-        $("reportShowCostPerKm")
-            ?.checked;
+        $("reportShowCostPerKm")?.checked;
 
 
     const showTotalVehicleCost =
-        $("reportShowTotalVehicleCost")
-            ?.checked;
+        $("reportShowTotalVehicleCost")?.checked;
 
 
-    const categoryTotals =
-        {};
+    const categoryTotals = {};
 
+    const subcategoryTotals = {};
 
-    const subcategoryTotals =
-        {};
-
-
-    const vehicleTotals =
-        {};
+    const vehicleTotals = {};
 
 
     list.forEach(
@@ -2923,65 +2628,43 @@ function generateReport() {
                 "Χωρίς κατηγορία";
 
 
-            categoryTotals[
-                category
-            ] =
+            categoryTotals[category] =
                 (
-                    categoryTotals[
-                        category
-                    ] ||
+                    categoryTotals[category] ||
                     0
                 ) +
-                Number(
-                    item.amount || 0
-                );
+                Number(item.amount || 0);
 
 
-            if (
-                item.shoppingSubcategory
-            ) {
+            if (item.shoppingSubcategory) {
 
                 const sub =
                     item.shoppingSubcategory;
 
 
-                subcategoryTotals[
-                    sub
-                ] =
+                subcategoryTotals[sub] =
                     (
-                        subcategoryTotals[
-                            sub
-                        ] ||
+                        subcategoryTotals[sub] ||
                         0
                     ) +
-                    Number(
-                        item.amount || 0
-                    );
+                    Number(item.amount || 0);
 
             }
 
 
-            if (
-                item.vehicleId
-            ) {
+            if (item.vehicleId) {
 
                 const name =
                     item.vehicleName ||
                     "Άγνωστο όχημα";
 
 
-                vehicleTotals[
-                    name
-                ] =
+                vehicleTotals[name] =
                     (
-                        vehicleTotals[
-                            name
-                        ] ||
+                        vehicleTotals[name] ||
                         0
                     ) +
-                    Number(
-                        item.amount || 0
-                    );
+                    Number(item.amount || 0);
 
             }
 
@@ -2990,170 +2673,106 @@ function generateReport() {
 
 
     const metrics =
-        calculateVehicleMetrics(
-            list
-        );
+        calculateVehicleMetrics(list);
 
 
     const categoryRows =
-        Object.entries(
-            categoryTotals
-        )
-        .sort(
-            function(a, b) {
+        Object.entries(categoryTotals)
+            .sort(
+                function(a, b) {
+                    return b[1] - a[1];
+                }
+            )
+            .map(
+                function(entry) {
 
-                return (
-                    b[1] -
-                    a[1]
-                );
+                    return `
 
-            }
-        )
-        .map(
-            function(entry) {
+                        <tr>
 
-                return `
+                            <td>
+                                ${escapeHTML(entry[0])}
+                            </td>
 
-                    <tr>
+                            <td>
+                                ${money(entry[1])}
+                            </td>
 
-                        <td>
-                            ${escapeHTML(
-                                entry[0]
-                            )}
-                        </td>
+                        </tr>
 
-                        <td>
-                            ${money(
-                                entry[1]
-                            )}
-                        </td>
+                    `;
 
-                    </tr>
-
-                `;
-
-            }
-        )
-        .join("");
+                }
+            )
+            .join("");
 
 
     const subcategoryRows =
-        Object.entries(
-            subcategoryTotals
-        )
-        .sort(
-            function(a, b) {
+        Object.entries(subcategoryTotals)
+            .sort(
+                function(a, b) {
+                    return b[1] - a[1];
+                }
+            )
+            .map(
+                function(entry) {
 
-                return (
-                    b[1] -
-                    a[1]
-                );
+                    return `
 
-            }
-        )
-        .map(
-            function(entry) {
+                        <tr>
 
-                return `
+                            <td>
+                                ${escapeHTML(entry[0])}
+                            </td>
 
-                    <tr>
+                            <td>
+                                ${money(entry[1])}
+                            </td>
 
-                        <td>
-                            ${escapeHTML(
-                                entry[0]
-                            )}
-                        </td>
+                        </tr>
 
-                        <td>
-                            ${money(
-                                entry[1]
-                            )}
-                        </td>
+                    `;
 
-                    </tr>
-
-                `;
-
-            }
-        )
-        .join("");
+                }
+            )
+            .join("");
 
 
     const vehicleRows =
-        Object.entries(
-            vehicleTotals
-        )
-        .sort(
-            function(a, b) {
+        Object.entries(vehicleTotals)
+            .sort(
+                function(a, b) {
+                    return b[1] - a[1];
+                }
+            )
+            .map(
+                function(entry) {
 
-                return (
-                    b[1] -
-                    a[1]
-                );
+                    return `
 
-            }
-        )
-        .map(
-            function(entry) {
+                        <tr>
 
-                return `
+                            <td>
+                                ${escapeHTML(entry[0])}
+                            </td>
 
-                    <tr>
+                            <td>
+                                ${money(entry[1])}
+                            </td>
 
-                        <td>
-                            ${escapeHTML(
-                                entry[0]
-                            )}
-                        </td>
+                        </tr>
 
-                        <td>
-                            ${money(
-                                entry[1]
-                            )}
-                        </td>
+                    `;
 
-                    </tr>
-
-                `;
-
-            }
-        )
-        .join("");
+                }
+            )
+            .join("");
 
 
     const metricsRows =
         metrics
             .map(
                 function(item) {
-
-                    const distance =
-                        item.distance > 0
-                            ? number(
-                                item.distance
-                            ) +
-                            " km"
-                            : "—";
-
-
-                    const cost =
-                        item.costPerKm !==
-                        null
-                            ? money(
-                                item.costPerKm
-                            ) +
-                            " / km"
-                            : "—";
-
-
-                    const fuelCost =
-                        item.fuelCostPerKm !==
-                        null
-                            ? money(
-                                item.fuelCostPerKm
-                            ) +
-                            " / km"
-                            : "—";
-
 
                     return `
 
@@ -3166,21 +2785,34 @@ function generateReport() {
                             </td>
 
                             <td>
-                                ${distance}
+                                ${
+                                    item.distance > 0
+                                        ? number(item.distance) +
+                                          " km"
+                                        : "—"
+                                }
                             </td>
 
                             <td>
-                                ${money(
-                                    item.totalCost
-                                )}
+                                ${money(item.totalCost)}
                             </td>
 
                             <td>
-                                ${cost}
+                                ${
+                                    item.costPerKm !== null
+                                        ? money(item.costPerKm) +
+                                          " / km"
+                                        : "—"
+                                }
                             </td>
 
                             <td>
-                                ${fuelCost}
+                                ${
+                                    item.fuelCostPerKm !== null
+                                        ? money(item.fuelCostPerKm) +
+                                          " / km"
+                                        : "—"
+                                }
                             </td>
 
                         </tr>
@@ -3205,9 +2837,7 @@ function generateReport() {
                             ) ||
                         String(a.time || "")
                             .localeCompare(
-                                String(
-                                    b.time || ""
-                                )
+                                String(b.time || "")
                             )
                     );
 
@@ -3216,19 +2846,13 @@ function generateReport() {
             .map(
                 function(item) {
 
-                    const vehicleText =
-                        item.vehicleName
-                            ? item.vehicleName
-                            : "";
-
-
                     const details = [
 
                         item.category,
 
                         item.shoppingSubcategory,
 
-                        vehicleText,
+                        item.vehicleName,
 
                         item.vehicleExpenseType,
 
@@ -3247,43 +2871,32 @@ function generateReport() {
 
                             <td>
                                 ${escapeHTML(
-                                    formatDate(
-                                        item.date
-                                    )
+                                    formatDate(item.date)
                                 )}
                             </td>
 
                             <td>
                                 ${escapeHTML(
-                                    item.time ||
-                                    ""
+                                    item.time || ""
                                 )}
                             </td>
 
                             <td>
-                                ${escapeHTML(
-                                    details
-                                )}
+                                ${escapeHTML(details)}
                             </td>
 
                             <td>
                                 ${
-                                    item.odometer !==
-                                    null &&
-                                    item.odometer !==
-                                    undefined
-                                        ? number(
-                                            item.odometer
-                                        ) +
-                                        " km"
+                                    item.odometer !== null &&
+                                    item.odometer !== undefined
+                                        ? number(item.odometer) +
+                                          " km"
                                         : "—"
                                 }
                             </td>
 
                             <td>
-                                ${money(
-                                    item.amount
-                                )}
+                                ${money(item.amount)}
                             </td>
 
                         </tr>
@@ -3296,10 +2909,7 @@ function generateReport() {
 
 
     const reportWindow =
-        window.open(
-            "",
-            "_blank"
-        );
+        window.open("", "_blank");
 
 
     if (!reportWindow) {
@@ -3329,7 +2939,6 @@ function generateReport() {
 Daily Expenses Report
 </title>
 
-
 <style>
 
 body {
@@ -3347,29 +2956,18 @@ body {
 
 }
 
-
 h1 {
-
     margin-bottom: 5px;
-
 }
-
 
 h2 {
-
     margin-top: 30px;
-
 }
-
 
 .meta {
-
     color: #6b7280;
-
     margin-bottom: 25px;
-
 }
-
 
 .summary {
 
@@ -3383,11 +2981,9 @@ h2 {
 
 }
 
-
 .box {
 
-    border:
-        1px solid #d1d5db;
+    border: 1px solid #d1d5db;
 
     border-radius: 10px;
 
@@ -3396,7 +2992,6 @@ h2 {
     min-width: 150px;
 
 }
-
 
 .box strong {
 
@@ -3408,7 +3003,6 @@ h2 {
 
 }
 
-
 table {
 
     width: 100%;
@@ -3419,12 +3013,10 @@ table {
 
 }
 
-
 th,
 td {
 
-    border:
-        1px solid #d1d5db;
+    border: 1px solid #d1d5db;
 
     padding: 8px;
 
@@ -3432,13 +3024,9 @@ td {
 
 }
 
-
 th {
-
     background: #f3f4f6;
-
 }
-
 
 .total {
 
@@ -3451,7 +3039,6 @@ th {
     margin-top: 20px;
 
 }
-
 
 .print-button {
 
@@ -3467,20 +3054,14 @@ th {
 
 }
 
-
 @media print {
 
     body {
-
         margin: 10mm;
-
     }
 
-
     .print-button {
-
         display: none;
-
     }
 
 }
@@ -3489,25 +3070,18 @@ th {
 
 </head>
 
-
 <body>
-
 
 <h1>
 Daily Expenses
 </h1>
 
-
 <div class="meta">
 
 Περίοδος:
-${escapeHTML(
-    formatDate(start)
-)}
+${escapeHTML(formatDate(start))}
 -
-${escapeHTML(
-    formatDate(end)
-)}
+${escapeHTML(formatDate(end))}
 
 </div>
 
@@ -3541,10 +3115,7 @@ ${escapeHTML(
         Μέση πληρωμή
 
         <strong>
-            ${money(
-                total /
-                list.length
-            )}
+            ${money(total / list.length)}
         </strong>
 
     </div>
@@ -3598,7 +3169,7 @@ ${categoryRows}
         html += `
 
 <h2>
-Σύνολα ανά υποκατηγορία αγοράς
+Σύνολα ανά υποκατηγορία
 </h2>
 
 <table>
@@ -3632,7 +3203,10 @@ ${subcategoryRows}
     }
 
 
-    if (showVehicles) {
+    if (
+        showVehicles &&
+        $("reportCategory")?.value === "Οχήματα"
+    ) {
 
         html += `
 
@@ -3672,9 +3246,12 @@ ${vehicleRows}
 
 
     if (
-        showOdometer ||
-        showCostPerKm ||
-        showTotalVehicleCost
+        (
+            showOdometer ||
+            showCostPerKm ||
+            showTotalVehicleCost
+        ) &&
+        $("reportCategory")?.value === "Οχήματα"
     ) {
 
         html += `
@@ -3723,10 +3300,9 @@ ${metricsRows}
 
 <p>
 
-Το κόστος ανά km υπολογίζεται μόνο όταν
+Το κόστος ανά km υπολογίζεται όταν
 υπάρχουν τουλάχιστον δύο καταχωρήσεις
-με διαφορετικές ενδείξεις κοντέρ για
-το ίδιο όχημα.
+με ένδειξη κοντέρ για το ίδιο όχημα.
 
 </p>
 
@@ -3814,12 +3390,9 @@ ${money(total)}
 
     reportWindow.document.open();
 
-    reportWindow.document.write(
-        html
-    );
+    reportWindow.document.write(html);
 
     reportWindow.document.close();
-
 }
 
 
@@ -3841,9 +3414,7 @@ function openSettings() {
     renderSettings();
 
 
-    modal.classList.remove(
-        "hidden"
-    );
+    modal.classList.remove("hidden");
 
 
     modal.setAttribute(
@@ -3855,7 +3426,6 @@ function openSettings() {
     document.body.classList.add(
         "modal-open"
     );
-
 }
 
 
@@ -3870,9 +3440,7 @@ function closeSettings() {
     }
 
 
-    modal.classList.add(
-        "hidden"
-    );
+    modal.classList.add("hidden");
 
 
     modal.setAttribute(
@@ -3884,12 +3452,11 @@ function closeSettings() {
     document.body.classList.remove(
         "modal-open"
     );
-
 }
 
 
 /* =========================================================
-   SIMPLE SETTINGS LISTS
+   SETTINGS LISTS
    ========================================================= */
 
 function renderSimpleSettings(
@@ -3914,9 +3481,7 @@ function renderSimpleSettings(
             function(value, index) {
 
                 const row =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
 
                 row.className =
@@ -3924,32 +3489,22 @@ function renderSimpleSettings(
 
 
                 const input =
-                    document.createElement(
-                        "input"
-                    );
+                    document.createElement("input");
 
 
-                input.type =
-                    "text";
+                input.type = "text";
 
-
-                input.value =
-                    value;
+                input.value = value;
 
 
                 const save =
-                    document.createElement(
-                        "button"
-                    );
+                    document.createElement("button");
 
 
-                save.type =
-                    "button";
-
+                save.type = "button";
 
                 save.textContent =
                     "Αποθήκευση";
-
 
                 save.className =
                     "secondary";
@@ -3964,15 +3519,11 @@ function renderSimpleSettings(
 
 
                         if (!newValue) {
-
                             return;
-
                         }
 
 
-                        settings[
-                            arrayName
-                        ][index] =
+                        settings[arrayName][index] =
                             newValue;
 
 
@@ -3987,18 +3538,13 @@ function renderSimpleSettings(
 
 
                 const remove =
-                    document.createElement(
-                        "button"
-                    );
+                    document.createElement("button");
 
 
-                remove.type =
-                    "button";
-
+                remove.type = "button";
 
                 remove.textContent =
                     "Διαγραφή";
-
 
                 remove.className =
                     "danger";
@@ -4013,15 +3559,11 @@ function renderSimpleSettings(
                                 "Να διαγραφεί αυτή η επιλογή;"
                             )
                         ) {
-
                             return;
-
                         }
 
 
-                        settings[
-                            arrayName
-                        ].splice(
+                        settings[arrayName].splice(
                             index,
                             1
                         );
@@ -4037,28 +3579,16 @@ function renderSimpleSettings(
                 );
 
 
-                row.appendChild(
-                    input
-                );
+                row.appendChild(input);
 
+                row.appendChild(save);
 
-                row.appendChild(
-                    save
-                );
+                row.appendChild(remove);
 
-
-                row.appendChild(
-                    remove
-                );
-
-
-                container.appendChild(
-                    row
-                );
+                container.appendChild(row);
 
             }
         );
-
 }
 
 
@@ -4080,142 +3610,109 @@ function renderVehicleSettings() {
     container.innerHTML = "";
 
 
-    settings.vehicles
-        .forEach(
-            function(vehicle, index) {
+    settings.vehicles.forEach(
+        function(vehicle, index) {
 
-                const row =
-                    document.createElement(
-                        "div"
-                    );
+            const row =
+                document.createElement("div");
 
 
-                row.className =
-                    "vehicle-setting";
+            row.className =
+                "vehicle-setting";
 
 
-                row.innerHTML = `
+            row.innerHTML = `
 
-                    <div>
+                <div>
 
-                        <strong>
-                            ${escapeHTML(
-                                vehicleDisplayName(
-                                    vehicle
-                                )
-                            )}
-                        </strong>
+                    <strong>
+                        ${escapeHTML(
+                            vehicleDisplayName(vehicle)
+                        )}
+                    </strong>
 
-                        <small>
+                    <small>
+                        ${escapeHTML(vehicle.type)}
+                    </small>
 
-                            ${escapeHTML(
-                                vehicle.type
-                            )}
+                </div>
 
-                        </small>
-
-                    </div>
-
-                `;
+            `;
 
 
-                const edit =
-                    document.createElement(
-                        "button"
-                    );
+            const edit =
+                document.createElement("button");
 
 
-                edit.type =
-                    "button";
+            edit.type = "button";
+
+            edit.textContent =
+                "Επεξεργασία";
+
+            edit.className =
+                "secondary";
 
 
-                edit.textContent =
-                    "Επεξεργασία";
+            edit.addEventListener(
+                "click",
+                function() {
+
+                    editVehicle(index);
+
+                }
+            );
 
 
-                edit.className =
-                    "secondary";
+            const remove =
+                document.createElement("button");
 
 
-                edit.addEventListener(
-                    "click",
-                    function() {
+            remove.type = "button";
 
-                        editVehicle(
-                            index
-                        );
+            remove.textContent =
+                "Διαγραφή";
 
+            remove.className =
+                "danger";
+
+
+            remove.addEventListener(
+                "click",
+                function() {
+
+                    if (
+                        !confirm(
+                            "Να διαγραφεί αυτό το όχημα;"
+                        )
+                    ) {
+                        return;
                     }
-                );
 
 
-                const remove =
-                    document.createElement(
-                        "button"
+                    settings.vehicles.splice(
+                        index,
+                        1
                     );
 
 
-                remove.type =
-                    "button";
+                    saveSettings();
+
+                    populateMainSelects();
+
+                    renderSettings();
+
+                }
+            );
 
 
-                remove.textContent =
-                    "Διαγραφή";
+            row.appendChild(edit);
 
+            row.appendChild(remove);
 
-                remove.className =
-                    "danger";
+            container.appendChild(row);
 
-
-                remove.addEventListener(
-                    "click",
-                    function() {
-
-                        if (
-                            !confirm(
-                                "Να διαγραφεί αυτό το όχημα;"
-                            )
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        settings.vehicles
-                            .splice(
-                                index,
-                                1
-                            );
-
-
-                        saveSettings();
-
-                        populateMainSelects();
-
-                        renderSettings();
-
-                    }
-                );
-
-
-                row.appendChild(
-                    edit
-                );
-
-
-                row.appendChild(
-                    remove
-                );
-
-
-                container.appendChild(
-                    row
-                );
-
-            }
-        );
-
+        }
+    );
 }
 
 
@@ -4226,29 +3723,22 @@ function renderVehicleSettings() {
 function addVehicle() {
 
     const type =
-        $("newVehicleType")
-            ?.value ||
+        $("newVehicleType")?.value ||
         "Αυτοκίνητο";
 
 
     const make =
-        $("newVehicleMake")
-            ?.value
-            .trim() ||
+        $("newVehicleMake")?.value.trim() ||
         "";
 
 
     const model =
-        $("newVehicleModel")
-            ?.value
-            .trim() ||
+        $("newVehicleModel")?.value.trim() ||
         "";
 
 
     const plate =
-        $("newVehiclePlate")
-            ?.value
-            .trim() ||
+        $("newVehiclePlate")?.value.trim() ||
         "";
 
 
@@ -4259,7 +3749,7 @@ function addVehicle() {
     ) {
 
         alert(
-            "Συμπλήρωσε τουλάχιστον το όχημα."
+            "Συμπλήρωσε τουλάχιστον τα στοιχεία του οχήματος."
         );
 
         return;
@@ -4271,17 +3761,13 @@ function addVehicle() {
         id:
             createId("vehicle"),
 
-        type:
-            type,
+        type,
 
-        make:
-            make,
+        make,
 
-        model:
-            model,
+        model,
 
-        plate:
-            plate
+        plate
 
     });
 
@@ -4293,29 +3779,20 @@ function addVehicle() {
     renderSettings();
 
 
-    if ($("newVehicleMake")) {
+    [
+        "newVehicleMake",
+        "newVehicleModel",
+        "newVehiclePlate"
+    ]
+    .forEach(
+        function(id) {
 
-        $("newVehicleMake").value =
-            "";
+            if ($(id)) {
+                $(id).value = "";
+            }
 
-    }
-
-
-    if ($("newVehicleModel")) {
-
-        $("newVehicleModel").value =
-            "";
-
-    }
-
-
-    if ($("newVehiclePlate")) {
-
-        $("newVehiclePlate").value =
-            "";
-
-    }
-
+        }
+    );
 }
 
 
@@ -4345,9 +3822,7 @@ function editVehicle(index) {
         type !== "Αυτοκίνητο" &&
         type !== "Μηχανή"
     ) {
-
         return;
-
     }
 
 
@@ -4387,20 +3862,13 @@ function editVehicle(index) {
     }
 
 
-    vehicle.type =
-        type;
+    vehicle.type = type;
 
+    vehicle.make = make.trim();
 
-    vehicle.make =
-        make.trim();
+    vehicle.model = model.trim();
 
-
-    vehicle.model =
-        model.trim();
-
-
-    vehicle.plate =
-        plate.trim();
+    vehicle.plate = plate.trim();
 
 
     saveSettings();
@@ -4408,7 +3876,6 @@ function editVehicle(index) {
     populateMainSelects();
 
     renderSettings();
-
 }
 
 
@@ -4440,17 +3907,16 @@ function addSimpleSetting(
 
 
     if (
-        settings[arrayName]
-            .some(
-                function(item) {
+        settings[arrayName].some(
+            function(item) {
 
-                    return (
-                        item.toLowerCase() ===
-                        value.toLowerCase()
-                    );
+                return (
+                    item.toLowerCase() ===
+                    value.toLowerCase()
+                );
 
-                }
-            )
+            }
+        )
     ) {
 
         alert(
@@ -4461,20 +3927,15 @@ function addSimpleSetting(
     }
 
 
-    settings[arrayName]
-        .push(value);
+    settings[arrayName].push(value);
 
-
-    input.value =
-        "";
-
+    input.value = "";
 
     saveSettings();
 
     populateMainSelects();
 
     renderSettings();
-
 }
 
 
@@ -4509,7 +3970,6 @@ function renderSettings() {
 
 
     renderVehicleSettings();
-
 }
 
 
@@ -4521,17 +3981,14 @@ function exportData() {
 
     const backup = {
 
-        version:
-            3,
+        version: 3,
 
         exportedAt:
             new Date().toISOString(),
 
-        settings:
-            settings,
+        settings,
 
-        expenses:
-            expenses
+        expenses
 
     };
 
@@ -4553,19 +4010,14 @@ function exportData() {
 
 
     const url =
-        URL.createObjectURL(
-            blob
-        );
+        URL.createObjectURL(blob);
 
 
     const link =
-        document.createElement(
-            "a"
-        );
+        document.createElement("a");
 
 
-    link.href =
-        url;
+    link.href = url;
 
 
     link.download =
@@ -4574,21 +4026,13 @@ function exportData() {
         ".json";
 
 
-    document.body.appendChild(
-        link
-    );
-
+    document.body.appendChild(link);
 
     link.click();
 
-
     link.remove();
 
-
-    URL.revokeObjectURL(
-        url
-    );
-
+    URL.revokeObjectURL(url);
 }
 
 
@@ -4662,10 +4106,7 @@ function importData(file) {
 
             } catch (error) {
 
-                console.error(
-                    error
-                );
-
+                console.error(error);
 
                 alert(
                     "Το αρχείο δεν είναι έγκυρο."
@@ -4676,10 +4117,7 @@ function importData(file) {
         };
 
 
-    reader.readAsText(
-        file
-    );
-
+    reader.readAsText(file);
 }
 
 
@@ -4694,16 +4132,12 @@ function resetSettings() {
             "Να επαναφερθούν οι αρχικές ρυθμίσεις;"
         )
     ) {
-
         return;
-
     }
 
 
     settings =
-        clone(
-            DEFAULT_SETTINGS
-        );
+        clone(DEFAULT_SETTINGS);
 
 
     saveSettings();
@@ -4711,12 +4145,11 @@ function resetSettings() {
     populateMainSelects();
 
     renderSettings();
-
 }
 
 
 /* =========================================================
-   CURRENT DATE / TIME
+   DATE / TIME
    ========================================================= */
 
 function updateDateTime() {
@@ -4730,31 +4163,37 @@ function updateDateTime() {
     }
 
 
+    const now =
+        new Date();
+
+
+    const datePart =
+        now.toLocaleDateString(
+            "el-GR",
+            {
+                weekday: "long",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            }
+        );
+
+
+    const timePart =
+        now.toLocaleTimeString(
+            "el-GR",
+            {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            }
+        );
+
+
     element.textContent =
-        new Date()
-            .toLocaleString(
-                "el-GR",
-                {
-                    weekday:
-                        "long",
-
-                    day:
-                        "2-digit",
-
-                    month:
-                        "2-digit",
-
-                    year:
-                        "numeric",
-
-                    hour:
-                        "2-digit",
-
-                    minute:
-                        "2-digit"
-                }
-            );
-
+        datePart +
+        " • " +
+        timePart;
 }
 
 
@@ -4765,26 +4204,20 @@ function updateDateTime() {
 function initialize() {
 
     if ($("selectedDate")) {
-
         $("selectedDate").value =
             today();
-
     }
 
 
     if ($("reportStartDate")) {
-
         $("reportStartDate").value =
             today();
-
     }
 
 
     if ($("reportEndDate")) {
-
         $("reportEndDate").value =
             today();
-
     }
 
 
@@ -4795,6 +4228,8 @@ function initialize() {
     renderDay();
 
     updateReportDates();
+
+    updateReportInterface();
 
 
     /* =====================================================
@@ -4850,8 +4285,7 @@ function initialize() {
         function(event) {
 
             if (
-                event.key ===
-                "Escape"
+                event.key === "Escape"
             ) {
 
                 closeSettings();
@@ -4886,7 +4320,11 @@ function initialize() {
         $("category")
             .addEventListener(
                 "change",
-                updateCategoryInterface
+                function() {
+
+                    updateCategoryInterface();
+
+                }
             );
 
     }
@@ -4902,8 +4340,6 @@ function initialize() {
             .addEventListener(
                 "change",
                 function() {
-
-                    populateVehicles();
 
                     updateVehicleInterface();
 
@@ -4922,14 +4358,18 @@ function initialize() {
         $("vehicle")
             .addEventListener(
                 "change",
-                updateVehicleInterface
+                function() {
+
+                    updateVehicleInterface();
+
+                }
             );
 
     }
 
 
     /* =====================================================
-       VEHICLE EXPENSE
+       VEHICLE EXPENSE TYPE
        ===================================================== */
 
     if ($("vehicleExpenseType")) {
@@ -4937,14 +4377,18 @@ function initialize() {
         $("vehicleExpenseType")
             .addEventListener(
                 "change",
-                updateVehicleInterface
+                function() {
+
+                    updateVehicleInterface();
+
+                }
             );
 
     }
 
 
     /* =====================================================
-       PURCHASE METHOD
+       PURCHASE
        ===================================================== */
 
     if ($("purchaseMethod")) {
@@ -4980,7 +4424,70 @@ function initialize() {
 
 
     /* =====================================================
-       REPORT
+       REPORT CATEGORY
+       ===================================================== */
+
+    if ($("reportCategory")) {
+
+        $("reportCategory")
+            .addEventListener(
+                "change",
+                function() {
+
+                    /*
+                     * Αν αλλάξει κατηγορία,
+                     * επαναφέρουμε το φίλτρο οχήματος.
+                     */
+
+                    if (
+                        $("reportVehicle")
+                    ) {
+
+                        $("reportVehicle").value =
+                            "all";
+
+                    }
+
+
+                    if (
+                        $("reportVehicleExpense")
+                    ) {
+
+                        $("reportVehicleExpense").value =
+                            "all";
+
+                    }
+
+
+                    updateReportInterface();
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       REPORT VEHICLE
+       ===================================================== */
+
+    if ($("reportVehicle")) {
+
+        $("reportVehicle")
+            .addEventListener(
+                "change",
+                function() {
+
+                    updateReportInterface();
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       REPORT TYPE
        ===================================================== */
 
     if ($("reportType")) {
@@ -4994,6 +4501,10 @@ function initialize() {
     }
 
 
+    /* =====================================================
+       GENERATE REPORT
+       ===================================================== */
+
     if ($("generateReportButton")) {
 
         $("generateReportButton")
@@ -5005,31 +4516,8 @@ function initialize() {
     }
 
 
-    if ($("reportVehicle")) {
-
-        $("reportVehicle")
-            .addEventListener(
-                "change",
-                function() {
-
-                    const selected =
-                        $("reportVehicle")
-                            .value;
-
-
-                    toggle(
-                        "reportVehicleExpenseWrap",
-                        selected !== "all"
-                    );
-
-                }
-            );
-
-    }
-
-
     /* =====================================================
-       SETTINGS - CATEGORIES
+       SETTINGS
        ===================================================== */
 
     if ($("addCategory")) {
@@ -5050,10 +4538,6 @@ function initialize() {
     }
 
 
-    /* =====================================================
-       SETTINGS - SHOPPING
-       ===================================================== */
-
     if ($("addSubcategory")) {
 
         $("addSubcategory")
@@ -5071,10 +4555,6 @@ function initialize() {
 
     }
 
-
-    /* =====================================================
-       SETTINGS - PAYMENT
-       ===================================================== */
 
     if ($("addPayment")) {
 
@@ -5094,10 +4574,6 @@ function initialize() {
     }
 
 
-    /* =====================================================
-       SETTINGS - PERSON
-       ===================================================== */
-
     if ($("addPerson")) {
 
         $("addPerson")
@@ -5116,10 +4592,6 @@ function initialize() {
     }
 
 
-    /* =====================================================
-       SETTINGS - VEHICLE
-       ===================================================== */
-
     if ($("addVehicle")) {
 
         $("addVehicle")
@@ -5130,10 +4602,6 @@ function initialize() {
 
     }
 
-
-    /* =====================================================
-       EXPORT
-       ===================================================== */
 
     if ($("exportData")) {
 
@@ -5146,10 +4614,6 @@ function initialize() {
     }
 
 
-    /* =====================================================
-       IMPORT
-       ===================================================== */
-
     if ($("importDataButton")) {
 
         $("importDataButton")
@@ -5158,9 +4622,7 @@ function initialize() {
                 function() {
 
                     if ($("importData")) {
-
                         $("importData").click();
-
                     }
 
                 }
@@ -5177,31 +4639,21 @@ function initialize() {
                 function(event) {
 
                     const file =
-                        event.target
-                            .files?.[0];
+                        event.target.files?.[0];
 
 
                     if (file) {
-
-                        importData(
-                            file
-                        );
-
+                        importData(file);
                     }
 
 
-                    event.target.value =
-                        "";
+                    event.target.value = "";
 
                 }
             );
 
     }
 
-
-    /* =====================================================
-       RESET
-       ===================================================== */
 
     if ($("resetSettings")) {
 
@@ -5215,7 +4667,7 @@ function initialize() {
 
 
     /* =====================================================
-       ENTER KEY IN SETTINGS
+       ENTER IN SETTINGS
        ===================================================== */
 
     const enterPairs = [
@@ -5251,12 +4703,9 @@ function initialize() {
     enterPairs.forEach(
         function(pair) {
 
-            const input =
-                $(pair[0]);
+            const input = $(pair[0]);
 
-
-            const button =
-                $(pair[1]);
+            const button = $(pair[1]);
 
 
             if (
@@ -5292,12 +4741,11 @@ function initialize() {
         updateDateTime,
         30000
     );
-
 }
 
 
 /* =========================================================
-   START APPLICATION
+   START
    ========================================================= */
 
 if (
