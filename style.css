@@ -4,7 +4,6 @@
    ========================================================= */
 
 :root {
-
     --bg: #f3f4f6;
     --surface: #ffffff;
     --surface-soft: #f9fafb;
@@ -19,16 +18,11 @@
     --primary-hover: #111827;
 
     --danger: #b91c1c;
-    --danger-hover: #991b1b;
-
-    --success: #166534;
 
     --radius: 12px;
     --radius-small: 8px;
 
-    --shadow:
-        0 4px 16px rgba(15, 23, 42, 0.07);
-
+    --shadow: 0 4px 16px rgba(15, 23, 42, 0.07);
 }
 
 
@@ -37,30 +31,19 @@
    ========================================================= */
 
 * {
-
     box-sizing: border-box;
-
 }
-
 
 html {
-
     font-size: 16px;
-
 }
 
-
 body {
-
     margin: 0;
-
     padding: 0;
 
-    background:
-        var(--bg);
-
-    color:
-        var(--text);
+    background: var(--bg);
+    color: var(--text);
 
     font-family:
         -apple-system,
@@ -73,9 +56,7 @@ body {
 
     line-height: 1.45;
 
-    -webkit-font-smoothing:
-        antialiased;
-
+    -webkit-font-smoothing: antialiased;
 }
 
 
@@ -84,16 +65,12 @@ body {
    ========================================================= */
 
 .app {
-
     width: 100%;
-
     max-width: 1050px;
 
     margin: 0 auto;
 
-    padding:
-        0 18px 40px;
-
+    padding: 0 18px 40px;
 }
 
 
@@ -102,51 +79,49 @@ body {
    ========================================================= */
 
 .app-header {
+    position: relative;
 
     display: flex;
-
     align-items: center;
+    justify-content: center;
 
-    justify-content: space-between;
+    min-height: 120px;
 
-    gap: 20px;
-
-    padding:
-        24px 0 20px;
-
+    padding: 22px 0 20px;
 }
-
 
 .header-title {
-
-    min-width: 0;
-
+    width: 100%;
+    text-align: center;
 }
-
 
 .app-header h1 {
-
     margin: 0;
 
-    font-size: 1.75rem;
+    font-size: 2rem;
+    line-height: 1.15;
 
-    font-weight: 700;
+    font-weight: 750;
 
-    letter-spacing:
-        -0.02em;
-
+    letter-spacing: -0.025em;
 }
 
-
 #currentDateTime {
+    margin-top: 7px;
 
-    margin-top: 4px;
+    color: var(--text-soft);
 
-    color:
-        var(--text-soft);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
 
-    font-size: 0.9rem;
+.app-header > .secondary {
+    position: absolute;
 
+    right: 0;
+    top: 50%;
+
+    transform: translateY(-50%);
 }
 
 
@@ -155,13 +130,10 @@ body {
    ========================================================= */
 
 main {
-
     display: flex;
-
     flex-direction: column;
 
     gap: 18px;
-
 }
 
 
@@ -170,48 +142,22 @@ main {
    ========================================================= */
 
 .card {
+    background: var(--surface);
 
-    background:
-        var(--surface);
+    border: 1px solid var(--border-light);
 
-    border:
-        1px solid var(--border-light);
+    border-radius: var(--radius);
 
-    border-radius:
-        var(--radius);
-
-    box-shadow:
-        var(--shadow);
+    box-shadow: var(--shadow);
 
     padding: 22px;
-
 }
-
 
 .card h2 {
-
-    margin:
-        0 0 20px;
+    margin: 0 0 20px;
 
     font-size: 1.2rem;
-
     font-weight: 700;
-
-    letter-spacing:
-        -0.01em;
-
-}
-
-
-.card h3 {
-
-    margin:
-        0 0 12px;
-
-    font-size: 1rem;
-
-    font-weight: 700;
-
 }
 
 
@@ -220,23 +166,16 @@ main {
    ========================================================= */
 
 .grid {
-
     display: grid;
 
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
-    gap:
-        16px;
-
+    gap: 16px;
 }
 
-
 .wide {
-
-    grid-column:
-        1 / -1;
-
+    grid-column: 1 / -1;
 }
 
 
@@ -245,18 +184,14 @@ main {
    ========================================================= */
 
 label {
-
     display: block;
 
     margin-bottom: 6px;
 
     font-size: 0.88rem;
-
     font-weight: 600;
 
-    color:
-        #374151;
-
+    color: #374151;
 }
 
 
@@ -267,60 +202,34 @@ label {
 input,
 select,
 textarea {
-
     width: 100%;
 
     min-height: 46px;
 
-    padding:
-        10px 12px;
+    padding: 10px 12px;
 
-    border:
-        1px solid var(--border);
+    border: 1px solid var(--border);
 
-    border-radius:
-        var(--radius-small);
+    border-radius: var(--radius-small);
 
-    background:
-        var(--surface);
+    background: var(--surface);
 
-    color:
-        var(--text);
+    color: var(--text);
 
-    font-family:
-        inherit;
-
-    font-size:
-        16px;
+    font-family: inherit;
+    font-size: 16px;
 
     outline: none;
-
-    transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
-
 }
-
-
-input::placeholder {
-
-    color:
-        #9ca3af;
-
-}
-
 
 input:focus,
 select:focus,
 textarea:focus {
-
-    border-color:
-        #6b7280;
+    border-color: #6b7280;
 
     box-shadow:
         0 0 0 3px
         rgba(107, 114, 128, 0.14);
-
 }
 
 
@@ -329,185 +238,80 @@ textarea:focus {
    ========================================================= */
 
 button {
-
     min-height: 44px;
 
-    padding:
-        9px 15px;
+    padding: 9px 15px;
 
-    border:
-        1px solid transparent;
+    border: 1px solid transparent;
 
-    border-radius:
-        var(--radius-small);
+    border-radius: var(--radius-small);
 
-    font-family:
-        inherit;
+    font-family: inherit;
 
-    font-size:
-        0.95rem;
+    font-size: 0.95rem;
+    font-weight: 600;
 
-    font-weight:
-        600;
-
-    cursor:
-        pointer;
-
-    transition:
-        background 0.15s ease,
-        border-color 0.15s ease,
-        transform 0.05s ease;
-
+    cursor: pointer;
 }
-
-
-button:active {
-
-    transform:
-        translateY(1px);
-
-}
-
 
 .primary {
-
     width: 100%;
 
     margin-top: 22px;
 
-    background:
-        var(--primary);
+    background: var(--primary);
 
-    color:
-        #ffffff;
+    color: #ffffff;
 
-    border-color:
-        var(--primary);
-
+    border-color: var(--primary);
 }
-
 
 .primary:hover {
-
-    background:
-        var(--primary-hover);
-
-    border-color:
-        var(--primary-hover);
-
+    background: var(--primary-hover);
 }
-
 
 .secondary {
+    background: var(--surface);
 
-    background:
-        var(--surface);
+    color: var(--text);
 
-    color:
-        var(--text);
-
-    border-color:
-        var(--border);
-
+    border-color: var(--border);
 }
-
 
 .secondary:hover {
-
-    background:
-        var(--surface-soft);
-
+    background: var(--surface-soft);
 }
-
 
 .danger {
+    background: #ffffff;
 
-    background:
-        #ffffff;
+    color: var(--danger);
 
-    color:
-        var(--danger);
-
-    border-color:
-        #fecaca;
-
-}
-
-
-.danger:hover {
-
-    background:
-        #fef2f2;
-
-}
-
-
-.settings-add {
-
-    min-width: 46px;
-
-    width: 46px;
-
-    padding:
-        0;
-
-    background:
-        var(--primary);
-
-    color:
-        #ffffff;
-
-    border-color:
-        var(--primary);
-
-    font-size:
-        1.35rem;
-
-    font-weight:
-        500;
-
+    border-color: #fecaca;
 }
 
 
 /* =========================================================
-   PLUS BUTTON
+   PLUS
    ========================================================= */
 
 .button-plus {
+    display: inline-flex;
 
-    display:
-        inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    align-items:
-        center;
+    width: 24px;
+    height: 24px;
 
-    justify-content:
-        center;
+    margin-right: 6px;
 
-    width:
-        24px;
+    color: #ffffff;
 
-    height:
-        24px;
+    font-size: 1.45rem;
+    font-weight: 300;
 
-    margin-right:
-        6px;
-
-    color:
-        #ffffff;
-
-    font-size:
-        1.45rem;
-
-    font-weight:
-        300;
-
-    line-height:
-        1;
-
-    vertical-align:
-        -2px;
-
+    line-height: 1;
 }
 
 
@@ -516,62 +320,40 @@ button:active {
    ========================================================= */
 
 .summary {
-
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap:
-        12px;
+    gap: 12px;
 
-    margin:
-        18px 0;
-
+    margin: 18px 0;
 }
-
 
 .summary-box {
+    padding: 14px;
 
-    padding:
-        14px;
+    border: 1px solid var(--border-light);
 
-    border:
-        1px solid var(--border-light);
+    border-radius: var(--radius-small);
 
-    border-radius:
-        var(--radius-small);
-
-    background:
-        var(--surface-soft);
-
+    background: var(--surface-soft);
 }
-
 
 .summary-box span {
-
     display: block;
 
-    color:
-        var(--text-soft);
+    color: var(--text-soft);
 
-    font-size:
-        0.82rem;
-
+    font-size: 0.82rem;
 }
 
-
 .summary-box strong {
-
     display: block;
 
-    margin-top:
-        3px;
+    margin-top: 3px;
 
-    font-size:
-        1.15rem;
-
+    font-size: 1.15rem;
 }
 
 
@@ -580,138 +362,81 @@ button:active {
    ========================================================= */
 
 #expenseList {
+    display: flex;
+    flex-direction: column;
 
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    gap:
-        10px;
-
+    gap: 10px;
 }
-
 
 .expense-item {
+    padding: 15px;
 
-    padding:
-        15px;
+    border: 1px solid var(--border-light);
 
-    border:
-        1px solid var(--border-light);
+    border-radius: var(--radius-small);
 
-    border-radius:
-        var(--radius-small);
-
-    background:
-        var(--surface-soft);
-
+    background: var(--surface-soft);
 }
-
 
 .expense-main {
+    display: flex;
 
-    display:
-        flex;
+    align-items: flex-start;
+    justify-content: space-between;
 
-    align-items:
-        flex-start;
-
-    justify-content:
-        space-between;
-
-    gap:
-        15px;
-
+    gap: 15px;
 }
-
 
 .expense-main strong {
-
-    font-size:
-        0.96rem;
-
+    font-size: 0.96rem;
 }
-
 
 .expense-details {
+    margin-top: 6px;
 
-    margin-top:
-        6px;
+    color: var(--text-soft);
 
-    color:
-        var(--text-soft);
-
-    font-size:
-        0.83rem;
-
+    font-size: 0.83rem;
 }
-
 
 .expense-details div {
-
-    margin-top:
-        2px;
-
+    margin-top: 2px;
 }
-
 
 .expense-amount {
+    flex: 0 0 auto;
 
-    flex:
-        0 0 auto;
+    font-size: 1.05rem;
+    font-weight: 700;
 
-    font-size:
-        1.05rem;
-
-    font-weight:
-        700;
-
-    white-space:
-        nowrap;
-
+    white-space: nowrap;
 }
 
-
 .expense-actions {
+    display: flex;
 
-    display:
-        flex;
+    justify-content: flex-end;
 
-    justify-content:
-        flex-end;
+    gap: 8px;
 
-    gap:
-        8px;
-
-    margin-top:
-        12px;
-
+    margin-top: 12px;
 }
 
 
 /* =========================================================
-   EMPTY STATE
+   EMPTY
    ========================================================= */
 
 .empty-state {
+    padding: 24px;
 
-    padding:
-        24px;
+    text-align: center;
 
-    text-align:
-        center;
+    color: var(--text-soft);
 
-    color:
-        var(--text-soft);
+    border: 1px dashed var(--border);
 
-    border:
-        1px dashed var(--border);
-
-    border-radius:
-        var(--radius-small);
-
+    border-radius: var(--radius-small);
 }
 
 
@@ -720,62 +445,88 @@ button:active {
    ========================================================= */
 
 .report-options {
+    margin-top: 22px;
 
-    margin-top:
-        22px;
+    padding: 17px;
 
-    padding:
-        17px;
+    border: 1px solid var(--border-light);
 
-    border:
-        1px solid var(--border-light);
+    border-radius: var(--radius-small);
 
-    border-radius:
-        var(--radius-small);
-
-    background:
-        var(--surface-soft);
-
+    background: var(--surface-soft);
 }
 
+.report-options h3 {
+    margin: 0 0 14px;
+
+    font-size: 1rem;
+}
+
+
+/* =========================================================
+   CHECKBOXES
+   ========================================================= */
 
 .check-option {
+    display: flex;
 
-    display:
-        flex;
+    align-items: center;
 
-    align-items:
-        center;
+    gap: 10px;
 
-    gap:
-        9px;
+    min-height: 36px;
 
-    margin:
-        10px 0;
+    margin: 6px 0;
 
-    font-weight:
-        500;
+    font-weight: 500;
 
-    cursor:
-        pointer;
-
+    cursor: pointer;
 }
 
 
-.check-option input {
+/*
+   Native checkbox ώστε το Safari/iPhone
+   να δείχνει καθαρά το τικ.
+*/
 
-    width:
-        18px;
+.check-option input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    appearance: checkbox;
 
-    min-height:
-        18px;
+    width: 20px;
+    height: 20px;
 
-    margin:
-        0;
+    min-height: 20px;
 
-    accent-color:
-        var(--primary);
+    margin: 0;
+    padding: 0;
 
+    flex: 0 0 20px;
+
+    accent-color: #1f2937;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   DYNAMIC VEHICLE MESSAGE
+   ========================================================= */
+
+.vehicle-empty-message {
+    margin-top: 6px;
+
+    padding: 9px 11px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    background: #f9fafb;
+
+    color: #6b7280;
+
+    font-size: 0.82rem;
 }
 
 
@@ -784,131 +535,78 @@ button:active {
    ========================================================= */
 
 .modal {
+    position: fixed;
 
-    position:
-        fixed;
+    inset: 0;
 
-    inset:
-        0;
+    z-index: 1000;
 
-    z-index:
-        1000;
+    display: flex;
 
-    display:
-        flex;
+    align-items: flex-start;
+    justify-content: center;
 
-    align-items:
-        flex-start;
+    padding: 20px;
 
-    justify-content:
-        center;
+    background: rgba(17, 24, 39, 0.52);
 
-    padding:
-        20px;
-
-    background:
-        rgba(17, 24, 39, 0.52);
-
-    overflow-y:
-        auto;
-
+    overflow-y: auto;
 }
-
 
 .modal.hidden {
-
-    display:
-        none;
-
+    display: none;
 }
 
-
 .modal-content {
+    width: 100%;
+    max-width: 760px;
 
-    width:
-        100%;
+    margin: 20px auto;
 
-    max-width:
-        760px;
+    background: var(--surface);
 
-    margin:
-        20px auto;
-
-    background:
-        var(--surface);
-
-    border-radius:
-        var(--radius);
+    border-radius: var(--radius);
 
     box-shadow:
         0 20px 50px
         rgba(0, 0, 0, 0.2);
 
-    padding:
-        22px;
-
+    padding: 22px;
 }
 
-
 .modal-header {
+    display: flex;
 
-    display:
-        flex;
+    align-items: flex-start;
+    justify-content: space-between;
 
-    align-items:
-        flex-start;
+    gap: 15px;
 
-    justify-content:
-        space-between;
-
-    gap:
-        15px;
-
-    padding-bottom:
-        18px;
+    padding-bottom: 18px;
 
     border-bottom:
         1px solid var(--border-light);
-
 }
-
 
 .modal-header h2 {
-
-    margin:
-        0;
-
+    margin: 0;
 }
-
 
 .muted {
+    margin: 3px 0 0;
 
-    margin:
-        3px 0 0;
+    color: var(--text-soft);
 
-    color:
-        var(--text-soft);
-
-    font-size:
-        0.85rem;
-
+    font-size: 0.85rem;
 }
 
-
 #closeSettings {
+    width: 44px;
+    min-width: 44px;
 
-    width:
-        44px;
+    padding: 0;
 
-    min-width:
-        44px;
-
-    padding:
-        0;
-
-    font-size:
-        1.35rem;
-
+    font-size: 1.35rem;
 }
 
 
@@ -917,180 +615,123 @@ button:active {
    ========================================================= */
 
 .settings-section {
-
-    padding:
-        20px 0;
+    padding: 20px 0;
 
     border-bottom:
         1px solid var(--border-light);
-
 }
-
 
 .settings-section:last-of-type {
-
-    border-bottom:
-        0;
-
+    border-bottom: 0;
 }
-
 
 .add-row {
+    display: flex;
 
-    display:
-        flex;
+    gap: 8px;
 
-    align-items:
-        stretch;
-
-    gap:
-        8px;
-
-    margin-top:
-        12px;
-
+    margin-top: 12px;
 }
-
 
 .add-row input {
-
-    flex:
-        1;
-
+    flex: 1;
 }
-
 
 #categorySettings,
 #subcategorySettings,
 #paymentSettings,
 #personSettings,
 #vehicleSettings {
+    display: flex;
 
-    display:
-        flex;
+    flex-direction: column;
 
-    flex-direction:
-        column;
-
-    gap:
-        8px;
-
+    gap: 8px;
 }
-
 
 .setting-item {
-
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
         minmax(0, 1fr)
         auto
         auto;
 
-    align-items:
-        center;
+    align-items: center;
 
-    gap:
-        8px;
-
+    gap: 8px;
 }
-
 
 .setting-item input {
-
-    min-width:
-        0;
-
+    min-width: 0;
 }
-
 
 .setting-item button {
-
-    white-space:
-        nowrap;
-
+    white-space: nowrap;
 }
 
-
 .vehicle-setting {
-
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
         minmax(0, 1fr)
         auto
         auto;
 
-    align-items:
-        center;
+    align-items: center;
 
-    gap:
-        8px;
+    gap: 8px;
 
-    padding:
-        12px;
+    padding: 12px;
 
-    border:
-        1px solid var(--border-light);
+    border: 1px solid var(--border-light);
 
-    border-radius:
-        var(--radius-small);
+    border-radius: var(--radius-small);
 
-    background:
-        var(--surface-soft);
-
+    background: var(--surface-soft);
 }
-
 
 .vehicle-setting strong {
-
-    display:
-        block;
-
+    display: block;
 }
-
 
 .vehicle-setting small {
+    display: block;
 
-    display:
-        block;
+    margin-top: 2px;
 
-    margin-top:
-        2px;
-
-    color:
-        var(--text-soft);
-
+    color: var(--text-soft);
 }
 
-
 .vehicle-add-form {
-
-    display:
-        grid;
+    display: grid;
 
     grid-template-columns:
         1fr 1fr;
 
-    gap:
-        8px;
+    gap: 8px;
 
-    margin-top:
-        12px;
-
+    margin-top: 12px;
 }
 
-
 .vehicle-add-form .settings-add {
+    grid-column: 1 / -1;
 
-    grid-column:
-        1 / -1;
+    width: 100%;
+}
 
-    width:
-        100%;
+.settings-add {
+    min-width: 46px;
 
+    width: 46px;
+
+    padding: 0;
+
+    background: var(--primary);
+
+    color: #ffffff;
+
+    font-size: 1.35rem;
 }
 
 
@@ -1099,27 +740,17 @@ button:active {
    ========================================================= */
 
 .modal-actions {
+    display: flex;
 
-    display:
-        flex;
+    flex-wrap: wrap;
 
-    flex-wrap:
-        wrap;
+    gap: 8px;
 
-    gap:
-        8px;
-
-    padding-top:
-        20px;
-
+    padding-top: 20px;
 }
 
-
 .modal-actions button {
-
-    flex:
-        1;
-
+    flex: 1;
 }
 
 
@@ -1128,288 +759,185 @@ button:active {
    ========================================================= */
 
 .hidden {
-
-    display:
-        none !important;
-
+    display: none !important;
 }
 
-
 body.modal-open {
-
-    overflow:
-        hidden;
-
+    overflow: hidden;
 }
 
 
 /* =========================================================
-   RESPONSIVE
+   MOBILE
    ========================================================= */
 
-@media (
-    max-width: 720px
-) {
+@media (max-width: 720px) {
 
     .app {
-
         padding:
             0 12px 30px;
-
     }
 
 
     .app-header {
+        min-height: 118px;
 
-        align-items:
-            flex-start;
-
-        padding-top:
-            18px;
-
+        padding:
+            18px 0;
     }
 
 
     .app-header h1 {
-
-        font-size:
-            1.45rem;
-
+        font-size: 1.75rem;
     }
 
 
-    .app-header .secondary {
+    .app-header > .secondary {
+        right: 0;
 
-        min-height:
-            40px;
+        top: 16px;
+
+        transform: none;
+
+        min-height: 38px;
 
         padding:
-            8px 11px;
+            7px 10px;
 
-        font-size:
-            0.86rem;
-
+        font-size: 0.82rem;
     }
 
 
-    .card {
-
-        padding:
-            17px;
-
+    .header-title {
+        padding-top: 24px;
     }
 
 
     .grid {
+        grid-template-columns: 1fr;
 
-        grid-template-columns:
-            1fr;
-
-        gap:
-            13px;
-
+        gap: 13px;
     }
 
 
     .wide {
-
-        grid-column:
-            auto;
-
+        grid-column: auto;
     }
 
 
     .summary {
-
-        grid-template-columns:
-            1fr;
-
+        grid-template-columns: 1fr;
     }
 
 
     .expense-main {
-
-        gap:
-            10px;
-
-    }
-
-
-    .expense-amount {
-
-        font-size:
-            1rem;
-
+        gap: 10px;
     }
 
 
     .expense-actions {
-
-        display:
-            grid;
+        display: grid;
 
         grid-template-columns:
             1fr 1fr;
-
     }
 
 
     .modal {
-
-        padding:
-            8px;
-
+        padding: 8px;
     }
 
 
     .modal-content {
+        margin: 8px auto;
 
-        margin:
-            8px auto;
-
-        padding:
-            17px;
-
+        padding: 17px;
     }
 
 
     .setting-item {
-
-        grid-template-columns:
-            1fr;
-
+        grid-template-columns: 1fr;
     }
 
 
     .setting-item button {
-
-        width:
-            100%;
-
+        width: 100%;
     }
 
 
     .vehicle-setting {
-
-        grid-template-columns:
-            1fr;
-
+        grid-template-columns: 1fr;
     }
 
 
     .vehicle-setting button {
-
-        width:
-            100%;
-
+        width: 100%;
     }
 
 
     .vehicle-add-form {
-
-        grid-template-columns:
-            1fr;
-
+        grid-template-columns: 1fr;
     }
 
 
     .vehicle-add-form .settings-add {
-
-        grid-column:
-            auto;
-
+        grid-column: auto;
     }
 
 
     .modal-actions {
-
-        flex-direction:
-            column;
-
+        flex-direction: column;
     }
 
 
     .modal-actions button {
-
-        width:
-            100%;
-
+        width: 100%;
     }
 
 }
 
 
 /* =========================================================
-   VERY SMALL PHONES
+   VERY SMALL IPHONES
    ========================================================= */
 
-@media (
-    max-width: 390px
-) {
+@media (max-width: 390px) {
 
     .app {
-
         padding:
             0 9px 25px;
-
     }
 
 
     .card {
-
-        padding:
-            14px;
-
-    }
-
-
-    .app-header {
-
-        gap:
-            10px;
-
+        padding: 14px;
     }
 
 
     .app-header h1 {
-
-        font-size:
-            1.28rem;
-
+        font-size: 1.58rem;
     }
 
 
-    .app-header .secondary {
-
-        font-size:
-            0.8rem;
-
-        padding:
-            7px 9px;
-
+    #currentDateTime {
+        font-size: 0.84rem;
     }
 
 
     .expense-main {
-
-        flex-direction:
-            column;
-
+        flex-direction: column;
     }
 
 
     .expense-amount {
-
-        align-self:
-            flex-start;
-
+        align-self: flex-start;
     }
 
 }
 
 
 /* =========================================================
-   SAFE AREA — iPHONE
+   IPHONE SAFE AREA
    ========================================================= */
 
 @supports (
@@ -1417,7 +945,6 @@ body.modal-open {
 ) {
 
     .app {
-
         padding-top:
             max(
                 0px,
@@ -1429,7 +956,6 @@ body.modal-open {
                 30px,
                 env(safe-area-inset-bottom)
             );
-
     }
 
 }
