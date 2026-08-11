@@ -1,4767 +1,954 @@
-"use strict";
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-/* =========================================================
-   DAILY EXPENSES
-   app.js
-   ========================================================= */
+<title>Daily Expenses</title>
 
+<link rel="stylesheet" href="style.css">
+</head>
 
-/* =========================================================
-   STORAGE
-   ========================================================= */
+<body>
 
-const EXPENSES_KEY = "dailyExpenses_expenses_v4";
-const SETTINGS_KEY = "dailyExpenses_settings_v4";
+<div class="app">
 
+<header class="app-header">
 
-const DEFAULT_SETTINGS = {
+    <div class="header-title">
 
-    categories: [
-        "Οχήματα",
-        "Φαγητό",
-        "Καφέ",
-        "Αγορές",
-        "Διάφορα",
-        "Διασκέδαση"
-    ],
+        <h1>
+            Daily Expenses
+        </h1>
 
-    shoppingSubcategories: [
-        "Super Market",
-        "Gadgets",
-        "Ρούχα",
-        "Σπίτι",
-        "Διάφορες αγορές",
-        "Εισιτήρια",
-        "Άλλο"
-    ],
+        <div id="currentDateTime"></div>
 
-    paymentMethods: [
-        "Κάρτα",
-        "Μετρητά",
-        "IRIS",
-        "Τραπεζικός λογαριασμός"
-    ],
+    </div>
 
-    persons: [
-        "Εμένα",
-        "Οικογένεια",
-        "Άλλος"
-    ],
 
-    vehicles: []
-};
+    <button
+        type="button"
+        id="settingsButton"
+        class="secondary">
 
+        Ρυθμίσεις
 
-let expenses = loadData(
-    EXPENSES_KEY,
-    []
-);
+    </button>
 
+</header>
 
-let settings = loadData(
-    SETTINGS_KEY,
-    DEFAULT_SETTINGS
-);
 
+<main>
 
-let editingExpenseId = null;
 
+<!-- =====================================================
+     ΝΕΑ ΠΛΗΡΩΜΗ
+     ===================================================== -->
 
-/* =========================================================
-   BASIC HELPERS
-   ========================================================= */
+<section class="card">
 
-function $(id) {
-    return document.getElementById(id);
-}
+    <h2>
+        Νέα πληρωμή
+    </h2>
 
 
-function clone(value) {
-    return JSON.parse(
-        JSON.stringify(value)
-    );
-}
+    <div class="grid">
 
 
-function loadData(key, fallback) {
+        <div>
 
-    try {
+            <label for="amount">
+                Ποσό (€)
+            </label>
 
-        const stored =
-            localStorage.getItem(key);
+            <input
+                type="number"
+                id="amount"
+                step="0.01"
+                min="0"
+                inputmode="decimal"
+                autocomplete="off">
 
-        if (stored !== null) {
-            return JSON.parse(stored);
-        }
+        </div>
 
-    } catch (error) {
 
-        console.error(
-            "Σφάλμα φόρτωσης:",
-            error
-        );
+        <div>
 
-    }
+            <label for="paymentMethod">
+                Πώς πληρώνω;
+            </label>
 
-    return clone(fallback);
-}
+            <select id="paymentMethod">
+            </select>
 
+        </div>
 
-function saveExpenses() {
 
-    localStorage.setItem(
-        EXPENSES_KEY,
-        JSON.stringify(expenses)
-    );
-}
+        <div>
 
+            <label for="category">
+                Κατηγορία
+            </label>
 
-function saveSettings() {
+            <select id="category">
+            </select>
 
-    localStorage.setItem(
-        SETTINGS_KEY,
-        JSON.stringify(settings)
-    );
-}
+        </div>
 
 
-function today() {
+        <!-- ΑΓΟΡΕΣ -->
 
-    const d = new Date();
+        <div
+            id="subcategoryWrap"
+            class="hidden">
 
-    return (
-        d.getFullYear() +
-        "-" +
-        String(
-            d.getMonth() + 1
-        ).padStart(2, "0") +
-        "-" +
-        String(
-            d.getDate()
-        ).padStart(2, "0")
-    );
-}
+            <label for="subcategory">
+                Τι είδους αγορά;
+            </label>
 
+            <select id="subcategory">
+            </select>
 
-function nowTime() {
+        </div>
 
-    const d = new Date();
 
-    return (
-        String(
-            d.getHours()
-        ).padStart(2, "0") +
-        ":" +
-        String(
-            d.getMinutes()
-        ).padStart(2, "0")
-    );
-}
+        <!-- ΤΥΠΟΣ ΟΧΗΜΑΤΟΣ -->
 
+        <div
+            id="vehicleTypeWrap"
+            class="hidden">
 
-function formatDate(value) {
+            <label for="vehicleType">
+                Τύπος οχήματος
+            </label>
 
-    if (!value) {
-        return "";
-    }
+            <select id="vehicleType">
 
-    const parts =
-        String(value).split("-");
+                <option value="">
+                    Επιλέξτε τύπο οχήματος
+                </option>
 
-    if (parts.length !== 3) {
-        return value;
-    }
+                <option value="Αυτοκίνητο">
+                    Αυτοκίνητο
+                </option>
 
-    return (
-        parts[2] +
-        "/" +
-        parts[1] +
-        "/" +
-        parts[0]
-    );
-}
+                <option value="Μηχανή">
+                    Μηχανή
+                </option>
 
+            </select>
 
-function money(value) {
+        </div>
 
-    return (
-        Number(value || 0).toLocaleString(
-            "el-GR",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        ) +
-        " €"
-    );
-}
 
+        <!-- ΣΥΓΚΕΚΡΙΜΕΝΟ ΟΧΗΜΑ -->
 
-function number(value) {
+        <div
+            id="vehicleWrap"
+            class="hidden">
 
-    return Number(value || 0).toLocaleString(
-        "el-GR",
-        {
-            maximumFractionDigits: 2
-        }
-    );
-}
+            <label for="vehicle">
+                Ποιο όχημα;
+            </label>
 
+            <select id="vehicle">
+            </select>
 
-function escapeHTML(value) {
 
-    const div =
-        document.createElement("div");
+            <div
+                id="vehicleEmptyMessage"
+                class="vehicle-empty-message hidden">
 
-    div.textContent =
-        value == null
-            ? ""
-            : String(value);
-
-    return div.innerHTML;
-}
-
-
-function createId(prefix) {
-
-    return (
-        prefix +
-        "-" +
-        Date.now() +
-        "-" +
-        Math.random()
-            .toString(36)
-            .substring(2, 9)
-    );
-}
-
-
-function toggle(id, visible) {
-
-    const element = $(id);
-
-    if (!element) {
-        return;
-    }
-
-    element.classList.toggle(
-        "hidden",
-        !visible
-    );
-}
-
-
-function showMessage(message) {
-
-    alert(message);
-}
-
-
-/* =========================================================
-   SETTINGS MIGRATION
-   ========================================================= */
-
-function migrateSettings() {
-
-    if (
-        !settings ||
-        typeof settings !== "object"
-    ) {
-
-        settings =
-            clone(DEFAULT_SETTINGS);
-
-    }
-
-
-    const arrays = [
-        "categories",
-        "shoppingSubcategories",
-        "paymentMethods",
-        "persons",
-        "vehicles"
-    ];
-
-
-    arrays.forEach(
-        function(key) {
-
-            if (
-                !Array.isArray(
-                    settings[key]
-                )
-            ) {
-
-                settings[key] =
-                    clone(
-                        DEFAULT_SETTINGS[key]
-                    );
-
-            }
-
-        }
-    );
-
-
-    DEFAULT_SETTINGS.categories
-        .forEach(
-            function(item) {
-
-                if (
-                    !settings.categories.includes(
-                        item
-                    )
-                ) {
-
-                    settings.categories.push(
-                        item
-                    );
-
-                }
-
-            }
-        );
-
-
-    DEFAULT_SETTINGS.shoppingSubcategories
-        .forEach(
-            function(item) {
-
-                if (
-                    !settings.shoppingSubcategories.includes(
-                        item
-                    )
-                ) {
-
-                    settings.shoppingSubcategories.push(
-                        item
-                    );
-
-                }
-
-            }
-        );
-
-
-    if (
-        !settings.paymentMethods.includes(
-            "Κάρτα"
-        )
-    ) {
-
-        settings.paymentMethods.unshift(
-            "Κάρτα"
-        );
-
-    }
-
-
-    if (
-        !settings.persons.includes(
-            "Εμένα"
-        )
-    ) {
-
-        settings.persons.unshift(
-            "Εμένα"
-        );
-
-    }
-
-
-    settings.vehicles =
-        settings.vehicles.map(
-            function(vehicle) {
-
-                if (
-                    typeof vehicle ===
-                    "string"
-                ) {
-
-                    return {
-
-                        id:
-                            createId(
-                                "vehicle"
-                            ),
-
-                        type:
-                            "Αυτοκίνητο",
-
-                        make:
-                            vehicle,
-
-                        model:
-                            "",
-
-                        plate:
-                            ""
-
-                    };
-
-                }
-
-
-                return {
-
-                    id:
-                        vehicle.id ||
-                        createId(
-                            "vehicle"
-                        ),
-
-                    type:
-                        vehicle.type ||
-                        "Αυτοκίνητο",
-
-                    make:
-                        vehicle.make ||
-                        "",
-
-                    model:
-                        vehicle.model ||
-                        "",
-
-                    plate:
-                        vehicle.plate ||
-                        ""
-
-                };
-
-            }
-        );
-
-
-    saveSettings();
-}
-
-
-migrateSettings();
-
-
-/* =========================================================
-   SELECT HELPERS
-   ========================================================= */
-
-function fillSelect(
-    select,
-    values,
-    placeholder,
-    includeAll
-) {
-
-    if (!select) {
-        return;
-    }
-
-
-    select.innerHTML = "";
-
-
-    if (
-        placeholder !== null
-    ) {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-        option.value = "";
-
-        option.textContent =
-            placeholder;
-
-        select.appendChild(
-            option
-        );
-
-    }
-
-
-    if (includeAll) {
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-        option.value = "all";
-
-        option.textContent =
-            "Όλα";
-
-        select.appendChild(
-            option
-        );
-
-    }
-
-
-    values.forEach(
-        function(value) {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value = value;
-
-            option.textContent = value;
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-}
-
-
-/* =========================================================
-   MAIN SELECTS
-   ========================================================= */
-
-function populateMainSelects() {
-
-    fillSelect(
-        $("category"),
-        settings.categories,
-        "Επιλέξτε κατηγορία",
-        false
-    );
-
-
-    fillSelect(
-        $("paymentMethod"),
-        settings.paymentMethods,
-        "Επιλέξτε τρόπο πληρωμής",
-        false
-    );
-
-
-    fillSelect(
-        $("person"),
-        settings.persons,
-        "Επιλέξτε για ποιον",
-        false
-    );
-
-
-    fillSelect(
-        $("reportCategory"),
-        settings.categories,
-        null,
-        true
-    );
-
-
-    fillSelect(
-        $("reportPerson"),
-        settings.persons,
-        null,
-        true
-    );
-
-
-    fillSelect(
-        $("reportPayment"),
-        settings.paymentMethods,
-        null,
-        true
-    );
-
-
-    populateShoppingSubcategories();
-
-    updateReportVehicles();
-
-    setDefaultValues();
-
-    updateCategoryInterface();
-
-    updatePurchaseInterface();
-
-    updateReportInterface();
-}
-
-
-/* =========================================================
-   DEFAULT VALUES
-   ========================================================= */
-
-function setDefaultValues() {
-
-    if ($("paymentMethod")) {
-
-        $("paymentMethod").value =
-            "Κάρτα";
-
-    }
-
-
-    if ($("person")) {
-
-        $("person").value =
-            "Εμένα";
-
-    }
-
-
-    if ($("purchaseMethod")) {
-
-        $("purchaseMethod").value =
-            "store";
-
-    }
-
-
-    if ($("reportPerson")) {
-
-        $("reportPerson").value =
-            "Εμένα";
-
-    }
-
-
-    if ($("reportPayment")) {
-
-        $("reportPayment").value =
-            "all";
-
-    }
-
-
-    if ($("reportCategory")) {
-
-        $("reportCategory").value =
-            "all";
-
-    }
-
-
-    setReportDefaultChecks();
-}
-
-
-/* =========================================================
-   REPORT DEFAULT CHECKBOXES
-   ========================================================= */
-
-function setReportDefaultChecks() {
-
-    const ids = [
-        "reportShowPayments",
-        "reportShowCategories",
-        "reportShowSubcategories"
-    ];
-
-
-    ids.forEach(
-        function(id) {
-
-            if ($(id)) {
-                $(id).checked = true;
-            }
-
-        }
-    );
-
-
-    const optionalIds = [
-        "reportShowVehicles",
-        "reportShowOdometer",
-        "reportShowCostPerKm",
-        "reportShowTotalVehicleCost"
-    ];
-
-
-    optionalIds.forEach(
-        function(id) {
-
-            if ($(id)) {
-                $(id).checked = false;
-            }
-
-        }
-    );
-}
-
-
-/* =========================================================
-   SHOPPING
-   ========================================================= */
-
-function populateShoppingSubcategories() {
-
-    fillSelect(
-        $("subcategory"),
-        settings.shoppingSubcategories,
-        "Επιλέξτε είδος αγοράς",
-        false
-    );
-}
-
-
-/* =========================================================
-   VEHICLE HELPERS
-   ========================================================= */
-
-function vehicleDisplayName(vehicle) {
-
-    const parts = [];
-
-
-    if (vehicle.make) {
-        parts.push(
-            vehicle.make
-        );
-    }
-
-
-    if (vehicle.model) {
-        parts.push(
-            vehicle.model
-        );
-    }
-
-
-    let name =
-        parts.join(" ");
-
-
-    if (vehicle.plate) {
-
-        if (name) {
-            name += " - ";
-        }
-
-        name += vehicle.plate;
-
-    }
-
-
-    return (
-        name ||
-        "Όχημα χωρίς στοιχεία"
-    );
-}
-
-
-function getVehiclesByType(type) {
-
-    return settings.vehicles.filter(
-        function(vehicle) {
-
-            return (
-                vehicle.type === type
-            );
-
-        }
-    );
-}
-
-
-function getVehicleById(id) {
-
-    if (!id) {
-        return null;
-    }
-
-    return (
-        settings.vehicles.find(
-            function(vehicle) {
-
-                return (
-                    vehicle.id === id
-                );
-
-            }
-        ) || null
-    );
-}
-
-
-/* =========================================================
-   VEHICLE SELECT
-   ========================================================= */
-
-function populateVehicleSelect(
-    selectedId = ""
-) {
-
-    const select =
-        $("vehicle");
-
-
-    if (!select) {
-        return;
-    }
-
-
-    const type =
-        $("vehicleType")
-            ? $("vehicleType").value
-            : "";
-
-
-    select.innerHTML = "";
-
-
-    const first =
-        document.createElement(
-            "option"
-        );
-
-
-    first.value = "";
-
-
-    if (type === "Αυτοκίνητο") {
-
-        first.textContent =
-            "Επιλέξτε αυτοκίνητο";
-
-    } else if (
-        type === "Μηχανή"
-    ) {
-
-        first.textContent =
-            "Επιλέξτε μηχανή";
-
-    } else {
-
-        first.textContent =
-            "Επιλέξτε όχημα";
-
-    }
-
-
-    select.appendChild(
-        first
-    );
-
-
-    if (!type) {
-
-        toggle(
-            "vehicleEmptyMessage",
-            false
-        );
-
-        return;
-    }
-
-
-    const vehicles =
-        getVehiclesByType(
-            type
-        );
-
-
-    vehicles.forEach(
-        function(vehicle) {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                vehicle.id;
-
-            option.textContent =
-                vehicleDisplayName(
-                    vehicle
-                );
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    if (selectedId) {
-
-        const found =
-            vehicles.some(
-                function(vehicle) {
-
-                    return (
-                        vehicle.id ===
-                        selectedId
-                    );
-
-                }
-            );
-
-
-        if (found) {
-
-            select.value =
-                selectedId;
-
-        }
-
-    }
-
-
-    toggle(
-        "vehicleEmptyMessage",
-        vehicles.length === 0
-    );
-}
-
-
-/* =========================================================
-   MAIN CATEGORY INTERFACE
-   ========================================================= */
-
-function updateCategoryInterface() {
-
-    const category =
-        $("category")
-            ? $("category").value
-            : "";
-
-
-    const isShopping =
-        category === "Αγορές";
-
-
-    const isVehicle =
-        category === "Οχήματα";
-
-
-    toggle(
-        "subcategoryWrap",
-        isShopping
-    );
-
-
-    toggle(
-        "vehicleTypeWrap",
-        isVehicle
-    );
-
-
-    if (!isShopping) {
-
-        if ($("subcategory")) {
-            $("subcategory").value =
-                "";
-        }
-
-    }
-
-
-    if (!isVehicle) {
-
-        if ($("vehicleType")) {
-            $("vehicleType").value =
-                "";
-        }
-
-
-        if ($("vehicle")) {
-            $("vehicle").value =
-                "";
-        }
-
-
-        if ($("vehicleExpenseType")) {
-            $("vehicleExpenseType").value =
-                "";
-        }
-
-
-        if ($("odometer")) {
-            $("odometer").value =
-                "";
-        }
-
-    }
-
-
-    updateVehicleInterface();
-}
-
-
-/* =========================================================
-   VEHICLE INTERFACE
-   ========================================================= */
-
-function updateVehicleInterface() {
-
-    const category =
-        $("category")
-            ? $("category").value
-            : "";
-
-
-    const type =
-        $("vehicleType")
-            ? $("vehicleType").value
-            : "";
-
-
-    const vehicleId =
-        $("vehicle")
-            ? $("vehicle").value
-            : "";
-
-
-    const isVehicle =
-        category === "Οχήματα";
-
-
-    const validType =
-        type === "Αυτοκίνητο" ||
-        type === "Μηχανή";
-
-
-    toggle(
-        "vehicleTypeWrap",
-        isVehicle
-    );
-
-
-    toggle(
-        "vehicleWrap",
-        isVehicle &&
-        validType
-    );
-
-
-    if (
-        isVehicle &&
-        validType
-    ) {
-
-        populateVehicleSelect(
-            vehicleId
-        );
-
-    } else {
-
-        if ($("vehicle")) {
-            $("vehicle").innerHTML =
-                "";
-        }
-
-        toggle(
-            "vehicleEmptyMessage",
-            false
-        );
-
-    }
-
-
-    /*
-     * Το είδος δαπάνης εμφανίζεται
-     * ΜΟΝΟ όταν έχει επιλεγεί
-     * συγκεκριμένο όχημα.
-     */
-
-    const hasVehicle =
-        isVehicle &&
-        validType &&
-        Boolean(
-            vehicleId
-        );
-
-
-    toggle(
-        "vehicleExpenseTypeWrap",
-        hasVehicle
-    );
-
-
-    toggle(
-        "odometerWrap",
-        hasVehicle
-    );
-
-
-    if (!hasVehicle) {
-
-        if ($("vehicleExpenseType")) {
-            $("vehicleExpenseType").value =
-                "";
-        }
-
-    }
-}
-
-
-/* =========================================================
-   PURCHASE INTERFACE
-   ========================================================= */
-
-function updatePurchaseInterface() {
-
-    const method =
-        $("purchaseMethod")
-            ? $("purchaseMethod").value
-            : "store";
-
-
-    const internet =
-        method === "internet";
-
-
-    toggle(
-        "orderWrap",
-        internet
-    );
-
-
-    toggle(
-        "orderStatusWrap",
-        internet
-    );
-
-
-    if (!internet) {
-
-        if ($("orderNumber")) {
-            $("orderNumber").value =
-                "";
-        }
-
-    }
-}
-
-
-/* =========================================================
-   REPORT VEHICLES
-   ========================================================= */
-
-function updateReportVehicles() {
-
-    const select =
-        $("reportVehicle");
-
-
-    if (!select) {
-        return;
-    }
-
-
-    const previous =
-        select.value;
-
-
-    select.innerHTML = "";
-
-
-    const all =
-        document.createElement(
-            "option"
-        );
-
-    all.value = "all";
-
-    all.textContent =
-        "Όλα τα οχήματα";
-
-    select.appendChild(
-        all
-    );
-
-
-    settings.vehicles.forEach(
-        function(vehicle) {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                vehicle.id;
-
-            option.textContent =
-                vehicleDisplayName(
-                    vehicle
-                );
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    if (
-        previous &&
-        settings.vehicles.some(
-            function(vehicle) {
-                return (
-                    vehicle.id ===
-                    previous
-                );
-            }
-        )
-    ) {
-
-        select.value =
-            previous;
-
-    }
-}
-
-
-/* =========================================================
-   REPORT INTERFACE
-   ========================================================= */
-
-function updateReportInterface() {
-
-    const category =
-        $("reportCategory")
-            ? $("reportCategory").value
-            : "all";
-
-
-    const isVehicle =
-        category === "Οχήματα";
-
-
-    /*
-     * Το βασικό ζητούμενο:
-     *
-     * Όλα / Αγορές / Φαγητό / κλπ
-     * → ΔΕΝ εμφανίζουν όχημα.
-     *
-     * Οχήματα
-     * → εμφανίζουν όχημα.
-     */
-
-    toggle(
-        "reportVehicleWrap",
-        isVehicle
-    );
-
-
-    toggle(
-        "reportVehicleExpenseWrap",
-        isVehicle
-    );
-
-
-    document
-        .querySelectorAll(
-            ".vehicle-report-option"
-        )
-        .forEach(
-            function(element) {
-
-                element.classList.toggle(
-                    "hidden",
-                    !isVehicle
-                );
-
-            }
-        );
-
-
-    if (!isVehicle) {
-
-        if ($("reportVehicle")) {
-
-            $("reportVehicle").value =
-                "all";
-
-        }
-
-
-        if ($("reportVehicleExpense")) {
-
-            $("reportVehicleExpense").value =
-                "all";
-
-        }
-
-
-        if ($("reportShowVehicles")) {
-
-            $("reportShowVehicles").checked =
-                false;
-
-        }
-
-
-        if ($("reportShowOdometer")) {
-
-            $("reportShowOdometer").checked =
-                false;
-
-        }
-
-
-        if ($("reportShowCostPerKm")) {
-
-            $("reportShowCostPerKm").checked =
-                false;
-
-        }
-
-
-        if (
-            $("reportShowTotalVehicleCost")
-        ) {
-
-            $(
-                "reportShowTotalVehicleCost"
-            ).checked = false;
-
-        }
-
-    }
-}
-
-
-/* =========================================================
-   DATE / TIME
-   ========================================================= */
-
-function updateDateTime() {
-
-    const element =
-        $("currentDateTime");
-
-
-    if (!element) {
-        return;
-    }
-
-
-    const d =
-        new Date();
-
-
-    const date =
-        d.toLocaleDateString(
-            "el-GR",
-            {
-                weekday: "long",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            }
-        );
-
-
-    const time =
-        d.toLocaleTimeString(
-            "el-GR",
-            {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false
-            }
-        );
-
-
-    element.textContent =
-        date +
-        " • " +
-        time;
-}
-
-
-/* =========================================================
-   FORM DATA
-   ========================================================= */
-
-function getFormData() {
-
-    return {
-
-        amount:
-            Number(
-                $("amount").value
-            ),
-
-        paymentMethod:
-            $("paymentMethod").value,
-
-        category:
-            $("category").value,
-
-        subcategory:
-            $("subcategory")
-                ? $("subcategory").value
-                : "",
-
-        vehicleType:
-            $("vehicleType")
-                ? $("vehicleType").value
-                : "",
-
-        vehicleId:
-            $("vehicle")
-                ? $("vehicle").value
-                : "",
-
-        vehicleExpenseType:
-            $("vehicleExpenseType")
-                ? $("vehicleExpenseType").value
-                : "",
-
-        odometer:
-            $("odometer")
-                ? (
-                    $("odometer").value === ""
-                        ? null
-                        : Number(
-                            $("odometer").value
-                        )
-                )
-                : null,
-
-        person:
-            $("person").value,
-
-        purchaseMethod:
-            $("purchaseMethod").value,
-
-        shop:
-            $("shop").value.trim(),
-
-        orderNumber:
-            $("orderNumber")
-                ? $("orderNumber").value.trim()
-                : "",
-
-        orderStatus:
-            $("orderStatus")
-                ? $("orderStatus").value
-                : "",
-
-        description:
-            $("description")
-                .value.trim()
-
-    };
-}
-
-
-/* =========================================================
-   VALIDATION
-   ========================================================= */
-
-function validateExpense(data) {
-
-    if (
-        !Number.isFinite(
-            data.amount
-        ) ||
-        data.amount <= 0
-    ) {
-
-        showMessage(
-            "Παρακαλώ συμπλήρωσε το ποσό."
-        );
-
-        return false;
-    }
-
-
-    /*
-     * ΤΙΠΟΤΑ ΑΛΛΟ ΔΕΝ ΕΙΝΑΙ ΥΠΟΧΡΕΩΤΙΚΟ.
-     */
-
-    if (
-        data.category === "Οχήματα"
-    ) {
-
-        if (
-            !data.vehicleType
-        ) {
-
-            showMessage(
-                "Επίλεξε τύπο οχήματος."
-            );
-
-            return false;
-        }
-
-
-        if (
-            !data.vehicleId
-        ) {
-
-            showMessage(
-                "Επίλεξε ποιο όχημα."
-            );
-
-            return false;
-        }
-
-
-        if (
-            !data.vehicleExpenseType
-        ) {
-
-            showMessage(
-                "Επίλεξε είδος δαπάνης."
-            );
-
-            return false;
-        }
-
-    }
-
-
-    return true;
-}
-
-
-/* =========================================================
-   RESET FORM
-   ========================================================= */
-
-function resetExpenseForm() {
-
-    $("amount").value = "";
-
-    $("category").value = "";
-
-    $("subcategory").value = "";
-
-    $("vehicleType").value = "";
-
-    $("vehicle").innerHTML = "";
-
-    $("vehicleExpenseType").value = "";
-
-    $("odometer").value = "";
-
-    $("shop").value = "";
-
-    $("orderNumber").value = "";
-
-    $("description").value = "";
-
-    $("purchaseMethod").value =
-        "store";
-
-
-    setDefaultValues();
-
-    updateCategoryInterface();
-
-    updatePurchaseInterface();
-
-    editingExpenseId = null;
-
-
-    $("addExpenseButton").innerHTML =
-        '<span class="button-plus" aria-hidden="true">+</span>Προσθήκη εξόδου';
-}
-
-
-/* =========================================================
-   ADD / EDIT EXPENSE
-   ========================================================= */
-
-function saveExpense() {
-
-    const data =
-        getFormData();
-
-
-    if (
-        !validateExpense(data)
-    ) {
-        return;
-    }
-
-
-    const date =
-        $("selectedDate").value ||
-        today();
-
-
-    const time =
-        nowTime();
-
-
-    const vehicle =
-        getVehicleById(
-            data.vehicleId
-        );
-
-
-    const record = {
-
-        id:
-            editingExpenseId ||
-            createId("expense"),
-
-        date:
-
-            editingExpenseId
-                ? (
-                    expenses.find(
-                        function(item) {
-                            return (
-                                item.id ===
-                                editingExpenseId
-                            );
-                        }
-                    )?.date || date
-                )
-                : date,
-
-        time:
-
-            editingExpenseId
-                ? (
-                    expenses.find(
-                        function(item) {
-                            return (
-                                item.id ===
-                                editingExpenseId
-                            );
-                        }
-                    )?.time || time
-                )
-                : time,
-
-        amount:
-            data.amount,
-
-        paymentMethod:
-            data.paymentMethod,
-
-        category:
-            data.category,
-
-        subcategory:
-            data.subcategory,
-
-        vehicleType:
-            data.vehicleType,
-
-        vehicleId:
-            data.vehicleId,
-
-        vehicle:
-            vehicle
-                ? vehicleDisplayName(vehicle)
-                : "",
-
-        vehicleExpenseType:
-            data.vehicleExpenseType,
-
-        odometer:
-            data.odometer,
-
-        person:
-            data.person,
-
-        purchaseMethod:
-            data.purchaseMethod,
-
-        shop:
-            data.shop,
-
-        orderNumber:
-            data.orderNumber,
-
-        orderStatus:
-            data.orderStatus,
-
-        description:
-            data.description
-
-    };
-
-
-    if (editingExpenseId) {
-
-        const index =
-            expenses.findIndex(
-                function(item) {
-
-                    return (
-                        item.id ===
-                        editingExpenseId
-                    );
-
-                }
-            );
-
-
-        if (index !== -1) {
-
-            expenses[index] =
-                record;
-
-        }
-
-    } else {
-
-        expenses.push(
-            record
-        );
-
-    }
-
-
-    saveExpenses();
-
-    renderExpenses();
-
-    resetExpenseForm();
-
-
-    showMessage(
-        editingExpenseId
-            ? "Η πληρωμή ενημερώθηκε."
-            : "Η πληρωμή καταχωρήθηκε."
-    );
-}
-
-
-/* =========================================================
-   EXPENSE LIST
-   ========================================================= */
-
-function renderExpenses() {
-
-    const container =
-        $("expenseList");
-
-
-    if (!container) {
-        return;
-    }
-
-
-    const date =
-        $("selectedDate").value ||
-        today();
-
-
-    const dayExpenses =
-        expenses
-            .filter(
-                function(item) {
-
-                    return (
-                        item.date === date
-                    );
-
-                }
-            )
-            .sort(
-                function(a, b) {
-
-                    return String(
-                        b.time || ""
-                    ).localeCompare(
-                        String(
-                            a.time || ""
-                        )
-                    );
-
-                }
-            );
-
-
-    container.innerHTML = "";
-
-
-    if (
-        dayExpenses.length === 0
-    ) {
-
-        container.innerHTML =
-            '<div class="empty-state">Δεν υπάρχουν πληρωμές για αυτή την ημέρα.</div>';
-
-        renderDaySummary(
-            []
-        );
-
-        return;
-    }
-
-
-    dayExpenses.forEach(
-        function(item) {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-
-            div.className =
-                "expense-item";
-
-
-            let details = "";
-
-
-            if (item.category) {
-
-                details +=
-                    "<div>Κατηγορία: " +
-                    escapeHTML(
-                        item.category
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if (item.subcategory) {
-
-                details +=
-                    "<div>Υποκατηγορία: " +
-                    escapeHTML(
-                        item.subcategory
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if (item.vehicle) {
-
-                details +=
-                    "<div>Όχημα: " +
-                    escapeHTML(
-                        item.vehicle
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if (
-                item.vehicleExpenseType
-            ) {
-
-                details +=
-                    "<div>Δαπάνη: " +
-                    escapeHTML(
-                        item.vehicleExpenseType
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if (
-                item.odometer !== null &&
-                item.odometer !== undefined &&
-                item.odometer !== ""
-            ) {
-
-                details +=
-                    "<div>Κοντέρ: " +
-                    number(
-                        item.odometer
-                    ) +
-                    " km</div>";
-
-            }
-
-
-            if (item.person) {
-
-                details +=
-                    "<div>Για: " +
-                    escapeHTML(
-                        item.person
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if (
-                item.paymentMethod
-            ) {
-
-                details +=
-                    "<div>Πληρωμή: " +
-                    escapeHTML(
-                        item.paymentMethod
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if (item.shop) {
-
-                details +=
-                    "<div>Κατάστημα: " +
-                    escapeHTML(
-                        item.shop
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if (item.description) {
-
-                details +=
-                    "<div>" +
-                    escapeHTML(
-                        item.description
-                    ) +
-                    "</div>";
-
-            }
-
-
-            div.innerHTML = `
-
-                <div class="expense-main">
-
-                    <div>
-
-                        <strong>
-                            ${escapeHTML(
-                                item.time || ""
-                            )}
-                        </strong>
-
-                        <div class="expense-details">
-                            ${details}
-                        </div>
-
-                    </div>
-
-                    <div class="expense-amount">
-                        ${money(item.amount)}
-                    </div>
-
-                </div>
-
-                <div class="expense-actions">
-
-                    <button
-                        type="button"
-                        class="secondary"
-                        data-edit="${escapeHTML(item.id)}">
-
-                        Επεξεργασία
-
-                    </button>
-
-                    <button
-                        type="button"
-                        class="danger"
-                        data-delete="${escapeHTML(item.id)}">
-
-                        Διαγραφή
-
-                    </button>
-
-                </div>
-            `;
-
-
-            container.appendChild(
-                div
-            );
-
-        }
-    );
-
-
-    renderDaySummary(
-        dayExpenses
-    );
-}
-
-
-/* =========================================================
-   DAY SUMMARY
-   ========================================================= */
-
-function renderDaySummary(
-    dayExpenses
-) {
-
-    const container =
-        $("daySummary");
-
-
-    if (!container) {
-        return;
-    }
-
-
-    const total =
-        dayExpenses.reduce(
-            function(sum, item) {
-
-                return (
-                    sum +
-                    Number(
-                        item.amount || 0
-                    )
-                );
-
-            },
-            0
-        );
-
-
-    container.innerHTML = `
-
-        <div class="summary">
-
-            <div class="summary-box">
-
-                <span>
-                    Πληρωμές
-                </span>
-
-                <strong>
-                    ${dayExpenses.length}
-                </strong>
-
-            </div>
-
-
-            <div class="summary-box">
-
-                <span>
-                    Σύνολο ημέρας
-                </span>
-
-                <strong>
-                    ${money(total)}
-                </strong>
+                Δεν έχει καταχωρηθεί όχημα
+                αυτού του τύπου.
+                Πρόσθεσέ το από τις Ρυθμίσεις.
 
             </div>
 
         </div>
-    `;
-}
 
 
-/* =========================================================
-   EDIT
-   ========================================================= */
+        <!-- ΕΙΔΟΣ ΔΑΠΑΝΗΣ -->
 
-function editExpense(id) {
+        <div
+            id="vehicleExpenseTypeWrap"
+            class="hidden">
 
-    const item =
-        expenses.find(
-            function(expense) {
+            <label for="vehicleExpenseType">
+                Είδος δαπάνης
+            </label>
 
-                return (
-                    expense.id === id
-                );
+            <select id="vehicleExpenseType">
 
-            }
-        );
+                <option value="">
+                    Επιλέξτε είδος δαπάνης
+                </option>
 
+                <option value="Βενζίνη">
+                    Βενζίνη
+                </option>
 
-    if (!item) {
-        return;
-    }
+                <option value="Έξοδα συντήρησης">
+                    Έξοδα συντήρησης
+                </option>
 
+            </select>
 
-    editingExpenseId =
-        id;
+        </div>
 
 
-    $("selectedDate").value =
-        item.date || today();
+        <!-- ΚΟΝΤΕΡ -->
 
+        <div
+            id="odometerWrap"
+            class="hidden">
 
-    $("amount").value =
-        item.amount;
+            <label for="odometer">
+                Κοντέρ (km)
+            </label>
 
+            <input
+                type="number"
+                id="odometer"
+                step="1"
+                min="0"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="Προαιρετικό">
 
-    $("paymentMethod").value =
-        item.paymentMethod || "Κάρτα";
+        </div>
 
 
-    $("category").value =
-        item.category || "";
+        <!-- ΓΙΑ ΠΟΙΟΝ -->
 
+        <div>
 
-    updateCategoryInterface();
+            <label for="person">
+                Για ποιον;
+            </label>
 
+            <select id="person">
+            </select>
 
-    if ($("subcategory")) {
+        </div>
 
-        $("subcategory").value =
-            item.subcategory || "";
 
-    }
+        <!-- ΤΡΟΠΟΣ ΑΓΟΡΑΣ -->
 
+        <div>
 
-    if ($("vehicleType")) {
+            <label for="purchaseMethod">
+                Τρόπος αγοράς
+            </label>
 
-        $("vehicleType").value =
-            item.vehicleType || "";
+            <select id="purchaseMethod">
 
-    }
+                <option value="store">
+                    Φυσικό κατάστημα
+                </option>
 
+                <option value="internet">
+                    Internet
+                </option>
 
-    updateVehicleInterface();
+            </select>
 
+        </div>
 
-    if ($("vehicle")) {
 
-        $("vehicle").value =
-            item.vehicleId || "";
+        <!-- ΚΑΤΑΣΤΗΜΑ -->
 
-    }
+        <div>
 
+            <label for="shop">
+                Κατάστημα / Ιστοσελίδα
+            </label>
 
-    updateVehicleInterface();
+            <input
+                type="text"
+                id="shop"
+                placeholder="Προαιρετικό"
+                autocomplete="off">
 
+        </div>
 
-    if ($("vehicleExpenseType")) {
 
-        $("vehicleExpenseType").value =
-            item.vehicleExpenseType || "";
+        <!-- ΠΑΡΑΓΓΕΛΙΑ -->
 
-    }
+        <div
+            id="orderWrap"
+            class="hidden">
 
+            <label for="orderNumber">
+                Αριθμός παραγγελίας
+            </label>
 
-    if ($("odometer")) {
+            <input
+                type="text"
+                id="orderNumber"
+                autocomplete="off">
 
-        $("odometer").value =
-            item.odometer ?? "";
+        </div>
 
-    }
 
+        <div
+            id="orderStatusWrap"
+            class="hidden">
 
-    if ($("person")) {
+            <label for="orderStatus">
+                Κατάσταση παραγγελίας
+            </label>
 
-        $("person").value =
-            item.person || "Εμένα";
+            <select id="orderStatus">
 
-    }
+                <option value="Παραγγέλθηκε">
+                    Παραγγέλθηκε
+                </option>
 
+                <option value="Αναμένεται">
+                    Αναμένεται
+                </option>
 
-    if ($("purchaseMethod")) {
+                <option value="Παραδόθηκε">
+                    Παραδόθηκε
+                </option>
 
-        $("purchaseMethod").value =
-            item.purchaseMethod || "store";
+                <option value="Ακυρώθηκε">
+                    Ακυρώθηκε
+                </option>
 
-    }
+                <option value="Επιστράφηκε">
+                    Επιστράφηκε
+                </option>
 
+            </select>
 
-    if ($("shop")) {
+        </div>
 
-        $("shop").value =
-            item.shop || "";
 
-    }
+        <!-- ΠΕΡΙΓΡΑΦΗ -->
 
+        <div class="wide">
 
-    if ($("orderNumber")) {
+            <label for="description">
+                Περιγραφή
+            </label>
 
-        $("orderNumber").value =
-            item.orderNumber || "";
+            <input
+                type="text"
+                id="description"
+                placeholder="Προαιρετική περιγραφή"
+                autocomplete="off">
 
-    }
+        </div>
 
+    </div>
 
-    if ($("orderStatus")) {
 
-        $("orderStatus").value =
-            item.orderStatus ||
-            "Παραγγέλθηκε";
+    <button
+        type="button"
+        id="addExpenseButton"
+        class="primary">
 
-    }
+        <span
+            class="button-plus"
+            aria-hidden="true">+</span>
 
+        Προσθήκη εξόδου
 
-    if ($("description")) {
+    </button>
 
-        $("description").value =
-            item.description || "";
+</section>
 
-    }
 
+<!-- =====================================================
+     ΗΜΕΡΟΛΟΓΙΟ
+     ===================================================== -->
 
-    updatePurchaseInterface();
+<section class="card">
 
+    <h2>
+        Ημερολόγιο
+    </h2>
 
-    $("addExpenseButton").innerHTML =
-        '<span class="button-plus" aria-hidden="true">+</span>Αποθήκευση αλλαγών';
 
+    <label for="selectedDate">
+        Ημερομηνία
+    </label>
 
-    window.scrollTo(
-        {
-            top: 0,
-            behavior: "smooth"
-        }
-    );
-}
+    <input
+        type="date"
+        id="selectedDate">
 
 
-/* =========================================================
-   DELETE
-   ========================================================= */
+    <div id="daySummary"></div>
 
-function deleteExpense(id) {
+    <div id="expenseList"></div>
 
-    const item =
-        expenses.find(
-            function(expense) {
+</section>
 
-                return (
-                    expense.id === id
-                );
 
-            }
-        );
+<!-- =====================================================
+     REPORTS
+     ===================================================== -->
 
+<section class="card">
 
-    if (!item) {
-        return;
-    }
+    <h2>
+        Reports
+    </h2>
 
 
-    const confirmed =
-        confirm(
-            "Να διαγραφεί αυτή η πληρωμή;"
-        );
+    <div class="grid">
 
 
-    if (!confirmed) {
-        return;
-    }
+        <!-- ΠΕΡΙΟΔΟΣ -->
 
+        <div>
 
-    expenses =
-        expenses.filter(
-            function(expense) {
+            <label for="reportType">
+                Περίοδος
+            </label>
 
-                return (
-                    expense.id !== id
-                );
+            <select id="reportType">
 
-            }
-        );
+                <option value="day">
+                    Ημέρα
+                </option>
 
+                <option value="week">
+                    Εβδομάδα
+                </option>
 
-    saveExpenses();
+                <option value="month">
+                    Μήνας
+                </option>
 
-    renderExpenses();
-}
+                <option value="year">
+                    Έτος
+                </option>
 
+                <option value="custom">
+                    Από - Έως
+                </option>
 
-/* =========================================================
-   REPORT PERIOD
-   ========================================================= */
+            </select>
 
-function getReportDates() {
+        </div>
 
-    const type =
-        $("reportType").value;
 
+        <!-- ΚΑΤΗΓΟΡΙΑ -->
 
-    const selected =
-        $("selectedDate").value ||
-        today();
+        <div>
 
+            <label for="reportCategory">
+                Κατηγορία
+            </label>
 
-    if (
-        type === "custom"
-    ) {
+            <select id="reportCategory">
+            </select>
 
-        return {
+        </div>
 
-            start:
-                $("reportStartDate")
-                    .value ||
-                selected,
 
-            end:
-                $("reportEndDate")
-                    .value ||
-                selected
+        <!--
+             ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ:
+             Το Όχημα έχει πλέον δικό του wrapper.
+             Εμφανίζεται ΜΟΝΟ όταν:
+             reportCategory = Οχήματα
+        -->
 
-        };
+        <div
+            id="reportVehicleWrap"
+            class="hidden">
 
-    }
+            <label for="reportVehicle">
+                Όχημα
+            </label>
 
+            <select id="reportVehicle">
+            </select>
 
-    const date =
-        new Date(
-            selected +
-            "T00:00:00"
-        );
+        </div>
 
 
-    let start =
-        new Date(date);
+        <!-- ΕΙΔΟΣ ΔΑΠΑΝΗΣ ΟΧΗΜΑΤΟΣ -->
 
+        <div
+            id="reportVehicleExpenseWrap"
+            class="hidden">
 
-    let end =
-        new Date(date);
+            <label for="reportVehicleExpense">
+                Είδος δαπάνης οχήματος
+            </label>
 
+            <select id="reportVehicleExpense">
 
-    if (type === "week") {
+                <option value="all">
+                    Όλα
+                </option>
 
-        const day =
-            date.getDay() || 7;
+                <option value="Βενζίνη">
+                    Βενζίνη
+                </option>
 
+                <option value="Έξοδα συντήρησης">
+                    Έξοδα συντήρησης
+                </option>
 
-        start.setDate(
-            date.getDate() -
-            day +
-            1
-        );
+            </select>
 
+        </div>
 
-        end =
-            new Date(start);
 
+        <!-- ΓΙΑ ΠΟΙΟΝ -->
 
-        end.setDate(
-            start.getDate() +
-            6
-        );
+        <div>
 
-    }
+            <label for="reportPerson">
+                Για ποιον
+            </label>
 
+            <select id="reportPerson">
+            </select>
 
-    if (type === "month") {
+        </div>
 
-        start =
-            new Date(
-                date.getFullYear(),
-                date.getMonth(),
-                1
-            );
 
+        <!-- ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ -->
 
-        end =
-            new Date(
-                date.getFullYear(),
-                date.getMonth() + 1,
-                0
-            );
+        <div>
 
-    }
+            <label for="reportPayment">
+                Τρόπος πληρωμής
+            </label>
 
+            <select id="reportPayment">
+            </select>
 
-    if (type === "year") {
+        </div>
 
-        start =
-            new Date(
-                date.getFullYear(),
-                0,
-                1
-            );
 
+        <!-- ΑΠΟ -->
 
-        end =
-            new Date(
-                date.getFullYear(),
-                11,
-                31
-            );
+        <div>
 
-    }
+            <label for="reportStartDate">
+                Από
+            </label>
 
+            <input
+                type="date"
+                id="reportStartDate">
 
-    function iso(d) {
+        </div>
 
-        return (
-            d.getFullYear() +
-            "-" +
-            String(
-                d.getMonth() + 1
-            ).padStart(2, "0") +
-            "-" +
-            String(
-                d.getDate()
-            ).padStart(2, "0")
-        );
 
-    }
+        <!-- ΕΩΣ -->
 
+        <div>
 
-    return {
+            <label for="reportEndDate">
+                Έως
+            </label>
 
-        start:
-            iso(start),
+            <input
+                type="date"
+                id="reportEndDate">
 
-        end:
-            iso(end)
+        </div>
 
-    };
-}
+    </div>
 
 
-/* =========================================================
-   REPORT FILTER
-   ========================================================= */
+    <!-- =================================================
+         ΤΙ ΘΕΛΩ ΝΑ ΕΜΦΑΝΙΖΕΙ ΤΟ REPORT
+         ================================================= -->
 
-function getFilteredExpenses() {
+    <div class="report-options">
 
-    const dates =
-        getReportDates();
+        <h3>
+            Τι θέλω να εμφανίζει το Report;
+        </h3>
 
 
-    const category =
-        $("reportCategory")
-            .value;
+        <!-- ΠΡΟΕΠΙΛΕΓΜΕΝΟ -->
 
+        <label class="check-option">
 
-    const vehicle =
-        $("reportVehicle")
-            ? $("reportVehicle").value
-            : "all";
+            <input
+                type="checkbox"
+                id="reportShowPayments"
+                checked>
 
+            Αναλυτικές πληρωμές
 
-    const vehicleExpense =
-        $("reportVehicleExpense")
-            ? $("reportVehicleExpense").value
-            : "all";
+        </label>
 
 
-    const person =
-        $("reportPerson")
-            .value;
+        <!-- ΠΡΟΕΠΙΛΕΓΜΕΝΟ -->
 
+        <label class="check-option">
 
-    const payment =
-        $("reportPayment")
-            .value;
+            <input
+                type="checkbox"
+                id="reportShowCategories"
+                checked>
 
+            Σύνολα ανά κατηγορία
 
-    return expenses.filter(
-        function(item) {
+        </label>
 
-            if (
-                item.date < dates.start ||
-                item.date > dates.end
-            ) {
 
-                return false;
+        <!-- ΠΡΟΕΠΙΛΕΓΜΕΝΟ -->
 
-            }
+        <label class="check-option">
 
+            <input
+                type="checkbox"
+                id="reportShowSubcategories"
+                checked>
 
-            if (
-                category !== "all" &&
-                item.category !== category
-            ) {
+            Σύνολα ανά υποκατηγορία
 
-                return false;
+        </label>
 
-            }
 
+        <!-- ΜΟΝΟ ΓΙΑ ΟΧΗΜΑΤΑ -->
 
-            if (
-                category === "Οχήματα" &&
-                vehicle !== "all" &&
-                item.vehicleId !== vehicle
-            ) {
+        <label
+            class="check-option vehicle-report-option hidden">
 
-                return false;
+            <input
+                type="checkbox"
+                id="reportShowVehicles">
 
-            }
+            Σύνολα ανά όχημα
 
+        </label>
 
-            if (
-                category === "Οχήματα" &&
-                vehicleExpense !== "all" &&
-                item.vehicleExpenseType !==
-                    vehicleExpense
-            ) {
 
-                return false;
+        <label
+            class="check-option vehicle-report-option hidden">
 
-            }
+            <input
+                type="checkbox"
+                id="reportShowOdometer">
 
+            Χιλιόμετρα / κοντέρ
 
-            if (
-                person !== "all" &&
-                item.person !== person
-            ) {
+        </label>
 
-                return false;
 
-            }
+        <label
+            class="check-option vehicle-report-option hidden">
 
+            <input
+                type="checkbox"
+                id="reportShowCostPerKm">
 
-            if (
-                payment !== "all" &&
-                item.paymentMethod !== payment
-            ) {
+            Κόστος ανά χιλιόμετρο
 
-                return false;
+        </label>
 
-            }
 
+        <label
+            class="check-option vehicle-report-option hidden">
 
-            return true;
+            <input
+                type="checkbox"
+                id="reportShowTotalVehicleCost">
 
-        }
-    );
-}
+            Συνολικό κόστος οχήματος ανά km
 
+        </label>
 
-/* =========================================================
-   REPORT CALCULATIONS
-   ========================================================= */
+    </div>
 
-function groupTotal(
-    list,
-    property
-) {
 
-    const result = {};
+    <button
+        type="button"
+        id="generateReportButton"
+        class="primary">
 
+        Δημιουργία Report
 
-    list.forEach(
-        function(item) {
+    </button>
 
-            const key =
-                item[property] ||
-                "Χωρίς επιλογή";
+</section>
 
+</main>
 
-            result[key] =
-                (
-                    result[key] || 0
-                ) +
-                Number(
-                    item.amount || 0
-                );
+</div>
 
-        }
-    );
 
+<!-- =====================================================
+     SETTINGS
+     ===================================================== -->
 
-    return result;
-}
+<div
+    id="settingsModal"
+    class="modal hidden"
+    aria-hidden="true">
 
+    <div
+        class="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settingsTitle">
 
-function calculateVehicleCostPerKm(
-    list
-) {
 
-    const byVehicle = {};
+        <div class="modal-header">
 
+            <div>
 
-    list.forEach(
-        function(item) {
+                <h2 id="settingsTitle">
+                    Ρυθμίσεις
+                </h2>
 
-            if (
-                !item.vehicleId ||
-                item.odometer === null ||
-                item.odometer === undefined ||
-                item.odometer === ""
-            ) {
+                <p class="muted">
+                    Παράμετροι εφαρμογής
+                </p>
 
-                return;
+            </div>
 
-            }
 
+            <button
+                type="button"
+                id="closeSettings"
+                class="secondary"
+                aria-label="Κλείσιμο">
 
-            if (
-                !byVehicle[
-                    item.vehicleId
-                ]
-            ) {
+                ×
 
-                byVehicle[
-                    item.vehicleId
-                ] = [];
+            </button>
 
-            }
+        </div>
 
 
-            byVehicle[
-                item.vehicleId
-            ].push(item);
+        <!-- ΚΑΤΗΓΟΡΙΕΣ -->
 
-        }
-    );
+        <div class="settings-section">
 
+            <h3>
+                Κατηγορίες
+            </h3>
 
-    const result = [];
+            <div id="categorySettings"></div>
 
+            <div class="add-row">
 
-    Object.keys(
-        byVehicle
-    ).forEach(
-        function(vehicleId) {
+                <input
+                    type="text"
+                    id="newCategory"
+                    placeholder="Νέα κατηγορία">
 
-            const records =
-                byVehicle[
-                    vehicleId
-                ].sort(
-                    function(a, b) {
+                <button
+                    id="addCategory"
+                    class="settings-add">
 
-                        return (
-                            Number(
-                                a.odometer
-                            ) -
-                            Number(
-                                b.odometer
-                            )
-                        );
+                    +
 
-                    }
-                );
+                </button>
 
+            </div>
 
-            if (
-                records.length < 2
-            ) {
+        </div>
 
-                return;
 
-            }
+        <!-- ΥΠΟΚΑΤΗΓΟΡΙΕΣ -->
 
+        <div class="settings-section">
 
-            const first =
-                Number(
-                    records[0].odometer
-                );
+            <h3>
+                Υποκατηγορίες αγορών
+            </h3>
 
+            <div id="subcategorySettings"></div>
 
-            const last =
-                Number(
-                    records[
-                        records.length - 1
-                    ].odometer
-                );
+            <div class="add-row">
 
+                <input
+                    type="text"
+                    id="newSubcategory"
+                    placeholder="Νέα υποκατηγορία">
 
-            const km =
-                last - first;
+                <button
+                    id="addSubcategory"
+                    class="settings-add">
 
+                    +
 
-            if (km <= 0) {
-                return;
-            }
+                </button>
 
+            </div>
 
-            const total =
-                records.reduce(
-                    function(sum, item) {
+        </div>
 
-                        return (
-                            sum +
-                            Number(
-                                item.amount ||
-                                0
-                            )
-                        );
 
-                    },
-                    0
-                );
+        <!-- ΤΡΟΠΟΙ ΠΛΗΡΩΜΗΣ -->
 
+        <div class="settings-section">
 
-            result.push({
+            <h3>
+                Τρόποι πληρωμής
+            </h3>
 
-                vehicleId:
-                    vehicleId,
+            <div id="paymentSettings"></div>
 
-                vehicle:
-                    records[0].vehicle ||
-                    "Όχημα",
+            <div class="add-row">
 
-                firstOdometer:
-                    first,
+                <input
+                    type="text"
+                    id="newPayment"
+                    placeholder="Νέος τρόπος πληρωμής">
 
-                lastOdometer:
-                    last,
+                <button
+                    id="addPayment"
+                    class="settings-add">
 
-                kilometers:
-                    km,
+                    +
 
-                total:
-                    total,
+                </button>
 
-                costPerKm:
-                    total / km
+            </div>
 
-            });
+        </div>
 
-        }
-    );
 
+        <!-- ΓΙΑ ΠΟΙΟΝ -->
 
-    return result;
-}
+        <div class="settings-section">
 
+            <h3>
+                Για ποιον
+            </h3>
 
-/* =========================================================
-   REPORT HTML
-   ========================================================= */
+            <div id="personSettings"></div>
 
-function createReportHTML(
-    list
-) {
+            <div class="add-row">
 
-    const showPayments =
-        $("reportShowPayments")
-            .checked;
+                <input
+                    type="text"
+                    id="newPerson"
+                    placeholder="Νέα επιλογή">
 
+                <button
+                    id="addPerson"
+                    class="settings-add">
 
-    const showCategories =
-        $("reportShowCategories")
-            .checked;
+                    +
 
+                </button>
 
-    const showSubcategories =
-        $("reportShowSubcategories")
-            .checked;
+            </div>
 
+        </div>
 
-    const showVehicles =
-        $("reportShowVehicles")
-            .checked;
 
+        <!-- ΟΧΗΜΑΤΑ -->
 
-    const showOdometer =
-        $("reportShowOdometer")
-            .checked;
+        <div class="settings-section">
 
+            <h3>
+                Οχήματα
+            </h3>
 
-    const showCostPerKm =
-        $("reportShowCostPerKm")
-            .checked;
+            <div id="vehicleSettings"></div>
 
 
-    const showTotalVehicleCost =
-        $("reportShowTotalVehicleCost")
-            .checked;
+            <div class="vehicle-add-form">
 
+                <select id="newVehicleType">
 
-    const category =
-        $("reportCategory")
-            .value;
+                    <option value="Αυτοκίνητο">
+                        Αυτοκίνητο
+                    </option>
 
+                    <option value="Μηχανή">
+                        Μηχανή
+                    </option>
 
-    const dates =
-        getReportDates();
+                </select>
 
 
-    const total =
-        list.reduce(
-            function(sum, item) {
+                <input
+                    id="newVehicleMake"
+                    type="text"
+                    placeholder="Μάρκα">
 
-                return (
-                    sum +
-                    Number(
-                        item.amount || 0
-                    )
-                );
 
-            },
-            0
-        );
+                <input
+                    id="newVehicleModel"
+                    type="text"
+                    placeholder="Μοντέλο / Τύπος">
 
 
-    let html = `
+                <input
+                    id="newVehiclePlate"
+                    type="text"
+                    placeholder="Πινακίδα">
 
-        <html>
 
-        <head>
+                <button
+                    id="addVehicle"
+                    class="settings-add">
 
-            <meta charset="UTF-8">
+                    Προσθήκη οχήματος
 
-            <title>
-                Daily Expenses Report
-            </title>
+                </button>
 
-            <style>
+            </div>
 
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 30px;
-                    color: #111827;
-                }
+        </div>
 
-                h1 {
-                    text-align: center;
-                }
 
-                h2 {
-                    margin-top: 30px;
-                }
+        <div class="modal-actions">
 
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 12px;
-                }
+            <button
+                id="exportData"
+                class="secondary">
 
-                th,
-                td {
-                    border: 1px solid #d1d5db;
-                    padding: 7px;
-                    text-align: left;
-                }
+                Εξαγωγή δεδομένων
 
-                th {
-                    background: #f3f4f6;
-                }
+            </button>
 
-                .total {
-                    font-size: 18px;
-                    font-weight: bold;
-                    margin-top: 20px;
-                }
 
-            </style>
+            <button
+                id="importDataButton"
+                class="secondary">
 
-        </head>
+                Εισαγωγή δεδομένων
 
-        <body>
+            </button>
 
-            <h1>
-                Daily Expenses
-            </h1>
 
-            <p>
-                Περίοδος:
-                ${formatDate(
-                    dates.start
-                )}
-                -
-                ${formatDate(
-                    dates.end
-                )}
-            </p>
+            <input
+                id="importData"
+                type="file"
+                accept="application/json"
+                class="hidden">
 
-            <p>
-                Κατηγορία:
-                ${
-                    category === "all"
-                        ? "Όλες"
-                        : escapeHTML(
-                            category
-                        )
-                }
-            </p>
 
-            <p class="total">
-                Σύνολο:
-                ${money(total)}
-            </p>
-    `;
+            <button
+                id="resetSettings"
+                class="danger">
 
+                Επαναφορά ρυθμίσεων
 
-    if (showPayments) {
+            </button>
 
-        html += `
+        </div>
 
-            <h2>
-                Αναλυτικές πληρωμές
-            </h2>
+    </div>
 
-            <table>
+</div>
 
-                <thead>
 
-                    <tr>
+<script src="app.js"></script>
 
-                        <th>
-                            Ημερομηνία
-                        </th>
-
-                        <th>
-                            Ώρα
-                        </th>
-
-                        <th>
-                            Κατηγορία
-                        </th>
-
-                        <th>
-                            Υποκατηγορία
-                        </th>
-
-                        <th>
-                            Για ποιον
-                        </th>
-
-                        <th>
-                            Πληρωμή
-                        </th>
-
-                        <th>
-                            Όχημα
-                        </th>
-
-                        <th>
-                            Δαπάνη
-                        </th>
-
-                        <th>
-                            Κοντέρ
-                        </th>
-
-                        <th>
-                            Ποσό
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-        `;
-
-
-        list.forEach(
-            function(item) {
-
-                html += `
-
-                    <tr>
-
-                        <td>
-                            ${formatDate(
-                                item.date
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.time
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.category
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.subcategory
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.person
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.paymentMethod
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.vehicle
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.vehicleExpenseType
-                            )}
-                        </td>
-
-                        <td>
-                            ${
-                                item.odometer !== null &&
-                                item.odometer !== undefined
-                                    ? number(
-                                        item.odometer
-                                    ) + " km"
-                                    : ""
-                            }
-                        </td>
-
-                        <td>
-                            ${money(
-                                item.amount
-                            )}
-                        </td>
-
-                    </tr>
-                `;
-
-            }
-        );
-
-
-        html += `
-
-                </tbody>
-
-            </table>
-        `;
-    }
-
-
-    if (showCategories) {
-
-        const groups =
-            groupTotal(
-                list,
-                "category"
-            );
-
-
-        html += `
-
-            <h2>
-                Σύνολα ανά κατηγορία
-            </h2>
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Κατηγορία</th>
-                        <th>Σύνολο</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-        `;
-
-
-        Object.keys(groups)
-            .forEach(
-                function(key) {
-
-                    html += `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHTML(
-                                    key
-                                )}
-                            </td>
-
-                            <td>
-                                ${money(
-                                    groups[key]
-                                )}
-                            </td>
-
-                        </tr>
-                    `;
-
-                }
-            );
-
-
-        html += `
-
-                </tbody>
-
-            </table>
-        `;
-    }
-
-
-    if (showSubcategories) {
-
-        const groups = {};
-
-
-        list.forEach(
-            function(item) {
-
-                const key =
-                    item.subcategory ||
-                    item.vehicleExpenseType ||
-                    "Χωρίς υποκατηγορία";
-
-
-                groups[key] =
-                    (
-                        groups[key] ||
-                        0
-                    ) +
-                    Number(
-                        item.amount || 0
-                    );
-
-            }
-        );
-
-
-        html += `
-
-            <h2>
-                Σύνολα ανά υποκατηγορία
-            </h2>
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Υποκατηγορία</th>
-                        <th>Σύνολο</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-        `;
-
-
-        Object.keys(groups)
-            .forEach(
-                function(key) {
-
-                    html += `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHTML(
-                                    key
-                                )}
-                            </td>
-
-                            <td>
-                                ${money(
-                                    groups[key]
-                                )}
-                            </td>
-
-                        </tr>
-                    `;
-
-                }
-            );
-
-
-        html += `
-
-                </tbody>
-
-            </table>
-        `;
-    }
-
-
-    if (
-        category === "Οχήματα" &&
-        showVehicles
-    ) {
-
-        const groups =
-            groupTotal(
-                list,
-                "vehicle"
-            );
-
-
-        html += `
-
-            <h2>
-                Σύνολα ανά όχημα
-            </h2>
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Όχημα</th>
-                        <th>Σύνολο</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-        `;
-
-
-        Object.keys(groups)
-            .forEach(
-                function(key) {
-
-                    html += `
-
-                        <tr>
-
-                            <td>
-                                ${escapeHTML(
-                                    key
-                                )}
-                            </td>
-
-                            <td>
-                                ${money(
-                                    groups[key]
-                                )}
-                            </td>
-
-                        </tr>
-                    `;
-
-                }
-            );
-
-
-        html += `
-
-                </tbody>
-
-            </table>
-        `;
-    }
-
-
-    if (
-        category === "Οχήματα" &&
-        showOdometer
-    ) {
-
-        const records =
-            list.filter(
-                function(item) {
-
-                    return (
-                        item.odometer !== null &&
-                        item.odometer !== undefined &&
-                        item.odometer !== ""
-                    );
-
-                }
-            );
-
-
-        html += `
-
-            <h2>
-                Χιλιόμετρα / κοντέρ
-            </h2>
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Ημερομηνία</th>
-                        <th>Όχημα</th>
-                        <th>Κοντέρ</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-        `;
-
-
-        records.forEach(
-            function(item) {
-
-                html += `
-
-                    <tr>
-
-                        <td>
-                            ${formatDate(
-                                item.date
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(
-                                item.vehicle
-                            )}
-                        </td>
-
-                        <td>
-                            ${number(
-                                item.odometer
-                            )} km
-                        </td>
-
-                    </tr>
-                `;
-
-            }
-        );
-
-
-        html += `
-
-                </tbody>
-
-            </table>
-        `;
-    }
-
-
-    if (
-        category === "Οχήματα" &&
-        (
-            showCostPerKm ||
-            showTotalVehicleCost
-        )
-    ) {
-
-        const calculations =
-            calculateVehicleCostPerKm(
-                list
-            );
-
-
-        html += `
-
-            <h2>
-                Κόστος οχήματος ανά χιλιόμετρο
-            </h2>
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Όχημα
-                        </th>
-
-                        <th>
-                            Αρχικό κοντέρ
-                        </th>
-
-                        <th>
-                            Τελικό κοντέρ
-                        </th>
-
-                        <th>
-                            Χιλιόμετρα
-                        </th>
-
-                        <th>
-                            Συνολικό κόστος
-                        </th>
-
-                        <th>
-                            Κόστος / km
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-        `;
-
-
-        calculations.forEach(
-            function(item) {
-
-                html += `
-
-                    <tr>
-
-                        <td>
-                            ${escapeHTML(
-                                item.vehicle
-                            )}
-                        </td>
-
-                        <td>
-                            ${number(
-                                item.firstOdometer
-                            )}
-                        </td>
-
-                        <td>
-                            ${number(
-                                item.lastOdometer
-                            )}
-                        </td>
-
-                        <td>
-                            ${number(
-                                item.kilometers
-                            )}
-                        </td>
-
-                        <td>
-                            ${money(
-                                item.total
-                            )}
-                        </td>
-
-                        <td>
-                            ${money(
-                                item.costPerKm
-                            )}
-                        </td>
-
-                    </tr>
-                `;
-
-            }
-        );
-
-
-        html += `
-
-                </tbody>
-
-            </table>
-        `;
-    }
-
-
-    html += `
-
-        </body>
-
-        </html>
-    `;
-
-
-    return html;
-}
-
-
-/* =========================================================
-   GENERATE REPORT
-   ========================================================= */
-
-function generateReport() {
-
-    const list =
-        getFilteredExpenses();
-
-
-    if (list.length === 0) {
-
-        showMessage(
-            "Δεν υπάρχουν πληρωμές για τα επιλεγμένα κριτήρια."
-        );
-
-        return;
-    }
-
-
-    const html =
-        createReportHTML(
-            list
-        );
-
-
-    const blob =
-        new Blob(
-            [html],
-            {
-                type:
-                    "text/html;charset=utf-8"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href = url;
-
-    link.download =
-        "daily-expenses-report.html";
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    link.remove();
-
-
-    URL.revokeObjectURL(
-        url
-    );
-}
-
-
-/* =========================================================
-   SETTINGS RENDER
-   ========================================================= */
-
-function renderSettings() {
-
-    renderSimpleSettings(
-        "categorySettings",
-        settings.categories,
-        "category"
-    );
-
-
-    renderSimpleSettings(
-        "subcategorySettings",
-        settings.shoppingSubcategories,
-        "subcategory"
-    );
-
-
-    renderSimpleSettings(
-        "paymentSettings",
-        settings.paymentMethods,
-        "payment"
-    );
-
-
-    renderSimpleSettings(
-        "personSettings",
-        settings.persons,
-        "person"
-    );
-
-
-    renderVehicleSettings();
-}
-
-
-/* =========================================================
-   SIMPLE SETTINGS
-   ========================================================= */
-
-function renderSimpleSettings(
-    containerId,
-    values,
-    type
-) {
-
-    const container =
-        $(containerId);
-
-
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML = "";
-
-
-    values.forEach(
-        function(value, index) {
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "setting-item";
-
-
-            const input =
-                document.createElement(
-                    "input"
-                );
-
-
-            input.type = "text";
-
-            input.value = value;
-
-
-            input.addEventListener(
-                "change",
-                function() {
-
-                    const newValue =
-                        input.value.trim();
-
-
-                    if (!newValue) {
-
-                        input.value =
-                            values[index];
-
-                        return;
-
-                    }
-
-
-                    values[index] =
-                        newValue;
-
-
-                    saveSettings();
-
-                    populateMainSelects();
-
-                    renderSettings();
-
-                }
-            );
-
-
-            const deleteButton =
-                document.createElement(
-                    "button"
-                );
-
-
-            deleteButton.type =
-                "button";
-
-            deleteButton.className =
-                "danger";
-
-            deleteButton.textContent =
-                "Διαγραφή";
-
-
-            deleteButton.addEventListener(
-                "click",
-                function() {
-
-                    if (
-                        !confirm(
-                            "Να διαγραφεί η επιλογή;"
-                        )
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    values.splice(
-                        index,
-                        1
-                    );
-
-
-                    saveSettings();
-
-                    populateMainSelects();
-
-                    renderSettings();
-
-                }
-            );
-
-
-            row.appendChild(
-                input
-            );
-
-            row.appendChild(
-                deleteButton
-            );
-
-
-            container.appendChild(
-                row
-            );
-
-        }
-    );
-}
-
-
-/* =========================================================
-   VEHICLE SETTINGS
-   ========================================================= */
-
-function renderVehicleSettings() {
-
-    const container =
-        $("vehicleSettings");
-
-
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML = "";
-
-
-    settings.vehicles.forEach(
-        function(vehicle) {
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "vehicle-setting";
-
-
-            const info =
-                document.createElement(
-                    "div"
-                );
-
-
-            info.innerHTML = `
-
-                <strong>
-                    ${escapeHTML(
-                        vehicleDisplayName(
-                            vehicle
-                        )
-                    )}
-                </strong>
-
-                <small>
-                    ${escapeHTML(
-                        vehicle.type
-                    )}
-                </small>
-            `;
-
-
-            const edit =
-                document.createElement(
-                    "button"
-                );
-
-
-            edit.type =
-                "button";
-
-            edit.className =
-                "secondary";
-
-            edit.textContent =
-                "Επεξεργασία";
-
-
-            edit.addEventListener(
-                "click",
-                function() {
-
-                    const make =
-                        prompt(
-                            "Μάρκα:",
-                            vehicle.make
-                        );
-
-
-                    if (
-                        make === null
-                    ) {
-                        return;
-                    }
-
-
-                    const model =
-                        prompt(
-                            "Μοντέλο / Τύπος:",
-                            vehicle.model
-                        );
-
-
-                    if (
-                        model === null
-                    ) {
-                        return;
-                    }
-
-
-                    const plate =
-                        prompt(
-                            "Πινακίδα:",
-                            vehicle.plate
-                        );
-
-
-                    if (
-                        plate === null
-                    ) {
-                        return;
-                    }
-
-
-                    vehicle.make =
-                        make.trim();
-
-                    vehicle.model =
-                        model.trim();
-
-                    vehicle.plate =
-                        plate.trim();
-
-
-                    saveSettings();
-
-                    populateMainSelects();
-
-                    renderSettings();
-
-                }
-            );
-
-
-            const remove =
-                document.createElement(
-                    "button"
-                );
-
-
-            remove.type =
-                "button";
-
-            remove.className =
-                "danger";
-
-            remove.textContent =
-                "Διαγραφή";
-
-
-            remove.addEventListener(
-                "click",
-                function() {
-
-                    if (
-                        !confirm(
-                            "Να διαγραφεί το όχημα;"
-                        )
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    settings.vehicles =
-                        settings.vehicles.filter(
-                            function(item) {
-
-                                return (
-                                    item.id !==
-                                    vehicle.id
-                                );
-
-                            }
-                        );
-
-
-                    saveSettings();
-
-                    populateMainSelects();
-
-                    renderSettings();
-
-                }
-            );
-
-
-            row.appendChild(
-                info
-            );
-
-            row.appendChild(
-                edit
-            );
-
-            row.appendChild(
-                remove
-            );
-
-
-            container.appendChild(
-                row
-            );
-
-        }
-    );
-}
-
-
-/* =========================================================
-   ADD SETTINGS
-   ========================================================= */
-
-function addSimpleSetting(
-    inputId,
-    array
-) {
-
-    const input =
-        $(inputId);
-
-
-    if (!input) {
-        return;
-    }
-
-
-    const value =
-        input.value.trim();
-
-
-    if (!value) {
-        return;
-    }
-
-
-    if (
-        !array.includes(
-            value
-        )
-    ) {
-
-        array.push(
-            value
-        );
-
-    }
-
-
-    input.value = "";
-
-    saveSettings();
-
-    populateMainSelects();
-
-    renderSettings();
-}
-
-
-/* =========================================================
-   ADD VEHICLE
-   ========================================================= */
-
-function addVehicle() {
-
-    const type =
-        $("newVehicleType")
-            .value;
-
-
-    const make =
-        $("newVehicleMake")
-            .value
-            .trim();
-
-
-    const model =
-        $("newVehicleModel")
-            .value
-            .trim();
-
-
-    const plate =
-        $("newVehiclePlate")
-            .value
-            .trim();
-
-
-    if (
-        !make &&
-        !model &&
-        !plate
-    ) {
-
-        showMessage(
-            "Συμπλήρωσε τουλάχιστον ένα στοιχείο του οχήματος."
-        );
-
-        return;
-    }
-
-
-    settings.vehicles.push({
-
-        id:
-            createId(
-                "vehicle"
-            ),
-
-        type:
-            type,
-
-        make:
-            make,
-
-        model:
-            model,
-
-        plate:
-            plate
-
-    });
-
-
-    $("newVehicleMake").value =
-        "";
-
-    $("newVehicleModel").value =
-        "";
-
-    $("newVehiclePlate").value =
-        "";
-
-
-    saveSettings();
-
-    populateMainSelects();
-
-    renderSettings();
-}
-
-
-/* =========================================================
-   SETTINGS MODAL
-   ========================================================= */
-
-function openSettings() {
-
-    const modal =
-        $("settingsModal");
-
-
-    if (!modal) {
-        return;
-    }
-
-
-    renderSettings();
-
-
-    modal.classList.remove(
-        "hidden"
-    );
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-
-    document.body.classList.add(
-        "modal-open"
-    );
-}
-
-
-function closeSettings() {
-
-    const modal =
-        $("settingsModal");
-
-
-    if (!modal) {
-        return;
-    }
-
-
-    modal.classList.add(
-        "hidden"
-    );
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-
-    document.body.classList.remove(
-        "modal-open"
-    );
-}
-
-
-/* =========================================================
-   EXPORT
-   ========================================================= */
-
-function exportData() {
-
-    const data = {
-
-        version: 4,
-
-        exportedAt:
-            new Date()
-                .toISOString(),
-
-        expenses:
-            expenses,
-
-        settings:
-            settings
-
-    };
-
-
-    const blob =
-        new Blob(
-            [
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                )
-            ],
-            {
-                type:
-                    "application/json"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href = url;
-
-    link.download =
-        "daily-expenses-backup.json";
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    link.remove();
-
-
-    URL.revokeObjectURL(
-        url
-    );
-}
-
-
-/* =========================================================
-   IMPORT
-   ========================================================= */
-
-function importData(file) {
-
-    if (!file) {
-        return;
-    }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload =
-        function(event) {
-
-            try {
-
-                const data =
-                    JSON.parse(
-                        event.target.result
-                    );
-
-
-                if (
-                    Array.isArray(
-                        data.expenses
-                    )
-                ) {
-
-                    expenses =
-                        data.expenses;
-
-                }
-
-
-                if (
-                    data.settings &&
-                    typeof data.settings ===
-                        "object"
-                ) {
-
-                    settings =
-                        data.settings;
-
-                    migrateSettings();
-
-                }
-
-
-                saveExpenses();
-
-                saveSettings();
-
-                populateMainSelects();
-
-                renderSettings();
-
-                renderExpenses();
-
-
-                showMessage(
-                    "Τα δεδομένα εισήχθησαν επιτυχώς."
-                );
-
-            } catch (error) {
-
-                console.error(
-                    error
-                );
-
-
-                showMessage(
-                    "Το αρχείο δεν είναι έγκυρο."
-                );
-
-            }
-
-        };
-
-
-    reader.readAsText(
-        file
-    );
-}
-
-
-/* =========================================================
-   RESET SETTINGS
-   ========================================================= */
-
-function resetSettings() {
-
-    if (
-        !confirm(
-            "Να γίνει επαναφορά των ρυθμίσεων στις αρχικές τιμές;"
-        )
-    ) {
-
-        return;
-    }
-
-
-    settings =
-        clone(
-            DEFAULT_SETTINGS
-        );
-
-
-    saveSettings();
-
-    populateMainSelects();
-
-    renderSettings();
-
-
-    showMessage(
-        "Οι ρυθμίσεις επαναφέρθηκαν."
-    );
-}
-
-
-/* =========================================================
-   OPTIONAL LOCATION
-   ========================================================= */
-
-function getCurrentLocation() {
-
-    if (
-        !navigator.geolocation
-    ) {
-
-        return Promise.resolve(
-            null
-        );
-
-    }
-
-
-    return new Promise(
-        function(resolve) {
-
-            navigator.geolocation.getCurrentPosition(
-
-                function(position) {
-
-                    resolve({
-
-                        latitude:
-                            position.coords.latitude,
-
-                        longitude:
-                            position.coords.longitude
-
-                    });
-
-                },
-
-                function() {
-
-                    /*
-                     * Η τοποθεσία είναι
-                     * ΠΡΟΑΙΡΕΤΙΚΗ.
-                     *
-                     * Αν το Safari δεν δώσει
-                     * άδεια, η πληρωμή
-                     * συνεχίζει κανονικά.
-                     */
-
-                    resolve(
-                        null
-                    );
-
-                },
-
-                {
-
-                    enableHighAccuracy:
-                        true,
-
-                    timeout:
-                        5000,
-
-                    maximumAge:
-                        60000
-
-                }
-
-            );
-
-        }
-    );
-}
-
-
-/* =========================================================
-   EVENTS
-   ========================================================= */
-
-function setupEvents() {
-
-
-    /* ΝΕΑ ΠΛΗΡΩΜΗ */
-
-    $("addExpenseButton")
-        ?.addEventListener(
-            "click",
-            saveExpense
-        );
-
-
-    /* ΚΑΤΗΓΟΡΙΑ */
-
-    $("category")
-        ?.addEventListener(
-            "change",
-            updateCategoryInterface
-        );
-
-
-    /* ΤΥΠΟΣ ΟΧΗΜΑΤΟΣ */
-
-    $("vehicleType")
-        ?.addEventListener(
-            "change",
-            function() {
-
-                /*
-                 * Καθαρίζουμε τις επόμενες
-                 * επιλογές πριν δημιουργήσουμε
-                 * τη νέα λίστα.
-                 */
-
-                if ($("vehicle")) {
-
-                    $("vehicle").value =
-                        "";
-
-                }
-
-
-                if (
-                    $("vehicleExpenseType")
-                ) {
-
-                    $(
-                        "vehicleExpenseType"
-                    ).value = "";
-
-                }
-
-
-                if ($("odometer")) {
-
-                    $("odometer").value =
-                        "";
-
-                }
-
-
-                updateVehicleInterface();
-
-            }
-        );
-
-
-    /* ΣΥΓΚΕΚΡΙΜΕΝΟ ΟΧΗΜΑ */
-
-    $("vehicle")
-        ?.addEventListener(
-            "change",
-            function() {
-
-                /*
-                 * Μόλις επιλεγεί
-                 * συγκεκριμένο όχημα,
-                 * εμφανίζεται το επόμενο
-                 * βήμα: Είδος δαπάνης.
-                 */
-
-                updateVehicleInterface();
-
-            }
-        );
-
-
-    /* ΤΡΟΠΟΣ ΑΓΟΡΑΣ */
-
-    $("purchaseMethod")
-        ?.addEventListener(
-            "change",
-            updatePurchaseInterface
-        );
-
-
-    /* ΗΜΕΡΟΜΗΝΙΑ */
-
-    $("selectedDate")
-        ?.addEventListener(
-            "change",
-            renderExpenses
-        );
-
-
-    /* REPORT CATEGORY */
-
-    $("reportCategory")
-        ?.addEventListener(
-            "change",
-            updateReportInterface
-        );
-
-
-    /* REPORT TYPE */
-
-    $("reportType")
-        ?.addEventListener(
-            "change",
-            function() {
-
-                const custom =
-                    $("reportType")
-                        .value ===
-                    "custom";
-
-
-                toggle(
-                    "reportStartDate",
-                    custom
-                );
-
-            }
-        );
-
-
-    /* REPORT */
-
-    $("generateReportButton")
-        ?.addEventListener(
-            "click",
-            generateReport
-        );
-
-
-    /* SETTINGS */
-
-    $("settingsButton")
-        ?.addEventListener(
-            "click",
-            openSettings
-        );
-
-
-    $("closeSettings")
-        ?.addEventListener(
-            "click",
-            closeSettings
-        );
-
-
-    /* ADD SETTINGS */
-
-    $("addCategory")
-        ?.addEventListener(
-            "click",
-            function() {
-
-                addSimpleSetting(
-                    "newCategory",
-                    settings.categories
-                );
-
-            }
-        );
-
-
-    $("addSubcategory")
-        ?.addEventListener(
-            "click",
-            function() {
-
-                addSimpleSetting(
-                    "newSubcategory",
-                    settings.shoppingSubcategories
-                );
-
-            }
-        );
-
-
-    $("addPayment")
-        ?.addEventListener(
-            "click",
-            function() {
-
-                addSimpleSetting(
-                    "newPayment",
-                    settings.paymentMethods
-                );
-
-            }
-        );
-
-
-    $("addPerson")
-        ?.addEventListener(
-            "click",
-            function() {
-
-                addSimpleSetting(
-                    "newPerson",
-                    settings.persons
-                );
-
-            }
-        );
-
-
-    $("addVehicle")
-        ?.addEventListener(
-            "click",
-            addVehicle
-        );
-
-
-    /* EXPORT */
-
-    $("exportData")
-        ?.addEventListener(
-            "click",
-            exportData
-        );
-
-
-    /* IMPORT */
-
-    $("importDataButton")
-        ?.addEventListener(
-            "click",
-            function() {
-
-                $("importData")
-                    ?.click();
-
-            }
-        );
-
-
-    $("importData")
-        ?.addEventListener(
-            "change",
-            function(event) {
-
-                const file =
-                    event.target.files[0];
-
-                importData(
-                    file
-                );
-
-            }
-        );
-
-
-    /* RESET */
-
-    $("resetSettings")
-        ?.addEventListener(
-            "click",
-            resetSettings
-        );
-
-
-    /* EXPENSE LIST */
-
-    $("expenseList")
-        ?.addEventListener(
-            "click",
-            function(event) {
-
-                const editButton =
-                    event.target.closest(
-                        "[data-edit]"
-                    );
-
-
-                if (editButton) {
-
-                    editExpense(
-                        editButton.dataset.edit
-                    );
-
-                    return;
-
-                }
-
-
-                const deleteButton =
-                    event.target.closest(
-                        "[data-delete]"
-                    );
-
-
-                if (deleteButton) {
-
-                    deleteExpense(
-                        deleteButton.dataset.delete
-                    );
-
-                }
-
-            }
-        );
-
-
-    /* ESC */
-
-    document.addEventListener(
-        "keydown",
-        function(event) {
-
-            if (
-                event.key ===
-                "Escape"
-            ) {
-
-                closeSettings();
-
-            }
-
-        }
-    );
-}
-
-
-/* =========================================================
-   INITIALIZATION
-   ========================================================= */
-
-function initialize() {
-
-    if ($("selectedDate")) {
-
-        $("selectedDate").value =
-            today();
-
-    }
-
-
-    updateDateTime();
-
-
-    setInterval(
-        updateDateTime,
-        30000
-    );
-
-
-    populateMainSelects();
-
-
-    setupEvents();
-
-
-    renderExpenses();
-
-
-    updatePurchaseInterface();
-
-
-    updateCategoryInterface();
-
-
-    updateReportInterface();
-}
-
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initialize
-);
+</body>
+</html>
