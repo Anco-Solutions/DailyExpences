@@ -849,6 +849,48 @@ async function generatePDF() {
 
     const doc =
         new jsPDF();
+        
+            try {
+        const response = await fetch(
+            "https://cdn.jsdelivr.net/gh/openmaptiles/fonts@master/noto-sans/NotoSans-Regular.ttf"
+        );
+
+        const buffer = await response.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+
+        let binary = "";
+        const chunkSize = 0x8000;
+
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            binary += String.fromCharCode(
+                ...bytes.subarray(i, i + chunkSize)
+            );
+        }
+
+        const base64 = btoa(binary);
+
+        doc.addFileToVFS(
+            "NotoSans-Regular.ttf",
+            base64
+        );
+
+        doc.addFont(
+            "NotoSans-Regular.ttf",
+            "NotoSans",
+            "normal"
+        );
+
+        doc.setFont(
+            "NotoSans",
+            "normal"
+        );
+
+    } catch (error) {
+        console.error(
+            "Greek font loading error:",
+            error
+        );
+    }
 
 
     const totals =
