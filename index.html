@@ -1,49 +1,93 @@
 <!DOCTYPE html>
 <html lang="el">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#111827">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <meta
+        name="theme-color"
+        content="#111827">
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes">
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent">
 
     <title>Daily Expenses</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css">
 </head>
+
 
 <body>
 
 <div class="app">
 
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
     <header class="app-header">
 
         <div class="header-title">
-            <h1>Daily Expenses</h1>
+
+            <h1>
+                Daily Expenses
+            </h1>
+
             <div id="currentDateTime"></div>
+
         </div>
+
 
         <button
             type="button"
             id="settingsButton"
-            class="secondary"
-            aria-label="Ρυθμίσεις">
-            ⚙️ Ρυθμίσεις
+            class="secondary">
+
+            Ρυθμίσεις
+
         </button>
 
     </header>
 
 
+
     <main>
+
+
+        <!-- =================================================
+             NEW PAYMENT
+             ================================================= -->
 
         <section class="card">
 
-            <h2>Νέο Έξοδο</h2>
+            <h2>
+                Νέα πληρωμή
+            </h2>
+
 
             <div class="grid">
 
+
+                <!-- AMOUNT -->
+
                 <div>
-                    <label for="amount">Ποσό (€)</label>
+
+                    <label for="amount">
+                        Ποσό (€)
+                    </label>
+
                     <input
                         type="number"
                         id="amount"
@@ -51,40 +95,114 @@
                         min="0"
                         inputmode="decimal"
                         autocomplete="off">
+
                 </div>
+
+
+
+                <!-- PAYMENT METHOD -->
 
                 <div>
-                    <label for="paymentMethod">Πώς πληρώνω;</label>
-                    <select id="paymentMethod"></select>
+
+                    <label for="paymentMethod">
+                        Πώς πληρώνω;
+                    </label>
+
+                    <select id="paymentMethod">
+                    </select>
+
                 </div>
+
+
+
+                <!-- CATEGORY -->
 
                 <div>
-                    <label for="category">Κατηγορία</label>
-                    <select id="category"></select>
+
+                    <label for="category">
+                        Κατηγορία
+                    </label>
+
+                    <select id="category">
+                    </select>
+
                 </div>
 
-                <div id="subcategoryWrap" class="hidden">
-                    <label for="subcategory">Υποκατηγορία</label>
-                    <select id="subcategory"></select>
+
+
+                <!-- SUBCATEGORY -->
+
+                <div
+                    id="subcategoryWrap"
+                    class="hidden">
+
+                    <label for="subcategory">
+                        Υποκατηγορία
+                    </label>
+
+                    <select id="subcategory">
+                    </select>
+
                 </div>
 
-                <div id="vehicleTypeWrap" class="hidden">
-                    <label for="vehicleType">Τύπος οχήματος</label>
+
+
+                <!-- VEHICLE TYPE -->
+
+                <div
+                    id="vehicleTypeWrap"
+                    class="hidden">
+
+                    <label for="vehicleType">
+                        Τύπος οχήματος
+                    </label>
 
                     <select id="vehicleType">
-                        <option value="">🚘 Επιλέξτε τύπο οχήματος</option>
-                        <option value="Αυτοκίνητο">🚗 Αυτοκίνητο</option>
-                        <option value="Μηχανή">🏍️ Μηχανή</option>
+
+                        <option value="">
+                            Επιλέξτε τύπο οχήματος
+                        </option>
+
+                        <option value="Αυτοκίνητο">
+                            Αυτοκίνητο
+                        </option>
+
+                        <option value="Μηχανή">
+                            Μηχανή
+                        </option>
+
                     </select>
+
                 </div>
 
-                <div id="vehicleWrap" class="hidden">
-                    <label for="vehicle">Όχημα</label>
-                    <select id="vehicle"></select>
+
+
+                <!-- VEHICLE -->
+
+                <div
+                    id="vehicleWrap"
+                    class="hidden">
+
+                    <label for="vehicle">
+                        Όχημα
+                    </label>
+
+                    <select id="vehicle">
+                    </select>
+
                 </div>
 
-                <div id="litersWrap" class="hidden">
-                    <label for="liters">Λίτρα καυσίμου</label>
+
+
+                <!-- FUEL -->
+
+                <div
+                    id="litersWrap"
+                    class="hidden">
+
+                    <label for="liters">
+                        Λίτρα καυσίμου
+                    </label>
 
                     <input
                         type="number"
@@ -92,10 +210,20 @@
                         step="0.01"
                         min="0"
                         inputmode="decimal">
+
                 </div>
 
-                <div id="odometerWrap" class="hidden">
-                    <label for="odometer">Χιλιόμετρα οχήματος</label>
+
+
+                <!-- ODOMETER -->
+
+                <div
+                    id="odometerWrap"
+                    class="hidden">
+
+                    <label for="odometer">
+                        Χιλιόμετρα οχήματος
+                    </label>
 
                     <input
                         type="number"
@@ -103,25 +231,57 @@
                         step="1"
                         min="0"
                         inputmode="numeric">
+
                 </div>
 
-                <div>
-                    <label for="person">Για ποιον;</label>
-                    <select id="person"></select>
-                </div>
+
+
+                <!-- PERSON -->
 
                 <div>
-                    <label for="purchaseMethod">Τρόπος αγοράς</label>
+
+                    <label for="person">
+                        Για ποιον;
+                    </label>
+
+                    <select id="person">
+                    </select>
+
+                </div>
+
+
+
+                <!-- PURCHASE METHOD -->
+
+                <div>
+
+                    <label for="purchaseMethod">
+                        Τρόπος αγοράς
+                    </label>
 
                     <select id="purchaseMethod">
-                        <option value="store">🏪 Φυσικό κατάστημα</option>
-                        <option value="internet">🌐 Internet</option>
+
+                        <option value="store">
+                            Φυσικό κατάστημα
+                        </option>
+
+                        <option value="internet">
+                            Internet
+                        </option>
+
                     </select>
+
                 </div>
+
+
+
+                <!-- SHOP -->
 
                 <div id="shopWrap">
 
-                    <label for="shop">Κατάστημα / Ιστοσελίδα</label>
+                    <label for="shop">
+                        Κατάστημα / Ιστοσελίδα
+                    </label>
 
                     <input
                         type="text"
@@ -131,9 +291,17 @@
 
                 </div>
 
-                <div id="orderWrap" class="hidden">
 
-                    <label for="orderNumber">Αριθμός παραγγελίας</label>
+
+                <!-- ORDER NUMBER -->
+
+                <div
+                    id="orderWrap"
+                    class="hidden">
+
+                    <label for="orderNumber">
+                        Αριθμός παραγγελίας
+                    </label>
 
                     <input
                         type="text"
@@ -142,23 +310,53 @@
 
                 </div>
 
-                <div id="orderStatusWrap" class="hidden">
 
-                    <label for="orderStatus">Κατάσταση παραγγελίας</label>
+
+                <!-- ORDER STATUS -->
+
+                <div
+                    id="orderStatusWrap"
+                    class="hidden">
+
+                    <label for="orderStatus">
+                        Κατάσταση παραγγελίας
+                    </label>
 
                     <select id="orderStatus">
-                        <option value="Παραγγέλθηκε">Παραγγέλθηκε</option>
-                        <option value="Αναμένεται">Αναμένεται</option>
-                        <option value="Παραδόθηκε">Παραδόθηκε</option>
-                        <option value="Ακυρώθηκε">Ακυρώθηκε</option>
-                        <option value="Επιστράφηκε">Επιστράφηκε</option>
+
+                        <option value="Παραγγέλθηκε">
+                            Παραγγέλθηκε
+                        </option>
+
+                        <option value="Αναμένεται">
+                            Αναμένεται
+                        </option>
+
+                        <option value="Παραδόθηκε">
+                            Παραδόθηκε
+                        </option>
+
+                        <option value="Ακυρώθηκε">
+                            Ακυρώθηκε
+                        </option>
+
+                        <option value="Επιστράφηκε">
+                            Επιστράφηκε
+                        </option>
+
                     </select>
 
                 </div>
 
+
+
+                <!-- DESCRIPTION -->
+
                 <div class="wide">
 
-                    <label for="description">Περιγραφή</label>
+                    <label for="description">
+                        Περιγραφή
+                    </label>
 
                     <input
                         type="text"
@@ -170,89 +368,180 @@
 
             </div>
 
+
+
+            <!-- ADD PAYMENT -->
+
             <button
                 type="button"
                 id="addExpenseButton"
                 class="primary">
-                ➕ Προσθήκη εξόδου
+
+                <span
+                    class="button-plus"
+                    aria-hidden="true">+</span>
+
+                Προσθήκη εξόδου
+
             </button>
 
         </section>
 
 
+
+        <!-- =================================================
+             CALENDAR
+             ================================================= -->
+
         <section class="card">
 
-            <h2>📅 Ημερολόγιο</h2>
+            <h2>
+                Ημερολόγιο
+            </h2>
 
-            <label for="selectedDate">Ημερομηνία</label>
+
+            <label for="selectedDate">
+                Ημερομηνία
+            </label>
 
             <input
                 type="date"
                 id="selectedDate">
 
+
             <div id="daySummary"></div>
+
 
             <div id="expenseList"></div>
 
         </section>
 
 
+
+        <!-- =================================================
+             REPORTS
+             ================================================= -->
+
         <section class="card">
 
-            <h2>📄 Reports / PDF</h2>
+            <h2>
+                Reports / PDF
+            </h2>
+
 
             <div class="grid">
 
+
                 <div>
-                    <label for="reportType">Τύπος Report</label>
+
+                    <label for="reportType">
+                        Τύπος Report
+                    </label>
 
                     <select id="reportType">
-                        <option value="day">Ημερήσιο</option>
-                        <option value="week">Εβδομαδιαίο</option>
-                        <option value="month">Μηνιαίο</option>
-                        <option value="year">Ετήσιο</option>
-                        <option value="custom">Συγκεκριμένη περίοδος</option>
+
+                        <option value="day">
+                            Ημερήσιο
+                        </option>
+
+                        <option value="week">
+                            Εβδομαδιαίο
+                        </option>
+
+                        <option value="month">
+                            Μηνιαίο
+                        </option>
+
+                        <option value="year">
+                            Ετήσιο
+                        </option>
+
+                        <option value="custom">
+                            Συγκεκριμένη περίοδος
+                        </option>
+
                     </select>
+
                 </div>
 
-                <div>
-                    <label for="reportCategory">Κατηγορία</label>
-                    <select id="reportCategory"></select>
-                </div>
+
 
                 <div>
-                    <label for="reportPerson">Για ποιον</label>
-                    <select id="reportPerson"></select>
+
+                    <label for="reportCategory">
+                        Κατηγορία
+                    </label>
+
+                    <select id="reportCategory">
+                    </select>
+
                 </div>
 
-                <div>
-                    <label for="reportPayment">Τρόπος πληρωμής</label>
-                    <select id="reportPayment"></select>
-                </div>
+
 
                 <div>
-                    <label for="reportStartDate">Από</label>
+
+                    <label for="reportPerson">
+                        Για ποιον
+                    </label>
+
+                    <select id="reportPerson">
+                    </select>
+
+                </div>
+
+
+
+                <div>
+
+                    <label for="reportPayment">
+                        Τρόπος πληρωμής
+                    </label>
+
+                    <select id="reportPayment">
+                    </select>
+
+                </div>
+
+
+
+                <div>
+
+                    <label for="reportStartDate">
+                        Από
+                    </label>
 
                     <input
                         type="date"
                         id="reportStartDate">
+
                 </div>
 
+
+
                 <div>
-                    <label for="reportEndDate">Έως</label>
+
+                    <label for="reportEndDate">
+                        Έως
+                    </label>
 
                     <input
                         type="date"
                         id="reportEndDate">
+
                 </div>
 
             </div>
+
+
 
             <button
                 type="button"
                 id="generateReportButton"
                 class="primary">
-                📄 Δημιουργία Report PDF
+
+                Δημιουργία Report PDF
+
             </button>
 
         </section>
@@ -262,10 +551,16 @@
 </div>
 
 
+
+<!-- =========================================================
+     SETTINGS MODAL
+     ========================================================= -->
+
 <div
     id="settingsModal"
     class="modal hidden"
     aria-hidden="true">
+
 
     <div
         class="modal-content"
@@ -273,11 +568,14 @@
         aria-modal="true"
         aria-labelledby="settingsTitle">
 
+
         <div class="modal-header">
 
             <div>
 
-                <h2 id="settingsTitle">⚙️ Ρυθμίσεις</h2>
+                <h2 id="settingsTitle">
+                    Ρυθμίσεις
+                </h2>
 
                 <p class="muted">
                     Ρυθμίσεις εφαρμογής
@@ -285,15 +583,19 @@
 
             </div>
 
+
             <button
                 type="button"
                 id="closeSettings"
                 class="secondary"
                 aria-label="Κλείσιμο">
-                ✕
+
+                ×
+
             </button>
 
         </div>
+
 
 
         <p class="muted">
@@ -302,13 +604,20 @@
         </p>
 
 
+
         <div class="settings-grid">
+
+
+            <!-- PAYMENT METHODS -->
 
             <div class="settings-section">
 
-                <h3>💳 Τρόποι πληρωμής</h3>
+                <h3>
+                    Τρόποι πληρωμής
+                </h3>
 
                 <div id="paymentSettings"></div>
+
 
                 <div class="add-row">
 
@@ -318,11 +627,15 @@
                         placeholder="Νέος τρόπος πληρωμής"
                         autocomplete="off">
 
+
                     <button
                         type="button"
                         id="addPayment"
+                        class="settings-add"
                         aria-label="Προσθήκη τρόπου πληρωμής">
-                        ➕
+
+                        +
+
                     </button>
 
                 </div>
@@ -330,11 +643,17 @@
             </div>
 
 
+
+            <!-- CATEGORIES -->
+
             <div class="settings-section">
 
-                <h3>🏷️ Κατηγορίες</h3>
+                <h3>
+                    Κατηγορίες
+                </h3>
 
                 <div id="categorySettings"></div>
+
 
                 <div class="add-row">
 
@@ -344,11 +663,15 @@
                         placeholder="Νέα κατηγορία"
                         autocomplete="off">
 
+
                     <button
                         type="button"
                         id="addCategory"
+                        class="settings-add"
                         aria-label="Προσθήκη κατηγορίας">
-                        ➕
+
+                        +
+
                     </button>
 
                 </div>
@@ -356,11 +679,17 @@
             </div>
 
 
+
+            <!-- PERSONS -->
+
             <div class="settings-section">
 
-                <h3>👥 Άτομα / Παραλήπτες εξόδων</h3>
+                <h3>
+                    Άτομα / Παραλήπτες πληρωμών
+                </h3>
 
                 <div id="personSettings"></div>
+
 
                 <div class="add-row">
 
@@ -370,11 +699,15 @@
                         placeholder="Νέο άτομο"
                         autocomplete="off">
 
+
                     <button
                         type="button"
                         id="addPerson"
+                        class="settings-add"
                         aria-label="Προσθήκη ατόμου">
-                        ➕
+
+                        +
+
                     </button>
 
                 </div>
@@ -382,11 +715,17 @@
             </div>
 
 
+
+            <!-- VEHICLES -->
+
             <div class="settings-section">
 
-                <h3>🚗 Οχήματα</h3>
+                <h3>
+                    Οχήματα
+                </h3>
 
                 <div id="vehicleSettings"></div>
+
 
                 <div class="add-row">
 
@@ -396,11 +735,15 @@
                         placeholder="Νέο όχημα"
                         autocomplete="off">
 
+
                     <button
                         type="button"
                         id="addVehicle"
+                        class="settings-add"
                         aria-label="Προσθήκη οχήματος">
-                        ➕
+
+                        +
+
                     </button>
 
                 </div>
@@ -408,11 +751,17 @@
             </div>
 
 
+
+            <!-- SUBCATEGORIES -->
+
             <div class="settings-section">
 
-                <h3>🛒 Υποκατηγορίες αγορών</h3>
+                <h3>
+                    Υποκατηγορίες αγορών
+                </h3>
 
                 <div id="subcategorySettings"></div>
+
 
                 <div class="add-row">
 
@@ -422,11 +771,15 @@
                         placeholder="π.χ. Super Market"
                         autocomplete="off">
 
+
                     <button
                         type="button"
                         id="addSubcategory"
+                        class="settings-add"
                         aria-label="Προσθήκη υποκατηγορίας">
-                        ➕
+
+                        +
+
                     </button>
 
                 </div>
@@ -436,21 +789,31 @@
         </div>
 
 
+
+        <!-- SETTINGS ACTIONS -->
+
         <div class="modal-actions">
+
 
             <button
                 type="button"
                 id="exportData"
                 class="secondary">
-                💾 Εξαγωγή δεδομένων
+
+                Εξαγωγή δεδομένων
+
             </button>
+
 
             <button
                 type="button"
                 id="importDataButton"
                 class="secondary">
-                📥 Εισαγωγή δεδομένων
+
+                Εισαγωγή δεδομένων
+
             </button>
+
 
             <input
                 type="file"
@@ -458,11 +821,14 @@
                 accept=".json,application/json"
                 class="hidden">
 
+
             <button
                 type="button"
                 id="resetSettings"
                 class="danger">
-                ♻️ Επαναφορά παραμέτρων
+
+                Επαναφορά παραμέτρων
+
             </button>
 
         </div>
@@ -472,7 +838,9 @@
 </div>
 
 
+
 <script src="app.js"></script>
 
 </body>
+
 </html>
