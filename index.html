@@ -1,748 +1,698 @@
 <!DOCTYPE html>
 <html lang="el">
-
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <meta charset="UTF-8">
+<title>Daily Expenses</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-    <meta
-        name="theme-color"
-        content="#111827">
-
-    <meta
-        name="apple-mobile-web-app-capable"
-        content="yes">
-
-    <meta
-        name="apple-mobile-web-app-status-bar-style"
-        content="black-translucent">
-
-    <title>Daily Expenses</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css">
-
+<link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
 <div class="app">
 
+<header class="app-header">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
+    <div class="header-title">
 
-    <header class="app-header">
+        <h1>
+            Daily Expenses
+        </h1>
 
-        <div class="header-title">
+        <div id="currentDateTime"></div>
 
-            <h1>
-                Daily Expenses
-            </h1>
+    </div>
 
-            <div id="currentDateTime"></div>
+
+    <button
+        type="button"
+        id="settingsButton"
+        class="secondary">
+
+        Ρυθμίσεις
+
+    </button>
+
+</header>
+
+
+<main>
+
+
+<!-- =====================================================
+     ΝΕΑ ΠΛΗΡΩΜΗ
+     ===================================================== -->
+
+<section class="card">
+
+    <h2>
+        Νέα πληρωμή
+    </h2>
+
+
+    <div class="grid">
+
+
+        <div>
+
+            <label for="amount">
+                Ποσό (€)
+            </label>
+
+            <input
+                type="number"
+                id="amount"
+                step="0.01"
+                min="0"
+                inputmode="decimal"
+                autocomplete="off">
 
         </div>
 
 
-        <button
-            type="button"
-            id="settingsButton"
-            class="secondary">
+        <div>
 
-            Ρυθμίσεις
+            <label for="paymentMethod">
+                Πώς πληρώνω;
+            </label>
 
-        </button>
+            <select id="paymentMethod">
+            </select>
 
-    </header>
+        </div>
 
 
+        <div>
 
-    <main>
+            <label for="category">
+                Κατηγορία
+            </label>
 
+            <select id="category">
+            </select>
 
-        <!-- =================================================
-             NEW PAYMENT
-             ================================================= -->
+        </div>
 
-        <section class="card">
 
-            <h2>
-                Νέα πληρωμή
-            </h2>
+        <!-- ΑΓΟΡΕΣ -->
 
+        <div
+            id="subcategoryWrap"
+            class="hidden">
 
-            <div class="grid">
+            <label for="subcategory">
+                Τι είδους αγορά;
+            </label>
 
+            <select id="subcategory">
+            </select>
 
-                <!-- AMOUNT -->
+        </div>
 
-                <div>
 
-                    <label for="amount">
-                        Ποσό (€)
-                    </label>
+        <!-- ΤΥΠΟΣ ΟΧΗΜΑΤΟΣ -->
 
-                    <input
-                        type="number"
-                        id="amount"
-                        step="0.01"
-                        min="0"
-                        inputmode="decimal"
-                        autocomplete="off">
+        <div
+            id="vehicleTypeWrap"
+            class="hidden">
 
-                </div>
+            <label for="vehicleType">
+                Τύπος οχήματος
+            </label>
 
+            <select id="vehicleType">
 
+                <option value="">
+                    Επιλέξτε τύπο οχήματος
+                </option>
 
-                <!-- PAYMENT METHOD -->
+                <option value="Αυτοκίνητο">
+                    Αυτοκίνητο
+                </option>
 
-                <div>
+                <option value="Μηχανή">
+                    Μηχανή
+                </option>
 
-                    <label for="paymentMethod">
-                        Πώς πληρώνω;
-                    </label>
+            </select>
 
-                    <select id="paymentMethod">
-                    </select>
+        </div>
 
-                </div>
 
+        <!-- ΣΥΓΚΕΚΡΙΜΕΝΟ ΟΧΗΜΑ -->
 
+        <div
+            id="vehicleWrap"
+            class="hidden">
 
-                <!-- CATEGORY -->
+            <label for="vehicle">
+                Ποιο όχημα;
+            </label>
 
-                <div>
+            <select id="vehicle">
+            </select>
 
-                    <label for="category">
-                        Κατηγορία
-                    </label>
 
-                    <select id="category">
-                    </select>
+            <div
+                id="vehicleEmptyMessage"
+                class="vehicle-empty-message hidden">
 
-                </div>
-
-
-
-                <!-- =================================================
-                     SHOPPING SUBCATEGORY
-                     Εμφανίζεται μόνο όταν Category = Αγορές
-                     ================================================= -->
-
-                <div
-                    id="subcategoryWrap"
-                    class="hidden">
-
-                    <label for="subcategory">
-                        Τι είδους αγορά;
-                    </label>
-
-                    <select id="subcategory">
-                    </select>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     VEHICLE TYPE
-                     Εμφανίζεται μόνο όταν Category = Οχήματα
-                     ================================================= -->
-
-                <div
-                    id="vehicleTypeWrap"
-                    class="hidden">
-
-                    <label for="vehicleType">
-                        Τύπος οχήματος
-                    </label>
-
-                    <select id="vehicleType">
-
-                        <option value="">
-                            Επιλέξτε τύπο οχήματος
-                        </option>
-
-                        <option value="Αυτοκίνητο">
-                            Αυτοκίνητο
-                        </option>
-
-                        <option value="Μηχανή">
-                            Μηχανή
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     SPECIFIC VEHICLE
-                     ================================================= -->
-
-                <div
-                    id="vehicleWrap"
-                    class="hidden">
-
-                    <label for="vehicle">
-                        Ποιο όχημα;
-                    </label>
-
-                    <select id="vehicle">
-                    </select>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     VEHICLE EXPENSE TYPE
-                     ΤΕΛΕΥΤΑΙΟ ΒΗΜΑ
-                     ================================================= -->
-
-                <div
-                    id="vehicleExpenseTypeWrap"
-                    class="hidden">
-
-                    <label for="vehicleExpenseType">
-                        Είδος δαπάνης
-                    </label>
-
-                    <select id="vehicleExpenseType">
-
-                        <option value="">
-                            Επιλέξτε είδος δαπάνης
-                        </option>
-
-                        <option value="Βενζίνη">
-                            Βενζίνη
-                        </option>
-
-                        <option value="Έξοδα συντήρησης">
-                            Έξοδα συντήρησης
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     ODOMETER
-                     Προαιρετικό
-                     ================================================= -->
-
-                <div
-                    id="odometerWrap"
-                    class="hidden">
-
-                    <label for="odometer">
-                        Κοντέρ (km)
-                    </label>
-
-                    <input
-                        type="number"
-                        id="odometer"
-                        step="1"
-                        min="0"
-                        inputmode="numeric"
-                        autocomplete="off"
-                        placeholder="Προαιρετικό">
-
-                </div>
-
-
-
-                <!-- PERSON -->
-
-                <div>
-
-                    <label for="person">
-                        Για ποιον;
-                    </label>
-
-                    <select id="person">
-                    </select>
-
-                </div>
-
-
-
-                <!-- PURCHASE METHOD -->
-
-                <div>
-
-                    <label for="purchaseMethod">
-                        Τρόπος αγοράς
-                    </label>
-
-                    <select id="purchaseMethod">
-
-                        <option value="store">
-                            Φυσικό κατάστημα
-                        </option>
-
-                        <option value="internet">
-                            Internet
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- SHOP -->
-
-                <div>
-
-                    <label for="shop">
-                        Κατάστημα / Ιστοσελίδα
-                    </label>
-
-                    <input
-                        type="text"
-                        id="shop"
-                        placeholder="Προαιρετικό"
-                        autocomplete="off">
-
-                </div>
-
-
-
-                <!-- ORDER NUMBER -->
-
-                <div
-                    id="orderWrap"
-                    class="hidden">
-
-                    <label for="orderNumber">
-                        Αριθμός παραγγελίας
-                    </label>
-
-                    <input
-                        type="text"
-                        id="orderNumber"
-                        autocomplete="off">
-
-                </div>
-
-
-
-                <!-- ORDER STATUS -->
-
-                <div
-                    id="orderStatusWrap"
-                    class="hidden">
-
-                    <label for="orderStatus">
-                        Κατάσταση παραγγελίας
-                    </label>
-
-                    <select id="orderStatus">
-
-                        <option value="Παραγγέλθηκε">
-                            Παραγγέλθηκε
-                        </option>
-
-                        <option value="Αναμένεται">
-                            Αναμένεται
-                        </option>
-
-                        <option value="Παραδόθηκε">
-                            Παραδόθηκε
-                        </option>
-
-                        <option value="Ακυρώθηκε">
-                            Ακυρώθηκε
-                        </option>
-
-                        <option value="Επιστράφηκε">
-                            Επιστράφηκε
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- DESCRIPTION -->
-
-                <div class="wide">
-
-                    <label for="description">
-                        Περιγραφή
-                    </label>
-
-                    <input
-                        type="text"
-                        id="description"
-                        placeholder="Προαιρετική περιγραφή"
-                        autocomplete="off">
-
-                </div>
+                Δεν έχει καταχωρηθεί όχημα
+                αυτού του τύπου.
+                Πρόσθεσέ το από τις Ρυθμίσεις.
 
             </div>
 
+        </div>
 
 
-            <!-- ADD PAYMENT -->
+        <!-- ΕΙΔΟΣ ΔΑΠΑΝΗΣ -->
 
-            <button
-                type="button"
-                id="addExpenseButton"
-                class="primary">
+        <div
+            id="vehicleExpenseTypeWrap"
+            class="hidden">
 
-                <span
-                    class="button-plus"
-                    aria-hidden="true">+</span>
+            <label for="vehicleExpenseType">
+                Είδος δαπάνης
+            </label>
 
-                Προσθήκη εξόδου
+            <select id="vehicleExpenseType">
 
-            </button>
+                <option value="">
+                    Επιλέξτε είδος δαπάνης
+                </option>
 
-        </section>
+                <option value="Βενζίνη">
+                    Βενζίνη
+                </option>
+
+                <option value="Έξοδα συντήρησης">
+                    Έξοδα συντήρησης
+                </option>
+
+            </select>
+
+        </div>
 
 
+        <!-- ΚΟΝΤΕΡ -->
 
-        <!-- =================================================
-             CALENDAR / DAILY PAYMENTS
-             ================================================= -->
+        <div
+            id="odometerWrap"
+            class="hidden">
 
-        <section class="card">
+            <label for="odometer">
+                Κοντέρ (km)
+            </label>
 
-            <h2>
-                Ημερολόγιο
-            </h2>
+            <input
+                type="number"
+                id="odometer"
+                step="1"
+                min="0"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="Προαιρετικό">
+
+        </div>
 
 
-            <label for="selectedDate">
-                Ημερομηνία
+        <!-- ΓΙΑ ΠΟΙΟΝ -->
+
+        <div>
+
+            <label for="person">
+                Για ποιον;
+            </label>
+
+            <select id="person">
+            </select>
+
+        </div>
+
+
+        <!-- ΤΡΟΠΟΣ ΑΓΟΡΑΣ -->
+
+        <div>
+
+            <label for="purchaseMethod">
+                Τρόπος αγοράς
+            </label>
+
+            <select id="purchaseMethod">
+
+                <option value="store">
+                    Φυσικό κατάστημα
+                </option>
+
+                <option value="internet">
+                    Internet
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ΚΑΤΑΣΤΗΜΑ -->
+
+        <div>
+
+            <label for="shop">
+                Κατάστημα / Ιστοσελίδα
+            </label>
+
+            <input
+                type="text"
+                id="shop"
+                placeholder="Προαιρετικό"
+                autocomplete="off">
+
+        </div>
+
+
+        <!-- ΠΑΡΑΓΓΕΛΙΑ -->
+
+        <div
+            id="orderWrap"
+            class="hidden">
+
+            <label for="orderNumber">
+                Αριθμός παραγγελίας
+            </label>
+
+            <input
+                type="text"
+                id="orderNumber"
+                autocomplete="off">
+
+        </div>
+
+
+        <div
+            id="orderStatusWrap"
+            class="hidden">
+
+            <label for="orderStatus">
+                Κατάσταση παραγγελίας
+            </label>
+
+            <select id="orderStatus">
+
+                <option value="Παραγγέλθηκε">
+                    Παραγγέλθηκε
+                </option>
+
+                <option value="Αναμένεται">
+                    Αναμένεται
+                </option>
+
+                <option value="Παραδόθηκε">
+                    Παραδόθηκε
+                </option>
+
+                <option value="Ακυρώθηκε">
+                    Ακυρώθηκε
+                </option>
+
+                <option value="Επιστράφηκε">
+                    Επιστράφηκε
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ΠΕΡΙΓΡΑΦΗ -->
+
+        <div class="wide">
+
+            <label for="description">
+                Περιγραφή
+            </label>
+
+            <input
+                type="text"
+                id="description"
+                placeholder="Προαιρετική περιγραφή"
+                autocomplete="off">
+
+        </div>
+
+    </div>
+
+
+    <button
+        type="button"
+        id="addExpenseButton"
+        class="primary">
+
+        <span
+            class="button-plus"
+            aria-hidden="true">+</span>
+
+        Προσθήκη εξόδου
+
+    </button>
+
+</section>
+
+
+<!-- =====================================================
+     ΗΜΕΡΟΛΟΓΙΟ
+     ===================================================== -->
+
+<section class="card">
+
+    <h2>
+        Ημερολόγιο
+    </h2>
+
+
+    <label for="selectedDate">
+        Ημερομηνία
+    </label>
+
+    <input
+        type="date"
+        id="selectedDate">
+
+
+    <div id="daySummary"></div>
+
+    <div id="expenseList"></div>
+
+</section>
+
+
+<!-- =====================================================
+     REPORTS
+     ===================================================== -->
+
+<section class="card">
+
+    <h2>
+        Reports
+    </h2>
+
+
+    <div class="grid">
+
+
+        <!-- ΠΕΡΙΟΔΟΣ -->
+
+        <div>
+
+            <label for="reportType">
+                Περίοδος
+            </label>
+
+            <select id="reportType">
+
+                <option value="day">
+                    Ημέρα
+                </option>
+
+                <option value="week">
+                    Εβδομάδα
+                </option>
+
+                <option value="month">
+                    Μήνας
+                </option>
+
+                <option value="year">
+                    Έτος
+                </option>
+
+                <option value="custom">
+                    Από - Έως
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ΚΑΤΗΓΟΡΙΑ -->
+
+        <div>
+
+            <label for="reportCategory">
+                Κατηγορία
+            </label>
+
+            <select id="reportCategory">
+            </select>
+
+        </div>
+
+
+        <!--
+             ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ:
+             Το Όχημα έχει πλέον δικό του wrapper.
+             Εμφανίζεται ΜΟΝΟ όταν:
+             reportCategory = Οχήματα
+        -->
+
+        <div
+            id="reportVehicleWrap"
+            class="hidden">
+
+            <label for="reportVehicle">
+                Όχημα
+            </label>
+
+            <select id="reportVehicle">
+            </select>
+
+        </div>
+
+
+        <!-- ΕΙΔΟΣ ΔΑΠΑΝΗΣ ΟΧΗΜΑΤΟΣ -->
+
+        <div
+            id="reportVehicleExpenseWrap"
+            class="hidden">
+
+            <label for="reportVehicleExpense">
+                Είδος δαπάνης οχήματος
+            </label>
+
+            <select id="reportVehicleExpense">
+
+                <option value="all">
+                    Όλα
+                </option>
+
+                <option value="Βενζίνη">
+                    Βενζίνη
+                </option>
+
+                <option value="Έξοδα συντήρησης">
+                    Έξοδα συντήρησης
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ΓΙΑ ΠΟΙΟΝ -->
+
+        <div>
+
+            <label for="reportPerson">
+                Για ποιον
+            </label>
+
+            <select id="reportPerson">
+            </select>
+
+        </div>
+
+
+        <!-- ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ -->
+
+        <div>
+
+            <label for="reportPayment">
+                Τρόπος πληρωμής
+            </label>
+
+            <select id="reportPayment">
+            </select>
+
+        </div>
+
+
+        <!-- ΑΠΟ -->
+
+        <div>
+
+            <label for="reportStartDate">
+                Από
             </label>
 
             <input
                 type="date"
-                id="selectedDate">
+                id="reportStartDate">
 
+        </div>
 
-            <div id="daySummary"></div>
 
+        <!-- ΕΩΣ -->
 
-            <div id="expenseList"></div>
+        <div>
 
-        </section>
+            <label for="reportEndDate">
+                Έως
+            </label>
 
+            <input
+                type="date"
+                id="reportEndDate">
 
+        </div>
 
-        <!-- =================================================
-             REPORTS
-             ================================================= -->
+    </div>
 
-        <section class="card">
 
-            <h2>
-                Reports
-            </h2>
+    <!-- =================================================
+         ΤΙ ΘΕΛΩ ΝΑ ΕΜΦΑΝΙΖΕΙ ΤΟ REPORT
+         ================================================= -->
 
+    <div class="report-options">
 
-            <div class="grid">
+        <h3>
+            Τι θέλω να εμφανίζει το Report;
+        </h3>
 
 
-                <!-- PERIOD -->
+        <!-- ΠΡΟΕΠΙΛΕΓΜΕΝΟ -->
 
-                <div>
+        <label class="check-option">
 
-                    <label for="reportType">
-                        Περίοδος
-                    </label>
+            <input
+                type="checkbox"
+                id="reportShowPayments"
+                checked>
 
-                    <select id="reportType">
+            Αναλυτικές πληρωμές
 
-                        <option value="day">
-                            Ημέρα
-                        </option>
+        </label>
 
-                        <option value="week">
-                            Εβδομάδα
-                        </option>
 
-                        <option value="month">
-                            Μήνας
-                        </option>
+        <!-- ΠΡΟΕΠΙΛΕΓΜΕΝΟ -->
 
-                        <option value="year">
-                            Έτος
-                        </option>
+        <label class="check-option">
 
-                        <option value="custom">
-                            Από - Έως
-                        </option>
+            <input
+                type="checkbox"
+                id="reportShowCategories"
+                checked>
 
-                    </select>
+            Σύνολα ανά κατηγορία
 
-                </div>
+        </label>
 
 
+        <!-- ΠΡΟΕΠΙΛΕΓΜΕΝΟ -->
 
-                <!-- CATEGORY -->
+        <label class="check-option">
 
-                <div>
+            <input
+                type="checkbox"
+                id="reportShowSubcategories"
+                checked>
 
-                    <label for="reportCategory">
-                        Κατηγορία
-                    </label>
+            Σύνολα ανά υποκατηγορία
 
-                    <select id="reportCategory">
-                    </select>
+        </label>
 
-                </div>
 
+        <!-- ΜΟΝΟ ΓΙΑ ΟΧΗΜΑΤΑ -->
 
+        <label
+            class="check-option vehicle-report-option hidden">
 
-                <!-- VEHICLE -->
+            <input
+                type="checkbox"
+                id="reportShowVehicles">
 
-                <div>
+            Σύνολα ανά όχημα
 
-                    <label for="reportVehicle">
-                        Όχημα
-                    </label>
+        </label>
 
-                    <select id="reportVehicle">
 
-                        <option value="all">
-                            Όλα τα οχήματα
-                        </option>
+        <label
+            class="check-option vehicle-report-option hidden">
 
-                    </select>
+            <input
+                type="checkbox"
+                id="reportShowOdometer">
 
-                </div>
+            Χιλιόμετρα / κοντέρ
 
+        </label>
 
 
-                <!-- VEHICLE EXPENSE -->
+        <label
+            class="check-option vehicle-report-option hidden">
 
-                <div
-                    id="reportVehicleExpenseWrap"
-                    class="hidden">
+            <input
+                type="checkbox"
+                id="reportShowCostPerKm">
 
-                    <label for="reportVehicleExpense">
-                        Είδος δαπάνης οχήματος
-                    </label>
+            Κόστος ανά χιλιόμετρο
 
-                    <select id="reportVehicleExpense">
+        </label>
 
-                        <option value="all">
-                            Όλα
-                        </option>
 
-                        <option value="Βενζίνη">
-                            Βενζίνη
-                        </option>
+        <label
+            class="check-option vehicle-report-option hidden">
 
-                        <option value="Έξοδα συντήρησης">
-                            Έξοδα συντήρησης
-                        </option>
+            <input
+                type="checkbox"
+                id="reportShowTotalVehicleCost">
 
-                    </select>
+            Συνολικό κόστος οχήματος ανά km
 
-                </div>
+        </label>
 
+    </div>
 
 
-                <!-- PERSON -->
+    <button
+        type="button"
+        id="generateReportButton"
+        class="primary">
 
-                <div>
+        Δημιουργία Report
 
-                    <label for="reportPerson">
-                        Για ποιον
-                    </label>
+    </button>
 
-                    <select id="reportPerson">
-                    </select>
+</section>
 
-                </div>
-
-
-
-                <!-- PAYMENT -->
-
-                <div>
-
-                    <label for="reportPayment">
-                        Τρόπος πληρωμής
-                    </label>
-
-                    <select id="reportPayment">
-                    </select>
-
-                </div>
-
-
-
-                <!-- START DATE -->
-
-                <div>
-
-                    <label for="reportStartDate">
-                        Από
-                    </label>
-
-                    <input
-                        type="date"
-                        id="reportStartDate">
-
-                </div>
-
-
-
-                <!-- END DATE -->
-
-                <div>
-
-                    <label for="reportEndDate">
-                        Έως
-                    </label>
-
-                    <input
-                        type="date"
-                        id="reportEndDate">
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 REPORT CONTENT
-                 ================================================= -->
-
-            <div class="report-options">
-
-                <h3>
-                    Τι θέλω να εμφανίζει το Report;
-                </h3>
-
-
-                <label class="check-option">
-
-                    <input
-                        type="checkbox"
-                        id="reportShowPayments"
-                        checked>
-
-                    Αναλυτικές πληρωμές
-
-                </label>
-
-
-                <label class="check-option">
-
-                    <input
-                        type="checkbox"
-                        id="reportShowCategories"
-                        checked>
-
-                    Σύνολα ανά κατηγορία
-
-                </label>
-
-
-                <label class="check-option">
-
-                    <input
-                        type="checkbox"
-                        id="reportShowSubcategories">
-
-                    Σύνολα ανά υποκατηγορία
-
-                </label>
-
-
-                <label class="check-option">
-
-                    <input
-                        type="checkbox"
-                        id="reportShowVehicles">
-
-                    Σύνολα ανά όχημα
-
-                </label>
-
-
-                <label class="check-option">
-
-                    <input
-                        type="checkbox"
-                        id="reportShowOdometer">
-
-                    Χιλιόμετρα / κοντέρ
-
-                </label>
-
-
-                <label class="check-option">
-
-                    <input
-                        type="checkbox"
-                        id="reportShowCostPerKm">
-
-                    Κόστος ανά χιλιόμετρο
-
-                </label>
-
-
-                <label class="check-option">
-
-                    <input
-                        type="checkbox"
-                        id="reportShowTotalVehicleCost">
-
-                    Συνολικό κόστος οχήματος ανά km
-
-                </label>
-
-            </div>
-
-
-
-            <button
-                type="button"
-                id="generateReportButton"
-                class="primary">
-
-                Δημιουργία Report
-
-            </button>
-
-        </section>
-
-    </main>
+</main>
 
 </div>
 
 
-
-<!-- =========================================================
-     SETTINGS MODAL
-     ========================================================= -->
+<!-- =====================================================
+     SETTINGS
+     ===================================================== -->
 
 <div
     id="settingsModal"
     class="modal hidden"
     aria-hidden="true">
-
 
     <div
         class="modal-content"
@@ -779,10 +729,7 @@
         </div>
 
 
-
-        <!-- =================================================
-             CATEGORIES
-             ================================================= -->
+        <!-- ΚΑΤΗΓΟΡΙΕΣ -->
 
         <div class="settings-section">
 
@@ -792,18 +739,14 @@
 
             <div id="categorySettings"></div>
 
-
             <div class="add-row">
 
                 <input
                     type="text"
                     id="newCategory"
-                    placeholder="Νέα κατηγορία"
-                    autocomplete="off">
-
+                    placeholder="Νέα κατηγορία">
 
                 <button
-                    type="button"
                     id="addCategory"
                     class="settings-add">
 
@@ -816,10 +759,7 @@
         </div>
 
 
-
-        <!-- =================================================
-             SHOPPING SUBCATEGORIES
-             ================================================= -->
+        <!-- ΥΠΟΚΑΤΗΓΟΡΙΕΣ -->
 
         <div class="settings-section">
 
@@ -829,18 +769,14 @@
 
             <div id="subcategorySettings"></div>
 
-
             <div class="add-row">
 
                 <input
                     type="text"
                     id="newSubcategory"
-                    placeholder="Νέα υποκατηγορία αγοράς"
-                    autocomplete="off">
-
+                    placeholder="Νέα υποκατηγορία">
 
                 <button
-                    type="button"
                     id="addSubcategory"
                     class="settings-add">
 
@@ -853,10 +789,67 @@
         </div>
 
 
+        <!-- ΤΡΟΠΟΙ ΠΛΗΡΩΜΗΣ -->
 
-        <!-- =================================================
-             VEHICLES
-             ================================================= -->
+        <div class="settings-section">
+
+            <h3>
+                Τρόποι πληρωμής
+            </h3>
+
+            <div id="paymentSettings"></div>
+
+            <div class="add-row">
+
+                <input
+                    type="text"
+                    id="newPayment"
+                    placeholder="Νέος τρόπος πληρωμής">
+
+                <button
+                    id="addPayment"
+                    class="settings-add">
+
+                    +
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ΓΙΑ ΠΟΙΟΝ -->
+
+        <div class="settings-section">
+
+            <h3>
+                Για ποιον
+            </h3>
+
+            <div id="personSettings"></div>
+
+            <div class="add-row">
+
+                <input
+                    type="text"
+                    id="newPerson"
+                    placeholder="Νέα επιλογή">
+
+                <button
+                    id="addPerson"
+                    class="settings-add">
+
+                    +
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ΟΧΗΜΑΤΑ -->
 
         <div class="settings-section">
 
@@ -868,7 +861,6 @@
 
 
             <div class="vehicle-add-form">
-
 
                 <select id="newVehicleType">
 
@@ -884,32 +876,28 @@
 
 
                 <input
-                    type="text"
                     id="newVehicleMake"
-                    placeholder="Μάρκα"
-                    autocomplete="off">
+                    type="text"
+                    placeholder="Μάρκα">
 
 
                 <input
-                    type="text"
                     id="newVehicleModel"
-                    placeholder="Μοντέλο / Τύπος"
-                    autocomplete="off">
+                    type="text"
+                    placeholder="Μοντέλο / Τύπος">
 
 
                 <input
-                    type="text"
                     id="newVehiclePlate"
-                    placeholder="Πινακίδα"
-                    autocomplete="off">
+                    type="text"
+                    placeholder="Πινακίδα">
 
 
                 <button
-                    type="button"
                     id="addVehicle"
                     class="settings-add">
 
-                    +
+                    Προσθήκη οχήματος
 
                 </button>
 
@@ -917,91 +905,10 @@
 
         </div>
 
-
-
-        <!-- =================================================
-             PAYMENT METHODS
-             ================================================= -->
-
-        <div class="settings-section">
-
-            <h3>
-                Τρόποι πληρωμής
-            </h3>
-
-            <div id="paymentSettings"></div>
-
-
-            <div class="add-row">
-
-                <input
-                    type="text"
-                    id="newPayment"
-                    placeholder="Νέος τρόπος πληρωμής"
-                    autocomplete="off">
-
-
-                <button
-                    type="button"
-                    id="addPayment"
-                    class="settings-add">
-
-                    +
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- =================================================
-             PERSONS
-             ================================================= -->
-
-        <div class="settings-section">
-
-            <h3>
-                Για ποιον
-            </h3>
-
-            <div id="personSettings"></div>
-
-
-            <div class="add-row">
-
-                <input
-                    type="text"
-                    id="newPerson"
-                    placeholder="Νέο άτομο"
-                    autocomplete="off">
-
-
-                <button
-                    type="button"
-                    id="addPerson"
-                    class="settings-add">
-
-                    +
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- =================================================
-             DATA
-             ================================================= -->
 
         <div class="modal-actions">
 
-
             <button
-                type="button"
                 id="exportData"
                 class="secondary">
 
@@ -1011,7 +918,6 @@
 
 
             <button
-                type="button"
                 id="importDataButton"
                 class="secondary">
 
@@ -1021,14 +927,13 @@
 
 
             <input
-                type="file"
                 id="importData"
-                accept=".json,application/json"
+                type="file"
+                accept="application/json"
                 class="hidden">
 
 
             <button
-                type="button"
                 id="resetSettings"
                 class="danger">
 
@@ -1043,9 +948,7 @@
 </div>
 
 
-
 <script src="app.js"></script>
 
 </body>
-
 </html>
