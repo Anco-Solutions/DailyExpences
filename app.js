@@ -1,17 +1,15 @@
 // ======================================================
-// DAILY EXPENSES V2
+// DAILY EXPENSES - COMPLETE APP.JS
 // ======================================================
 
 const STORAGE_KEY = "dailyExpensesV2";
 const SETTINGS_KEY = "dailyExpensesSettingsV2";
-
 
 // ======================================================
 // DEFAULT SETTINGS
 // ======================================================
 
 const defaultSettings = {
-
     payments: [
         "Κάρτα",
         "Μετρητά",
@@ -49,57 +47,42 @@ const defaultSettings = {
         "Διάφορες αγορές",
         "Άλλο"
     ]
-
 };
 
 
 // ======================================================
-// LOAD DATA
+// HELPERS
 // ======================================================
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+
+function cloneObject(object) {
+    return JSON.parse(JSON.stringify(object));
+}
+
 
 function loadJSON(key, fallback) {
 
     try {
 
-        const data =
-            localStorage.getItem(key);
+        const data = localStorage.getItem(key);
 
         if (data) {
-
             return JSON.parse(data);
-
         }
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Load error:", error);
 
     }
 
-    return JSON.parse(
-        JSON.stringify(fallback)
-    );
-
+    return cloneObject(fallback);
 }
 
-
-let settings =
-    loadJSON(
-        SETTINGS_KEY,
-        defaultSettings
-    );
-
-
-let expenses =
-    loadJSON(
-        STORAGE_KEY,
-        []
-    );
-
-
-// ======================================================
-// SAVE
-// ======================================================
 
 function saveExpenses() {
 
@@ -121,21 +104,9 @@ function saveSettings() {
 }
 
 
-// ======================================================
-// HELPERS
-// ======================================================
-
-function $(id) {
-
-    return document.getElementById(id);
-
-}
-
-
 function pad(number) {
 
-    return String(number)
-        .padStart(2, "0");
+    return String(number).padStart(2, "0");
 
 }
 
@@ -171,18 +142,13 @@ function getCurrentTime() {
 function formatDate(dateString) {
 
     if (!dateString) {
-
         return "";
-
     }
 
-    const parts =
-        dateString.split("-");
+    const parts = dateString.split("-");
 
     if (parts.length !== 3) {
-
         return dateString;
-
     }
 
     return (
@@ -198,25 +164,22 @@ function formatDate(dateString) {
 
 function formatMoney(value) {
 
-    return Number(value || 0)
-        .toLocaleString(
-            "el-GR",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        ) + " €";
+    return Number(value || 0).toLocaleString(
+        "el-GR",
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    ) + " €";
 
 }
 
 
 function escapeHtml(text) {
 
-    const div =
-        document.createElement("div");
+    const div = document.createElement("div");
 
-    div.textContent =
-        text || "";
+    div.textContent = text == null ? "" : String(text);
 
     return div.innerHTML;
 
@@ -224,21 +187,35 @@ function escapeHtml(text) {
 
 
 // ======================================================
-// SELECT OPTIONS
+// DATA
 // ======================================================
 
-function fillSelect(
-    select,
-    items,
-    allText = null
-) {
+let settings = loadJSON(
+    SETTINGS_KEY,
+    defaultSettings
+);
+
+let expenses = loadJSON(
+    STORAGE_KEY,
+    []
+);
+
+
+// ======================================================
+// SELECTS
+// ======================================================
+
+function fillSelect(select, items, allText = null) {
+
+    if (!select) {
+        return;
+    }
 
     select.innerHTML = "";
 
     if (allText !== null) {
 
-        const option =
-            document.createElement("option");
+        const option = document.createElement("option");
 
         option.value = "all";
         option.textContent = allText;
@@ -247,11 +224,9 @@ function fillSelect(
 
     }
 
-
     items.forEach(item => {
 
-        const option =
-            document.createElement("option");
+        const option = document.createElement("option");
 
         option.value = item;
         option.textContent = item;
@@ -263,10 +238,6 @@ function fillSelect(
 }
 
 
-// ======================================================
-// REFRESH SELECTS
-// ======================================================
-
 function refreshSelects() {
 
     fillSelect(
@@ -274,30 +245,25 @@ function refreshSelects() {
         settings.payments
     );
 
-
     fillSelect(
         $("category"),
         settings.categories
     );
-
 
     fillSelect(
         $("person"),
         settings.persons
     );
 
-
     fillSelect(
         $("vehicle"),
         settings.vehicles
     );
 
-
     fillSelect(
         $("subcategory"),
         settings.subcategories
     );
-
 
     fillSelect(
         $("reportCategory"),
@@ -305,20 +271,17 @@ function refreshSelects() {
         "Όλες"
     );
 
-
     fillSelect(
         $("reportPerson"),
         settings.persons,
         "Όλοι"
     );
 
-
     fillSelect(
         $("reportPayment"),
         settings.payments,
         "Όλοι"
     );
-
 
     updateConditionalFields();
 
@@ -331,90 +294,56 @@ function refreshSelects() {
 
 function updateConditionalFields() {
 
-    const category =
-        $("category").value;
-
+    const category = $("category")?.value || "";
 
     const isFuel =
         category === "Βενζίνη";
-
 
     const isVehicle =
         category === "Βενζίνη" ||
         category === "Συντήρηση οχήματος";
 
-
     const isShopping =
         category === "Αγορές";
 
+    const purchaseMethod =
+        $("purchaseMethod")?.value || "store";
 
-    $("vehicleWrap")
-        .classList
-        .toggle(
-            "hidden",
-            !isVehicle
-        );
+    const isInternet =
+        purchaseMethod === "internet";
 
 
-    $("litersWrap")
-        .classList
-        .toggle(
-            "hidden",
-            !isFuel
-        );
+    $("vehicleWrap")?.classList.toggle(
+        "hidden",
+        !isVehicle
+    );
 
+    $("litersWrap")?.classList.toggle(
+        "hidden",
+        !isFuel
+    );
 
-    $("odometerWrap")
-        .classList
-        .toggle(
-            "hidden",
-            !isFuel
-        );
+    $("odometerWrap")?.classList.toggle(
+        "hidden",
+        !isFuel
+    );
 
+    $("subcategoryWrap")?.classList.toggle(
+        "hidden",
+        !isShopping
+    );
 
-    $("subcategoryWrap")
-        .classList
-        .toggle(
-            "hidden",
-            !isShopping
-        );
+    $("orderWrap")?.classList.toggle(
+        "hidden",
+        !isInternet
+    );
 
-
-    const internet =
-        $("purchaseMethod").value ===
-        "internet";
-
-
-    $("orderWrap")
-        .classList
-        .toggle(
-            "hidden",
-            !internet
-        );
-
-
-    $("orderStatusWrap")
-        .classList
-        .toggle(
-            "hidden",
-            !internet
-        );
+    $("orderStatusWrap")?.classList.toggle(
+        "hidden",
+        !isInternet
+    );
 
 }
-
-
-$("category")
-    .addEventListener(
-        "change",
-        updateConditionalFields
-    );
-
-
-$("purchaseMethod")
-    .addEventListener(
-        "change",
-        updateConditionalFields
-    );
 
 
 // ======================================================
@@ -423,37 +352,28 @@ $("purchaseMethod")
 
 function addExpense() {
 
-    const amount =
-        Number(
-            $("amount").value
-        );
+    const amount = Number(
+        $("amount").value
+    );
 
-
-    if (
-        !amount ||
-        amount <= 0
-    ) {
+    if (!amount || amount <= 0) {
 
         alert(
             "Παρακαλώ εισάγετε έγκυρο ποσό."
         );
 
         return;
-
     }
 
 
     const category =
         $("category").value;
 
-
     const isFuel =
         category === "Βενζίνη";
 
-
     const isInternet =
-        $("purchaseMethod").value ===
-        "internet";
+        $("purchaseMethod").value === "internet";
 
 
     const expense = {
@@ -517,9 +437,7 @@ function addExpense() {
                 : 0,
 
         description:
-            $("description")
-                .value
-                .trim()
+            $("description").value.trim()
 
     };
 
@@ -528,18 +446,12 @@ function addExpense() {
 
     saveExpenses();
 
-
     clearForm();
-
 
     $("selectedDate").value =
         expense.date;
 
-
-    renderDay(
-        expense.date
-    );
-
+    renderDay(expense.date);
 
     alert(
         "Το έξοδο καταχωρήθηκε."
@@ -566,33 +478,64 @@ function clearForm() {
 
     $("description").value = "";
 
+    $("purchaseMethod").value = "store";
 
-    $("purchaseMethod").value =
-        "store";
+    $("category").selectedIndex = 0;
 
+    $("paymentMethod").selectedIndex = 0;
 
-    $("category").selectedIndex =
-        0;
+    $("person").selectedIndex = 0;
 
+    if ($("vehicle")) {
+        $("vehicle").selectedIndex = 0;
+    }
 
-    $("paymentMethod").selectedIndex =
-        0;
+    if ($("subcategory")) {
+        $("subcategory").selectedIndex = 0;
+    }
 
-
-    $("person").selectedIndex =
-        0;
-
+    if ($("orderStatus")) {
+        $("orderStatus").selectedIndex = 0;
+    }
 
     updateConditionalFields();
 
 }
 
 
-$("addExpenseButton")
-    .addEventListener(
-        "click",
-        addExpense
+// ======================================================
+// DELETE EXPENSE
+// ======================================================
+
+function deleteExpense(id) {
+
+    const expense = expenses.find(
+        item => item.id === id
     );
+
+    if (!expense) {
+        return;
+    }
+
+    const confirmed = confirm(
+        "Θέλετε να διαγράψετε αυτό το έξοδο;"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    expenses = expenses.filter(
+        item => item.id !== id
+    );
+
+    saveExpenses();
+
+    renderDay(
+        $("selectedDate").value
+    );
+
+}
 
 
 // ======================================================
@@ -601,18 +544,15 @@ $("addExpenseButton")
 
 function renderDay(date) {
 
-    const list =
-        expenses
-            .filter(
-                expense =>
-                    expense.date === date
-            )
-            .sort(
-                (a, b) =>
-                    a.time.localeCompare(
-                        b.time
-                    )
-            );
+    const list = expenses
+        .filter(
+            expense =>
+                expense.date === date
+        )
+        .sort(
+            (a, b) =>
+                a.time.localeCompare(b.time)
+        );
 
 
     let cash = 0;
@@ -622,28 +562,17 @@ function renderDay(date) {
 
     list.forEach(expense => {
 
-        total += expense.amount;
+        const amount =
+            Number(expense.amount || 0);
 
+        total += amount;
 
-        if (
-            expense.payment ===
-            "Κάρτα"
-        ) {
-
-            card +=
-                expense.amount;
-
+        if (expense.payment === "Κάρτα") {
+            card += amount;
         }
 
-
-        if (
-            expense.payment ===
-            "Μετρητά"
-        ) {
-
-            cash +=
-                expense.amount;
-
+        if (expense.payment === "Μετρητά") {
+            cash += amount;
         }
 
     });
@@ -681,188 +610,166 @@ function renderDay(date) {
 
     if (!list.length) {
 
-        $("expenseList").innerHTML =
-            `
+        $("expenseList").innerHTML = `
             <p class="muted">
                 Δεν υπάρχουν έξοδα
                 για αυτή την ημέρα.
             </p>
-            `;
+        `;
 
         return;
-
     }
 
 
-    $("expenseList").innerHTML =
-        list
-            .map(expense => {
+    $("expenseList").innerHTML = list
+        .map(expense => {
 
-                let details =
-                    `${expense.time} — ` +
-                    `${escapeHtml(
-                        expense.payment
-                    )} — ` +
-                    `${escapeHtml(
-                        expense.category
-                    )} — ` +
-                    `${escapeHtml(
-                        expense.person
+            let details =
+                `${expense.time} — ` +
+                `${escapeHtml(expense.payment)} — ` +
+                `${escapeHtml(expense.category)} — ` +
+                `${escapeHtml(expense.person)}`;
+
+
+            if (expense.subcategory) {
+
+                details +=
+                    ` — ${escapeHtml(
+                        expense.subcategory
                     )}`;
 
+            }
 
-                if (
-                    expense.subcategory
-                ) {
+
+            if (expense.vehicle) {
+
+                details +=
+                    ` — ${escapeHtml(
+                        expense.vehicle
+                    )}`;
+
+            }
+
+
+            if (expense.liters) {
+
+                details +=
+                    ` — ${expense.liters} L`;
+
+            }
+
+
+            if (expense.odometer) {
+
+                details +=
+                    ` — ${expense.odometer} km`;
+
+            }
+
+
+            if (
+                expense.purchaseMethod ===
+                "internet"
+            ) {
+
+                details += " — Internet";
+
+                if (expense.shop) {
 
                     details +=
-                        ` — ${
-                            escapeHtml(
-                                expense.subcategory
-                            )
-                        }`;
+                        ` — ${escapeHtml(
+                            expense.shop
+                        )}`;
 
                 }
 
-
-                if (
-                    expense.vehicle
-                ) {
+                if (expense.orderNumber) {
 
                     details +=
-                        ` — ${
-                            escapeHtml(
-                                expense.vehicle
-                            )
-                        }`;
+                        ` — #${escapeHtml(
+                            expense.orderNumber
+                        )}`;
 
                 }
 
-
-                if (
-                    expense.liters
-                ) {
+                if (expense.orderStatus) {
 
                     details +=
-                        ` — ${
-                            expense.liters
-                        } L`;
+                        ` — ${escapeHtml(
+                            expense.orderStatus
+                        )}`;
 
                 }
 
+            } else if (expense.shop) {
 
-                if (
-                    expense.odometer
-                ) {
-
-                    details +=
-                        ` — ${
-                            expense.odometer
-                        } km`;
-
-                }
-
-
-                if (
-                    expense.purchaseMethod ===
-                    "internet"
-                ) {
-
-                    details +=
-                        " — Internet";
-
-
-                    if (
+                details +=
+                    ` — ${escapeHtml(
                         expense.shop
-                    ) {
+                    )}`;
 
-                        details +=
-                            ` — ${
-                                escapeHtml(
-                                    expense.shop
-                                )
-                            }`;
-
-                    }
+            }
 
 
-                    if (
-                        expense.orderNumber
-                    ) {
+            if (expense.description) {
 
-                        details +=
-                            ` — #${
-                                escapeHtml(
-                                    expense.orderNumber
-                                )
-                            }`;
+                details +=
+                    ` — ${escapeHtml(
+                        expense.description
+                    )}`;
 
-                    }
-
-                } else if (
-                    expense.shop
-                ) {
-
-                    details +=
-                        ` — ${
-                            escapeHtml(
-                                expense.shop
-                            )
-                        }`;
-
-                }
+            }
 
 
-                if (
-                    expense.description
-                ) {
+            return `
 
-                    details +=
-                        ` — ${
-                            escapeHtml(
-                                expense.description
-                            )
-                        }`;
+                <div class="expense-item">
 
-                }
+                    <div class="expense-main">
 
+                        <div class="expense-details">
+                            ${details}
+                        </div>
 
-                return `
-
-                    <div class="expense-item">
-
-                        <div class="expense-main">
-
-                            <div class="expense-details">
-                                ${details}
-                            </div>
-
-                            <div class="expense-amount">
-                                ${formatMoney(
-                                    expense.amount
-                                )}
-                            </div>
-
+                        <div class="expense-amount">
+                            ${formatMoney(
+                                expense.amount
+                            )}
                         </div>
 
                     </div>
 
-                `;
+                    <button
+                        class="danger delete-expense"
+                        data-id="${expense.id}"
+                    >
+                        Διαγραφή
+                    </button>
 
-            })
-            .join("");
+                </div>
+
+            `;
+
+        })
+        .join("");
+
+
+    document
+        .querySelectorAll(".delete-expense")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+                    deleteExpense(
+                        Number(button.dataset.id)
+                    );
+                }
+            );
+
+        });
 
 }
-
-
-$("selectedDate")
-    .addEventListener(
-        "change",
-        event =>
-            renderDay(
-                event.target.value
-            )
-    );
 
 
 // ======================================================
@@ -871,45 +778,43 @@ $("selectedDate")
 
 function updateReportDates() {
 
-    const todayDate =
-        new Date();
-
+    const today = new Date();
 
     const type =
         $("reportType").value;
 
-
     let start =
-        new Date(todayDate);
-
+        new Date(today);
 
     let end =
-        new Date(todayDate);
+        new Date(today);
 
 
-    if (
-        type === "week"
-    ) {
+    if (type === "day") {
+
+        start = new Date(today);
+        end = new Date(today);
+
+    }
+
+
+    if (type === "week") {
 
         const day =
-            todayDate.getDay();
+            today.getDay();
 
+        const diff =
+            day === 0 ? 6 : day - 1;
 
-        const difference =
-            day === 0
-                ? 6
-                : day - 1;
-
+        start =
+            new Date(today);
 
         start.setDate(
-            todayDate.getDate() -
-            difference
+            today.getDate() - diff
         );
-
 
         end =
             new Date(start);
-
 
         end.setDate(
             start.getDate() + 6
@@ -918,213 +823,131 @@ function updateReportDates() {
     }
 
 
-    if (
-        type === "month"
-    ) {
+    if (type === "month") {
 
-        start =
-            new Date(
-                todayDate.getFullYear(),
-                todayDate.getMonth(),
-                1
-            );
+        start = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1
+        );
 
-
-        end =
-            new Date(
-                todayDate.getFullYear(),
-                todayDate.getMonth() + 1,
-                0
-            );
+        end = new Date(
+            today.getFullYear(),
+            today.getMonth() + 1,
+            0
+        );
 
     }
 
 
-    if (
-        type === "year"
-    ) {
+    if (type === "year") {
 
-        start =
-            new Date(
-                todayDate.getFullYear(),
-                0,
-                1
-            );
+        start = new Date(
+            today.getFullYear(),
+            0,
+            1
+        );
 
-
-        end =
-            new Date(
-                todayDate.getFullYear(),
-                11,
-                31
-            );
+        end = new Date(
+            today.getFullYear(),
+            11,
+            31
+        );
 
     }
 
 
-    if (
-        type !== "custom"
-    ) {
+    if (type !== "custom") {
 
         $("reportStartDate").value =
-            start.getFullYear() +
-            "-" +
-            pad(
-                start.getMonth() + 1
-            ) +
-            "-" +
-            pad(
-                start.getDate()
-            );
-
+            formatDateInput(start);
 
         $("reportEndDate").value =
-            end.getFullYear() +
-            "-" +
-            pad(
-                end.getMonth() + 1
-            ) +
-            "-" +
-            pad(
-                end.getDate()
-            );
+            formatDateInput(end);
 
     }
 
 }
 
 
-$("reportType")
-    .addEventListener(
-        "change",
-        updateReportDates
+function formatDateInput(date) {
+
+    return (
+        date.getFullYear() +
+        "-" +
+        pad(date.getMonth() + 1) +
+        "-" +
+        pad(date.getDate())
     );
 
+}
+
 
 // ======================================================
-// FILTER REPORT
+// REPORT DATA
 // ======================================================
 
-function getFilteredExpenses() {
+function getReportExpenses() {
 
     const start =
         $("reportStartDate").value;
 
-
     const end =
         $("reportEndDate").value;
 
+    const category =
+        $("reportCategory").value;
 
-    let list =
-        expenses.filter(
-            expense =>
-                expense.date >= start &&
-                expense.date <= end
-        );
+    const person =
+        $("reportPerson").value;
 
-
-    if (
-        $("reportCategory").value !==
-        "all"
-    ) {
-
-        list =
-            list.filter(
-                expense =>
-                    expense.category ===
-                    $("reportCategory").value
-            );
-
-    }
+    const payment =
+        $("reportPayment").value;
 
 
-    if (
-        $("reportPerson").value !==
-        "all"
-    ) {
+    return expenses.filter(expense => {
 
-        list =
-            list.filter(
-                expense =>
-                    expense.person ===
-                    $("reportPerson").value
-            );
+        if (start && expense.date < start) {
+            return false;
+        }
 
-    }
+        if (end && expense.date > end) {
+            return false;
+        }
 
+        if (
+            category !== "all" &&
+            expense.category !== category
+        ) {
+            return false;
+        }
 
-    if (
-        $("reportPayment").value !==
-        "all"
-    ) {
+        if (
+            person !== "all" &&
+            expense.person !== person
+        ) {
+            return false;
+        }
 
-        list =
-            list.filter(
-                expense =>
-                    expense.payment ===
-                    $("reportPayment").value
-            );
+        if (
+            payment !== "all" &&
+            expense.payment !== payment
+        ) {
+            return false;
+        }
 
-    }
+        return true;
 
+    }).sort(
+        (a, b) => {
 
-    return list.sort(
-        (a, b) =>
-            (
-                a.date +
-                " " +
-                a.time
-            ).localeCompare(
-                b.date +
-                " " +
-                b.time
-            )
-    );
+            const first =
+                `${a.date} ${a.time}`;
 
-}
+            const second =
+                `${b.date} ${b.time}`;
 
-
-// ======================================================
-// LOAD jsPDF
-// ======================================================
-
-function loadJsPDF() {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            if (
-                window.jspdf
-            ) {
-
-                resolve();
-
-                return;
-
-            }
-
-
-            const script =
-                document.createElement(
-                    "script"
-                );
-
-
-            script.src =
-                "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-
-
-            script.onload =
-                resolve;
-
-
-            script.onerror =
-                reject;
-
-
-            document.head.appendChild(
-                script
-            );
+            return first.localeCompare(second);
 
         }
     );
@@ -1133,594 +956,402 @@ function loadJsPDF() {
 
 
 // ======================================================
-// GENERATE PDF
+// CREATE REPORT
 // ======================================================
 
-async function generatePDF() {
+function createReport() {
 
     const list =
-        getFilteredExpenses();
-
+        getReportExpenses();
 
     if (!list.length) {
 
         alert(
-            "Δεν υπάρχουν έξοδα " +
-            "για τα συγκεκριμένα φίλτρα."
+            "Δεν βρέθηκαν έξοδα για τα συγκεκριμένα κριτήρια."
         );
 
         return;
 
     }
 
-
-    try {
-
-        await loadJsPDF();
-
-    } catch (error) {
-
-        alert(
-            "Δεν ήταν δυνατή " +
-            "η φόρτωση του PDF."
-        );
-
-        return;
-
-    }
-
-
-    const {
-        jsPDF
-    } =
-        window.jspdf;
-
-
-    const doc =
-        new jsPDF();
-
-
-    // ==================================================
-    // GREEK FONT
-    // ==================================================
-
-    try {
-
-        const response =
-            await fetch(
-                "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf"
-            );
-
-
-        const buffer =
-            await response.arrayBuffer();
-
-
-        const bytes =
-            new Uint8Array(
-                buffer
-            );
-
-
-        let binary = "";
-
-        const chunkSize =
-            0x8000;
-
-
-        for (
-            let i = 0;
-            i < bytes.length;
-            i += chunkSize
-        ) {
-
-            binary +=
-                String.fromCharCode(
-                    ...bytes.subarray(
-                        i,
-                        i + chunkSize
-                    )
-                );
-
-        }
-
-
-        const base64 =
-            btoa(binary);
-
-
-        doc.addFileToVFS(
-            "NotoSans-Regular.ttf",
-            base64
-        );
-
-
-        doc.addFont(
-            "NotoSans-Regular.ttf",
-            "NotoSans",
-            "normal"
-        );
-
-
-        doc.setFont(
-            "NotoSans",
-            "normal"
-        );
-
-
-    } catch (error) {
-
-        console.warn(
-            "Noto Sans font unavailable.",
-            error
-        );
-
-    }
-
-
-    // ==================================================
-    // TOTAL
-    // ==================================================
 
     const total =
         list.reduce(
             (sum, expense) =>
-                sum + expense.amount,
+                sum + Number(expense.amount || 0),
             0
         );
 
 
-    doc.setFontSize(18);
-
-
-    doc.text(
-        "DAILY EXPENSES",
-        20,
-        20
-    );
-
-
-    doc.setFontSize(11);
-
-
-    doc.text(
-        `Περίοδος: ${
-            formatDate(
-                $("reportStartDate").value
-            )
-        } - ${
-            formatDate(
-                $("reportEndDate").value
-            )
-        }`,
-        20,
-        29
-    );
-
-
-    let y = 42;
-
-
-    doc.setFontSize(12);
-
-
-    doc.text(
-        `ΣΥΝΟΛΟ: ${formatMoney(total)}`,
-        20,
-        y
-    );
-
-
-    y += 10;
-
-
-    // ==================================================
-    // PAYMENT TOTALS
-    // ==================================================
-
-    const paymentTotals = {};
-
-
-    list.forEach(expense => {
-
-        if (
-            !paymentTotals[
-                expense.payment
-            ]
-        ) {
-
-            paymentTotals[
-                expense.payment
-            ] = 0;
-
-        }
-
-
-        paymentTotals[
-            expense.payment
-        ] += expense.amount;
-
-    });
-
-
-    doc.setFontSize(12);
-
-
-    doc.text(
-        "ΑΝΑ ΤΡΟΠΟ ΠΛΗΡΩΜΗΣ",
-        20,
-        y
-    );
-
-
-    y += 7;
-
-
-    doc.setFontSize(10);
-
-
-    Object.entries(
-        paymentTotals
-    ).forEach(
-        ([payment, amount]) => {
-
-            if (y > 275) {
-
-                doc.addPage();
-
-                y = 20;
-
-            }
-
-
-            doc.text(
-                `${payment}: ${
-                    formatMoney(amount)
-                }`,
-                20,
-                y
-            );
-
-
-            y += 6;
-
-        }
-    );
-
-
-    y += 5;
-
-
-    // ==================================================
-    // DETAILS
-    // ==================================================
-
-    doc.setFontSize(12);
-
-
-    doc.text(
-        "ΑΝΑΛΥΤΙΚΕΣ ΕΓΓΡΑΦΕΣ",
-        20,
-        y
-    );
-
-
-    y += 8;
-
-
-    doc.setFontSize(9);
-
-
-    list.forEach(expense => {
-
-        let line =
-            `${formatDate(
-                expense.date
-            )} ${
-                expense.time
-            } | ${
-                formatMoney(
-                    expense.amount
-                )
-            } | ${
-                expense.payment
-            } | ${
-                expense.category
-            } | ${
-                expense.person
-            }`;
-
-
-        if (
-            expense.subcategory
-        ) {
-
-            line +=
-                ` | ${
-                    expense.subcategory
-                }`;
-
-        }
-
-
-        if (
-            expense.vehicle
-        ) {
-
-            line +=
-                ` | ${
-                    expense.vehicle
-                }`;
-
-        }
-
-
-        if (
-            expense.liters
-        ) {
-
-            line +=
-                ` | ${
-                    expense.liters
-                } L`;
-
-        }
-
-
-        if (
-            expense.odometer
-        ) {
-
-            line +=
-                ` | ${
-                    expense.odometer
-                } km`;
-
-        }
-
-
-        if (
-            expense.shop
-        ) {
-
-            line +=
-                ` | ${
-                    expense.shop
-                }`;
-
-        }
-
-
-        if (
-            expense.orderNumber
-        ) {
-
-            line +=
-                ` | #${
-                    expense.orderNumber
-                }`;
-
-        }
-
-
-        if (
-            expense.description
-        ) {
-
-            line +=
-                ` | ${
-                    expense.description
-                }`;
-
-        }
-
-
-        const lines =
-            doc.splitTextToSize(
-                line,
-                170
-            );
-
-
-        if (
-            y +
-            lines.length * 5 >
-            280
-        ) {
-
-            doc.addPage();
-
-            y = 20;
-
-        }
-
-
-        doc.text(
-            lines,
-            20,
-            y
+    const reportWindow =
+        window.open(
+            "",
+            "_blank"
         );
 
 
-        y +=
-            lines.length * 5 + 2;
+    if (!reportWindow) {
 
-    });
+        alert(
+            "Ο browser μπλόκαρε το παράθυρο του Report. Επιτρέψτε τα pop-ups."
+        );
 
+        return;
 
-    // ==================================================
-    // SAVE
-    // ==================================================
-
-    const filename =
-        `Daily-Expenses-${
-            $("reportStartDate").value
-        }-${
-            $("reportEndDate").value
-        }.pdf`;
+    }
 
 
-    doc.save(
-        filename
-    );
+    const rows = list
+        .map(expense => {
+
+            return `
+
+                <tr>
+
+                    <td>
+                        ${formatDate(expense.date)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(expense.time)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            expense.category
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            expense.payment
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            expense.person
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            expense.shop || ""
+                        )}
+                    </td>
+
+                    <td class="amount">
+                        ${formatMoney(
+                            expense.amount
+                        )}
+                    </td>
+
+                </tr>
+
+            `;
+
+        })
+        .join("");
+
+
+    reportWindow.document.write(`
+
+        <!DOCTYPE html>
+
+        <html lang="el">
+
+        <head>
+
+            <meta charset="UTF-8">
+
+            <title>
+                Daily Expenses Report
+            </title>
+
+            <style>
+
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 30px;
+                    color: #222;
+                }
+
+                h1 {
+                    margin-bottom: 5px;
+                }
+
+                h2 {
+                    margin-top: 30px;
+                }
+
+                .info {
+                    margin: 15px 0;
+                    line-height: 1.6;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+
+                th,
+                td {
+                    border: 1px solid #ccc;
+                    padding: 8px;
+                    text-align: left;
+                }
+
+                th {
+                    background: #eee;
+                }
+
+                .amount {
+                    text-align: right;
+                }
+
+                .total {
+                    margin-top: 20px;
+                    font-size: 20px;
+                    font-weight: bold;
+                }
+
+                @media print {
+
+                    body {
+                        margin: 10mm;
+                    }
+
+                    button {
+                        display: none;
+                    }
+
+                }
+
+            </style>
+
+        </head>
+
+        <body>
+
+            <h1>
+                Daily Expenses
+            </h1>
+
+            <div class="info">
+
+                <strong>Αναφορά εξόδων</strong><br>
+
+                Από:
+                ${formatDate(
+                    $("reportStartDate").value
+                )}
+
+                <br>
+
+                Έως:
+                ${formatDate(
+                    $("reportEndDate").value
+                )}
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Ημερομηνία</th>
+
+                        <th>Ώρα</th>
+
+                        <th>Κατηγορία</th>
+
+                        <th>Πληρωμή</th>
+
+                        <th>Για ποιον</th>
+
+                        <th>Κατάστημα</th>
+
+                        <th>Ποσό</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${rows}
+
+                </tbody>
+
+            </table>
+
+            <div class="total">
+
+                ΣΥΝΟΛΟ:
+                ${formatMoney(total)}
+
+            </div>
+
+            <br>
+
+            <button
+                onclick="window.print()"
+            >
+                Εκτύπωση / Αποθήκευση ως PDF
+            </button>
+
+        </body>
+
+        </html>
+
+    `);
+
+
+    reportWindow.document.close();
 
 }
-
-
-$("generateReportButton")
-    .addEventListener(
-        "click",
-        generatePDF
-    );
 
 
 // ======================================================
 // SETTINGS
 // ======================================================
 
-function renderSettingsList(
+function openSettings() {
+
+    const modal =
+        $("settingsModal");
+
+    if (!modal) {
+        return;
+    }
+
+    renderSettings();
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+function closeSettings() {
+
+    const modal =
+        $("settingsModal");
+
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.add(
+        "hidden"
+    );
+
+}
+
+
+// ======================================================
+// SETTINGS RENDER
+// ======================================================
+
+function renderSettings() {
+
+    renderSettingList(
+        "paymentSettings",
+        settings.payments,
+        "payments"
+    );
+
+    renderSettingList(
+        "categorySettings",
+        settings.categories,
+        "categories"
+    );
+
+    renderSettingList(
+        "personSettings",
+        settings.persons,
+        "persons"
+    );
+
+    renderSettingList(
+        "vehicleSettings",
+        settings.vehicles,
+        "vehicles"
+    );
+
+    renderSettingList(
+        "subcategorySettings",
+        settings.subcategories,
+        "subcategories"
+    );
+
+}
+
+
+function renderSettingList(
     containerId,
-    key
+    items,
+    type
 ) {
 
     const container =
         $(containerId);
 
+    if (!container) {
+        return;
+    }
 
     container.innerHTML = "";
 
 
-    settings[key].forEach(
-        (value, index) => {
+    items.forEach(
+        (item, index) => {
 
             const row =
-                document.createElement(
-                    "div"
-                );
-
+                document.createElement("div");
 
             row.className =
-                "setting-item";
+                "setting-row";
 
 
-            const input =
-                document.createElement(
-                    "input"
-                );
+            row.innerHTML = `
+
+                <span>
+                    ${escapeHtml(item)}
+                </span>
+
+                <button
+                    type="button"
+                    class="danger"
+                    data-type="${type}"
+                    data-index="${index}"
+                >
+                    ✕
+                </button>
+
+            `;
 
 
-            input.value =
-                value;
+            row
+                .querySelector("button")
+                .addEventListener(
+                    "click",
+                    () => {
 
-
-            const editButton =
-                document.createElement(
-                    "button"
-                );
-
-
-            editButton.textContent =
-                "✏️";
-
-
-            editButton.className =
-                "secondary";
-
-
-            const deleteButton =
-                document.createElement(
-                    "button"
-                );
-
-
-            deleteButton.textContent =
-                "🗑️";
-
-
-            deleteButton.className =
-                "danger";
-
-
-            editButton.onclick =
-                () => {
-
-                    const newValue =
-                        input.value.trim();
-
-
-                    if (!newValue) {
-
-                        return;
-
-                    }
-
-
-                    settings[key][index] =
-                        newValue;
-
-
-                    saveSettings();
-
-                    refreshAllSettings();
-
-                };
-
-
-            deleteButton.onclick =
-                () => {
-
-                    if (
-                        settings[key].length <= 1
-                    ) {
-
-                        alert(
-                            "Πρέπει να υπάρχει " +
-                            "τουλάχιστον μία επιλογή."
+                        deleteSettingItem(
+                            type,
+                            index
                         );
 
-                        return;
-
                     }
+                );
 
 
-                    if (
-                        !confirm(
-                            `Να διαγραφεί "${value}";`
-                        )
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    settings[key].splice(
-                        index,
-                        1
-                    );
-
-
-                    saveSettings();
-
-                    refreshAllSettings();
-
-                };
-
-
-            row.appendChild(input);
-
-            row.appendChild(
-                editButton
-            );
-
-            row.appendChild(
-                deleteButton
-            );
-
-
-            container.appendChild(
-                row
-            );
+            container.appendChild(row);
 
         }
     );
@@ -1729,42 +1360,54 @@ function renderSettingsList(
 
 
 // ======================================================
-// REFRESH SETTINGS
+// DELETE SETTING
 // ======================================================
 
-function refreshAllSettings() {
+function deleteSettingItem(
+    type,
+    index
+) {
+
+    if (
+        !settings[type] ||
+        settings[type].length <= 1
+    ) {
+
+        alert(
+            "Πρέπει να υπάρχει τουλάχιστον μία επιλογή."
+        );
+
+        return;
+
+    }
+
+
+    const item =
+        settings[type][index];
+
+
+    const confirmed =
+        confirm(
+            `Να διαγραφεί το "${item}";`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    settings[type].splice(
+        index,
+        1
+    );
+
+
+    saveSettings();
 
     refreshSelects();
 
-
-    renderSettingsList(
-        "paymentSettings",
-        "payments"
-    );
-
-
-    renderSettingsList(
-        "categorySettings",
-        "categories"
-    );
-
-
-    renderSettingsList(
-        "personSettings",
-        "persons"
-    );
-
-
-    renderSettingsList(
-        "vehicleSettings",
-        "vehicles"
-    );
-
-
-    renderSettingsList(
-        "subcategorySettings",
-        "subcategories"
-    );
+    renderSettings();
 
 }
 
@@ -1774,17 +1417,27 @@ function refreshAllSettings() {
 // ======================================================
 
 function addSetting(
-    inputId,
-    key
+    type,
+    inputId
 ) {
 
+    const input =
+        $(inputId);
+
+    if (!input) {
+        return;
+    }
+
+
     const value =
-        $(inputId)
-            .value
-            .trim();
+        input.value.trim();
 
 
     if (!value) {
+
+        alert(
+            "Πληκτρολογήστε μια τιμή."
+        );
 
         return;
 
@@ -1792,349 +1445,529 @@ function addSetting(
 
 
     if (
-        !settings[key].includes(
-            value
-        )
+        settings[type]
+            .some(
+                item =>
+                    item.toLowerCase() ===
+                    value.toLowerCase()
+            )
     ) {
 
-        settings[key].push(
-            value
+        alert(
+            "Αυτή η επιλογή υπάρχει ήδη."
         );
+
+        return;
 
     }
 
 
-    $(inputId).value = "";
+    settings[type].push(
+        value
+    );
 
 
     saveSettings();
 
-    refreshAllSettings();
+    input.value = "";
+
+    refreshSelects();
+
+    renderSettings();
 
 }
-
-
-$("addPayment")
-    .onclick =
-    () =>
-        addSetting(
-            "newPayment",
-            "payments"
-        );
-
-
-$("addCategory")
-    .onclick =
-    () =>
-        addSetting(
-            "newCategory",
-            "categories"
-        );
-
-
-$("addPerson")
-    .onclick =
-    () =>
-        addSetting(
-            "newPerson",
-            "persons"
-        );
-
-
-$("addVehicle")
-    .onclick =
-    () =>
-        addSetting(
-            "newVehicle",
-            "vehicles"
-        );
-
-
-$("addSubcategory")
-    .onclick =
-    () =>
-        addSetting(
-            "newSubcategory",
-            "subcategories"
-        );
-
-
-// ======================================================
-// SETTINGS MODAL
-// ======================================================
-
-$("settingsButton")
-    .onclick =
-    () => {
-
-        $("settingsModal")
-            .classList
-            .remove("hidden");
-
-        refreshAllSettings();
-
-    };
-
-
-$("closeSettings")
-    .onclick =
-    () => {
-
-        $("settingsModal")
-            .classList
-            .add("hidden");
-
-    };
-
-
-// ======================================================
-// EXPORT DATA
-// ======================================================
-
-$("exportData")
-    .onclick =
-    () => {
-
-        const data = {
-
-            settings:
-                settings,
-
-            expenses:
-                expenses
-
-        };
-
-
-        const blob =
-            new Blob(
-                [
-                    JSON.stringify(
-                        data,
-                        null,
-                        2
-                    )
-                ],
-                {
-                    type:
-                        "application/json"
-                }
-            );
-
-
-        const link =
-            document.createElement(
-                "a"
-            );
-
-
-        link.href =
-            URL.createObjectURL(
-                blob
-            );
-
-
-        link.download =
-            "Daily-Expenses-backup.json";
-
-
-        link.click();
-
-
-        URL.revokeObjectURL(
-            link.href
-        );
-
-    };
-
-
-// ======================================================
-// IMPORT DATA
-// ======================================================
-
-$("importDataButton")
-    .onclick =
-    () => {
-
-        $("importData").click();
-
-    };
-
-
-$("importData")
-    .onchange =
-    async event => {
-
-        const file =
-            event.target.files[0];
-
-
-        if (!file) {
-
-            return;
-
-        }
-
-
-        try {
-
-            const data =
-                JSON.parse(
-                    await file.text()
-                );
-
-
-            if (
-                data.settings
-            ) {
-
-                settings =
-                    data.settings;
-
-            }
-
-
-            if (
-                data.expenses
-            ) {
-
-                expenses =
-                    data.expenses;
-
-            }
-
-
-            saveSettings();
-
-            saveExpenses();
-
-            refreshAllSettings();
-
-            renderDay(
-                getToday()
-            );
-
-
-            alert(
-                "Τα δεδομένα εισήχθησαν."
-            );
-
-
-        } catch (error) {
-
-            alert(
-                "Μη έγκυρο αρχείο backup."
-            );
-
-        }
-
-    };
 
 
 // ======================================================
 // RESET SETTINGS
 // ======================================================
 
-$("resetSettings")
-    .onclick =
-    () => {
+function resetSettings() {
 
-        if (
-            !confirm(
-                "Να επαναφερθούν οι " +
-                "αρχικές παράμετροι; " +
-                "Τα έξοδα δεν θα διαγραφούν."
-            )
-        ) {
+    const confirmed =
+        confirm(
+            "Θέλετε να επαναφέρετε όλες τις αρχικές ρυθμίσεις;"
+        );
 
-            return;
-
-        }
+    if (!confirmed) {
+        return;
+    }
 
 
-        settings =
-            JSON.parse(
-                JSON.stringify(
-                    defaultSettings
-                )
-            );
+    settings =
+        cloneObject(
+            defaultSettings
+        );
 
 
-        saveSettings();
+    saveSettings();
 
-        refreshAllSettings();
+    refreshSelects();
 
-    };
-
-
-// ======================================================
-// CLOCK
-// ======================================================
-
-function updateClock() {
-
-    const date =
-        new Date();
-
-
-    $("currentDateTime")
-        .textContent =
-        `${pad(
-            date.getDate()
-        )}/${
-            pad(
-                date.getMonth() + 1
-            )
-        }/${
-            date.getFullYear()
-        } — ${
-            pad(
-                date.getHours()
-            )
-        }:${
-            pad(
-                date.getMinutes()
-            )
-        }:${
-            pad(
-                date.getSeconds()
-            )
-        }`;
+    renderSettings();
 
 }
 
 
-setInterval(
-    updateClock,
-    1000
-);
+// ======================================================
+// EXPORT DATA
+// ======================================================
+
+function exportData() {
+
+    const data = {
+
+        version: 2,
+
+        exportedAt:
+            new Date().toISOString(),
+
+        settings:
+            settings,
+
+        expenses:
+            expenses
+
+    };
 
 
-updateClock();
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type: "application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        "daily-expenses-backup.json";
+
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+// ======================================================
+// IMPORT DATA
+// ======================================================
+
+function importData(file) {
+
+    if (!file) {
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(event) {
+
+            try {
+
+                const data =
+                    JSON.parse(
+                        event.target.result
+                    );
+
+
+                if (
+                    !data ||
+                    !Array.isArray(
+                        data.expenses
+                    ) ||
+                    !data.settings
+                ) {
+
+                    throw new Error(
+                        "Invalid backup"
+                    );
+
+                }
+
+
+                const confirmed =
+                    confirm(
+                        "Η εισαγωγή θα αντικαταστήσει τα υπάρχοντα δεδομένα. Συνέχεια;"
+                    );
+
+
+                if (!confirmed) {
+                    return;
+                }
+
+
+                expenses =
+                    data.expenses;
+
+
+                settings =
+                    data.settings;
+
+
+                saveExpenses();
+
+                saveSettings();
+
+                refreshSelects();
+
+                renderSettings();
+
+                renderDay(
+                    $("selectedDate").value
+                );
+
+
+                alert(
+                    "Τα δεδομένα εισήχθησαν επιτυχώς."
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    error
+                );
+
+                alert(
+                    "Το αρχείο δεν είναι έγκυρο backup της εφαρμογής."
+                );
+
+            }
+
+        };
+
+
+    reader.readAsText(
+        file
+    );
+
+}
+
+
+// ======================================================
+// CURRENT DATE / TIME
+// ======================================================
+
+function updateCurrentDateTime() {
+
+    const element =
+        $("currentDateTime");
+
+    if (!element) {
+        return;
+    }
+
+
+    const now =
+        new Date();
+
+
+    element.textContent =
+        now.toLocaleString(
+            "el-GR",
+            {
+                dateStyle: "full",
+                timeStyle: "short"
+            }
+        );
+
+}
 
 
 // ======================================================
 // INITIALIZATION
 // ======================================================
 
-$("selectedDate").value =
-    getToday();
+function initializeApp() {
+
+    // ------------------------------
+    // BUTTONS
+    // ------------------------------
+
+    $("addExpenseButton")
+        ?.addEventListener(
+            "click",
+            addExpense
+        );
 
 
-$("reportStartDate").value =
-    getToday();
+    $("settingsButton")
+        ?.addEventListener(
+            "click",
+            openSettings
+        );
 
 
-$("reportEndDate").value =
-    getToday();
+    $("closeSettings")
+        ?.addEventListener(
+            "click",
+            closeSettings
+        );
 
 
-refreshSelects();
+    $("generateReportButton")
+        ?.addEventListener(
+            "click",
+            createReport
+        );
 
-refreshAllSettings();
 
-renderDay(
-    getToday()
-);
+    $("reportType")
+        ?.addEventListener(
+            "change",
+            updateReportDates
+        );
 
-updateReportDates();
+
+    $("selectedDate")
+        ?.addEventListener(
+            "change",
+            event => {
+
+                renderDay(
+                    event.target.value
+                );
+
+            }
+        );
+
+
+    $("category")
+        ?.addEventListener(
+            "change",
+            updateConditionalFields
+        );
+
+
+    $("purchaseMethod")
+        ?.addEventListener(
+            "change",
+            updateConditionalFields
+        );
+
+
+    // ------------------------------
+    // SETTINGS - ADD BUTTONS
+    // ------------------------------
+
+    $("addPayment")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                addSetting(
+                    "payments",
+                    "newPayment"
+                );
+
+            }
+        );
+
+
+    $("addCategory")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                addSetting(
+                    "categories",
+                    "newCategory"
+                );
+
+            }
+        );
+
+
+    $("addPerson")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                addSetting(
+                    "persons",
+                    "newPerson"
+                );
+
+            }
+        );
+
+
+    $("addVehicle")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                addSetting(
+                    "vehicles",
+                    "newVehicle"
+                );
+
+            }
+        );
+
+
+    $("addSubcategory")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                addSetting(
+                    "subcategories",
+                    "newSubcategory"
+                );
+
+            }
+        );
+
+
+    // ------------------------------
+    // SETTINGS - DATA
+    // ------------------------------
+
+    $("exportData")
+        ?.addEventListener(
+            "click",
+            exportData
+        );
+
+
+    $("importDataButton")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                $("importData")?.click();
+
+            }
+        );
+
+
+    $("importData")
+        ?.addEventListener(
+            "change",
+            event => {
+
+                const file =
+                    event.target.files[0];
+
+                importData(file);
+
+                event.target.value = "";
+
+            }
+        );
+
+
+    $("resetSettings")
+        ?.addEventListener(
+            "click",
+            resetSettings
+        );
+
+
+    // ------------------------------
+    // CLOSE MODAL WHEN CLICKING
+    // OUTSIDE THE CONTENT
+    // ------------------------------
+
+    $("settingsModal")
+        ?.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    $("settingsModal")
+                ) {
+
+                    closeSettings();
+
+                }
+
+            }
+        );
+
+
+    // ------------------------------
+    // INITIAL DATA
+    // ------------------------------
+
+    refreshSelects();
+
+
+    const today =
+        getToday();
+
+
+    if ($("selectedDate")) {
+
+        $("selectedDate").value =
+            today;
+
+    }
+
+
+    updateReportDates();
+
+
+    renderDay(
+        today
+    );
+
+
+    updateCurrentDateTime();
+
+
+    setInterval(
+        updateCurrentDateTime,
+        30000
+    );
+
+}
+
+
+// ======================================================
+// START APP
+// ======================================================
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeApp
+    );
+
+} else {
+
+    initializeApp();
+
+}
