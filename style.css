@@ -150,7 +150,7 @@ textarea {
     top: 50%;
 
     transform:
-        translateY(-50%);
+    translateY(calc(-50% + 15px));
 }
 
 
