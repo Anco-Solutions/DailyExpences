@@ -154,6 +154,10 @@ textarea {
 }
 
 #settingsButton {
+    top: 20px !important;
+}
+
+#settingsButton {
     top: 65%;
 }
 
