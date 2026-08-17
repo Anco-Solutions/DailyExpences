@@ -4,6 +4,7 @@
    ========================================================= */
 
 (function () {
+
     "use strict";
 
 
@@ -16,25 +17,40 @@
        ΔΗΜΙΟΥΡΓΙΑ ΠΕΔΙΩΝ ΗΜΕΡΟΜΗΝΙΑΣ / ΩΡΑΣ
        ===================================================== */
 
-    function addEditDateTimeFields() {
+    function createEditDateTimeFields() {
 
         if (get("expenseEditDateTime")) {
             return;
         }
 
-        const button = get("addExpenseButton");
+
+        const button =
+            get("addExpenseButton");
+
 
         if (!button) {
             return;
         }
 
-        const wrapper = document.createElement("div");
 
-        wrapper.id = "expenseEditDateTime";
-        wrapper.className = "grid hidden";
-        wrapper.style.marginTop = "12px";
+        const wrapper =
+            document.createElement("div");
+
+
+        wrapper.id =
+            "expenseEditDateTime";
+
+
+        wrapper.className =
+            "grid hidden";
+
+
+        wrapper.style.marginTop =
+            "12px";
+
 
         wrapper.innerHTML = `
+
             <div>
 
                 <label for="expenseEditDate">
@@ -59,7 +75,9 @@
                     id="expenseEditTime">
 
             </div>
+
         `;
+
 
         button.parentNode.insertBefore(
             wrapper,
@@ -72,15 +90,31 @@
        ΕΜΦΑΝΙΣΗ ΗΜΕΡΟΜΗΝΙΑΣ / ΩΡΑΣ
        ===================================================== */
 
-    function showEditDateTime(date, time) {
+    function showEditDateTime(id) {
 
-        addEditDateTimeFields();
+        const item =
+            expenses.find(
+                function (expense) {
+                    return expense.id === id;
+                }
+            );
+
+
+        if (!item) {
+            return;
+        }
+
+
+        createEditDateTimeFields();
+
 
         const wrapper =
             get("expenseEditDateTime");
 
+
         const dateInput =
             get("expenseEditDate");
+
 
         const timeInput =
             get("expenseEditTime");
@@ -96,14 +130,16 @@
 
 
         dateInput.value =
-            date || today();
+            item.date || today();
 
 
         timeInput.value =
-            time || nowTime();
+            item.time || nowTime();
 
 
-        wrapper.classList.remove("hidden");
+        wrapper.classList.remove(
+            "hidden"
+        );
     }
 
 
@@ -116,57 +152,80 @@
         const wrapper =
             get("expenseEditDateTime");
 
+
         if (wrapper) {
-            wrapper.classList.add("hidden");
+
+            wrapper.classList.add(
+                "hidden"
+            );
+
         }
     }
 
 
     /* =====================================================
-       ΕΠΕΞΕΡΓΑΣΙΑ ΠΛΗΡΩΜΗΣ
+       ΠΑΡΑΚΟΛΟΥΘΗΣΗ ΤΟΥ EDIT
        ===================================================== */
 
-    function installEditDateTime() {
+    function watchEditButton() {
 
-        addEditDateTimeFields();
-
-
-        /*
-         * Κρατάμε την αρχική editExpense()
-         * του app.js.
-         */
-
-        if (typeof editExpense === "function") {
-
-            const originalEditExpense =
-                editExpense;
+        const list =
+            get("expenseList");
 
 
-            editExpense = function (id) {
-
-                originalEditExpense(id);
-
-
-                const item =
-                    expenses.find(function (expense) {
-
-                        return expense.id === id;
-
-                    });
+        if (!list) {
+            return;
+        }
 
 
-                if (!item) {
+        list.addEventListener(
+            "click",
+            function (event) {
+
+                const button =
+                    event.target.closest(
+                        "[data-edit]"
+                    );
+
+
+                if (!button) {
                     return;
                 }
 
 
-                showEditDateTime(
-                    item.date || today(),
-                    item.time || nowTime()
-                );
-            };
-        }
+                const id =
+                    button.getAttribute(
+                        "data-edit"
+                    );
 
+
+                /*
+                 * Το app.js έχει ήδη εκτελέσει
+                 * την κανονική editExpense().
+                 *
+                 * Εμείς απλώς εμφανίζουμε
+                 * τα δύο επιπλέον πεδία.
+                 */
+
+                setTimeout(
+                    function () {
+
+                        showEditDateTime(id);
+
+                    },
+                    0
+                );
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       ΑΝΤΙΚΑΤΑΣΤΑΣΗ SAVE BUTTON
+       ===================================================== */
+
+    function setupSaveButton() {
 
         const button =
             get("addExpenseButton");
@@ -177,30 +236,23 @@
         }
 
 
-        /*
-         * Αφαιρούμε τον αρχικό click listener
-         * χωρίς να αλλάξουμε το υπόλοιπο app.js.
-         */
-
-        const cleanButton =
+        const newButton =
             button.cloneNode(true);
 
 
-        button.replaceWith(cleanButton);
+        button.replaceWith(
+            newButton
+        );
 
 
-        cleanButton.addEventListener(
+        newButton.addEventListener(
             "click",
             function () {
 
-
                 /*
-                 * =================================================
                  * ΝΕΑ ΠΛΗΡΩΜΗ
                  *
-                 * Η συμπεριφορά παραμένει ακριβώς ίδια.
-                 * Αυτόματα ημερομηνία + ώρα.
-                 * =================================================
+                 * Δεν αλλάζουμε τίποτα.
                  */
 
                 if (!editingExpenseId) {
@@ -212,17 +264,20 @@
 
 
                 /*
-                 * =================================================
-                 * ΕΠΕΞΕΡΓΑΣΙΑ ΥΠΑΡΧΟΥΣΑΣ ΠΛΗΡΩΜΗΣ
-                 * =================================================
+                 * ΕΠΕΞΕΡΓΑΣΙΑ
                  */
 
                 const item =
-                    expenses.find(function (expense) {
+                    expenses.find(
+                        function (expense) {
 
-                        return expense.id === editingExpenseId;
+                            return (
+                                expense.id ===
+                                editingExpenseId
+                            );
 
-                    });
+                        }
+                    );
 
 
                 if (!item) {
@@ -238,110 +293,56 @@
                     get("expenseEditTime");
 
 
-                const editDate =
-                    dateInput && dateInput.value
+                const newDate =
+                    dateInput &&
+                    dateInput.value
                         ? dateInput.value
                         : item.date;
 
 
-                const editTime =
-                    timeInput && timeInput.value
+                const newTime =
+                    timeInput &&
+                    timeInput.value
                         ? timeInput.value
                         : item.time;
 
 
-                if (!editDate) {
-
-                    alert(
-                        "Παρακαλώ επίλεξε ημερομηνία."
-                    );
-
-                    return;
-                }
-
-
-                if (!editTime) {
-
-                    alert(
-                        "Παρακαλώ επίλεξε ώρα."
-                    );
-
-                    return;
-                }
-
-
                 /*
-                 * =================================================
-                 * ΑΠΟΘΗΚΕΥΟΥΜΕ ΠΡΟΣΩΡΙΝΑ ΤΗΝ ΕΠΙΛΕΓΜΕΝΗ
-                 * ΗΜΕΡΟΜΗΝΙΑ ΚΑΙ ΩΡΑ
-                 * =================================================
+                 * Αποθηκεύουμε προσωρινά
+                 * τις νέες τιμές στο record.
                  */
 
-                const oldDate =
-                    item.date;
-
-                const oldTime =
-                    item.time;
-
-
                 item.date =
-                    editDate;
+                    newDate;
+
 
                 item.time =
-                    editTime;
+                    newTime;
 
 
                 /*
-                 * Το selectedDate ακολουθεί την ημερομηνία
-                 * που επέλεξε ο χρήστης.
+                 * Το selectedDate ακολουθεί
+                 * τη νέα ημερομηνία.
                  */
 
                 if (get("selectedDate")) {
 
                     get("selectedDate").value =
-                        editDate;
+                        newDate;
+
                 }
 
 
                 /*
-                 * Καλούμε την κανονική saveExpense()
-                 * του app.js.
-                 *
-                 * Αν κάτι αποτύχει, επαναφέρουμε
-                 * την παλιά ημερομηνία/ώρα.
+                 * Καλούμε την υπάρχουσα
+                 * saveExpense() του app.js.
                  */
 
-                try {
+                saveExpense();
 
-                    saveExpense();
-
-                }
-                catch (error) {
-
-                    item.date =
-                        oldDate;
-
-                    item.time =
-                        oldTime;
-
-                    console.error(
-                        "Σφάλμα κατά την αποθήκευση:",
-                        error
-                    );
-
-                    alert(
-                        "Παρουσιάστηκε σφάλμα κατά την αποθήκευση."
-                    );
-
-                    return;
-                }
-
-
-                /*
-                 * Τέλος επεξεργασίας.
-                 */
 
                 hideEditDateTime();
+
             }
         );
     }
@@ -355,7 +356,11 @@
         "DOMContentLoaded",
         function () {
 
-            installEditDateTime();
+            createEditDateTimeFields();
+
+            watchEditButton();
+
+            setupSaveButton();
 
         }
     );
