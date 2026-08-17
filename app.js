@@ -1606,34 +1606,20 @@ function saveExpense() {
             createId("expense"),
 
         date:
+    editingExpenseId
+        ? (
+            $("editExpenseDate")?.value ||
+            date
+        )
+        : date,
 
-            editingExpenseId
-                ? (
-                    expenses.find(
-                        function(item) {
-                            return (
-                                item.id ===
-                                editingExpenseId
-                            );
-                        }
-                    )?.date || date
-                )
-                : date,
-
-        time:
-
-            editingExpenseId
-                ? (
-                    expenses.find(
-                        function(item) {
-                            return (
-                                item.id ===
-                                editingExpenseId
-                            );
-                        }
-                    )?.time || time
-                )
-                : time,
+time:
+    editingExpenseId
+        ? (
+            $("editExpenseTime")?.value ||
+            time
+        )
+        : time,
 
         amount:
             data.amount,
