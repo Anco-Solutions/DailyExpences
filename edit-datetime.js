@@ -6,6 +6,7 @@
 (function () {
     "use strict";
 
+
     function get(id) {
         return document.getElementById(id);
     }
@@ -68,7 +69,7 @@
 
 
     /* =====================================================
-       ΕΜΦΑΝΙΣΗ ΗΜΕΡΟΜΗΝΙΑΣ / ΩΡΑΣ ΣΤΗΝ ΕΠΕΞΕΡΓΑΣΙΑ
+       ΕΜΦΑΝΙΣΗ ΗΜΕΡΟΜΗΝΙΑΣ / ΩΡΑΣ
        ===================================================== */
 
     function showEditDateTime(date, time) {
@@ -115,23 +116,25 @@
         const wrapper =
             get("expenseEditDateTime");
 
-
         if (wrapper) {
-
             wrapper.classList.add("hidden");
-
         }
     }
 
 
     /* =====================================================
-       ΕΝΕΡΓΟΠΟΙΗΣΗ EDIT MODE
+       ΕΠΕΞΕΡΓΑΣΙΑ ΠΛΗΡΩΜΗΣ
        ===================================================== */
 
-    function installSafeEditMode() {
+    function installEditDateTime() {
 
         addEditDateTimeFields();
 
+
+        /*
+         * Κρατάμε την αρχική editExpense()
+         * του app.js.
+         */
 
         if (typeof editExpense === "function") {
 
@@ -153,20 +156,14 @@
 
 
                 if (!item) {
-
                     return;
-
                 }
 
 
                 showEditDateTime(
-
                     item.date || today(),
-
                     item.time || nowTime()
-
                 );
-
             };
         }
 
@@ -176,24 +173,20 @@
 
 
         if (!button) {
-
             return;
-
         }
 
 
         /*
-         * Δημιουργούμε νέο κουμπί ώστε να
-         * αντικατασταθεί ο αρχικός click listener.
+         * Αφαιρούμε τον αρχικό click listener
+         * χωρίς να αλλάξουμε το υπόλοιπο app.js.
          */
 
         const cleanButton =
             button.cloneNode(true);
 
 
-        button.replaceWith(
-            cleanButton
-        );
+        button.replaceWith(cleanButton);
 
 
         cleanButton.addEventListener(
@@ -202,9 +195,12 @@
 
 
                 /*
-                 * ΚΑΝΟΝΙΚΗ ΝΕΑ ΠΛΗΡΩΜΗ
+                 * =================================================
+                 * ΝΕΑ ΠΛΗΡΩΜΗ
                  *
-                 * Δεν αλλάζουμε τίποτα.
+                 * Η συμπεριφορά παραμένει ακριβώς ίδια.
+                 * Αυτόματα ημερομηνία + ώρα.
+                 * =================================================
                  */
 
                 if (!editingExpenseId) {
@@ -212,13 +208,27 @@
                     saveExpense();
 
                     return;
-
                 }
 
 
                 /*
+                 * =================================================
                  * ΕΠΕΞΕΡΓΑΣΙΑ ΥΠΑΡΧΟΥΣΑΣ ΠΛΗΡΩΜΗΣ
+                 * =================================================
                  */
+
+                const item =
+                    expenses.find(function (expense) {
+
+                        return expense.id === editingExpenseId;
+
+                    });
+
+
+                if (!item) {
+                    return;
+                }
+
 
                 const dateInput =
                     get("expenseEditDate");
@@ -229,17 +239,15 @@
 
 
                 const editDate =
-                    dateInput &&
-                    dateInput.value
+                    dateInput && dateInput.value
                         ? dateInput.value
-                        : "";
+                        : item.date;
 
 
                 const editTime =
-                    timeInput &&
-                    timeInput.value
+                    timeInput && timeInput.value
                         ? timeInput.value
-                        : "";
+                        : item.time;
 
 
                 if (!editDate) {
@@ -263,61 +271,77 @@
 
 
                 /*
-                 * Κρατάμε προσωρινά την αρχική
-                 * λειτουργία nowTime().
+                 * =================================================
+                 * ΑΠΟΘΗΚΕΥΟΥΜΕ ΠΡΟΣΩΡΙΝΑ ΤΗΝ ΕΠΙΛΕΓΜΕΝΗ
+                 * ΗΜΕΡΟΜΗΝΙΑ ΚΑΙ ΩΡΑ
+                 * =================================================
                  */
 
-                const originalNowTime =
-                    nowTime;
+                const oldDate =
+                    item.date;
+
+                const oldTime =
+                    item.time;
+
+
+                item.date =
+                    editDate;
+
+                item.time =
+                    editTime;
 
 
                 /*
-                 * Η ημερομηνία επιλέγεται
-                 * από το πεδίο επεξεργασίας.
+                 * Το selectedDate ακολουθεί την ημερομηνία
+                 * που επέλεξε ο χρήστης.
                  */
 
                 if (get("selectedDate")) {
 
                     get("selectedDate").value =
                         editDate;
-
                 }
 
 
                 /*
-                 * Κατά την αποθήκευση της
-                 * επεξεργασμένης εγγραφής,
-                 * δίνουμε την ώρα που επέλεξε
-                 * ο χρήστης.
+                 * Καλούμε την κανονική saveExpense()
+                 * του app.js.
+                 *
+                 * Αν κάτι αποτύχει, επαναφέρουμε
+                 * την παλιά ημερομηνία/ώρα.
                  */
-
-                nowTime = function () {
-
-                    return editTime;
-
-                };
-
 
                 try {
 
                     saveExpense();
 
                 }
-                finally {
+                catch (error) {
 
-                    /*
-                     * Επαναφέρουμε αμέσως
-                     * την κανονική λειτουργία.
-                     */
+                    item.date =
+                        oldDate;
 
-                    nowTime =
-                        originalNowTime;
+                    item.time =
+                        oldTime;
 
+                    console.error(
+                        "Σφάλμα κατά την αποθήκευση:",
+                        error
+                    );
+
+                    alert(
+                        "Παρουσιάστηκε σφάλμα κατά την αποθήκευση."
+                    );
+
+                    return;
                 }
 
 
-                hideEditDateTime();
+                /*
+                 * Τέλος επεξεργασίας.
+                 */
 
+                hideEditDateTime();
             }
         );
     }
@@ -331,7 +355,7 @@
         "DOMContentLoaded",
         function () {
 
-            installSafeEditMode();
+            installEditDateTime();
 
         }
     );
