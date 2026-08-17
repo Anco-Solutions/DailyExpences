@@ -1716,6 +1716,20 @@ time:
     );
 }
 
+const editDateTimeWrap =
+    $("editDateTimeWrap");
+
+if (editDateTimeWrap) {
+    editDateTimeWrap.classList.add("hidden");
+}
+
+if ($("editExpenseDate")) {
+    $("editExpenseDate").value = "";
+}
+
+if ($("editExpenseTime")) {
+    $("editExpenseTime").value = "";
+}
 
 /* =========================================================
    EXPENSE LIST
