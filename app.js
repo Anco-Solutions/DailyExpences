@@ -2076,6 +2076,22 @@ function editExpense(id) {
     $("amount").value =
         item.amount;
 
+const editDateTimeWrap =
+    $("editDateTimeWrap");
+
+if (editDateTimeWrap) {
+    editDateTimeWrap.classList.remove("hidden");
+}
+
+if ($("editExpenseDate")) {
+    $("editExpenseDate").value =
+        item.date || today();
+}
+
+if ($("editExpenseTime")) {
+    $("editExpenseTime").value =
+        item.time || nowTime();
+}
 
     $("paymentMethod").value =
         item.paymentMethod || "Κάρτα";
