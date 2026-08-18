@@ -2024,11 +2024,9 @@ function renderDaySummary(
     const container =
         $("daySummary");
 
-
     if (!container) {
         return;
     }
-
 
     const total =
         dayExpenses.reduce(
@@ -2044,6 +2042,164 @@ function renderDaySummary(
             },
             0
         );
+
+
+    /* =====================================================
+       ΗΜΕΡΗΣΙΟ ΟΡΙΟ
+       ===================================================== */
+
+    const dailyLimit =
+        Number(
+            settings.dailyLimit || 33
+        );
+
+
+    let limitMessage = "";
+    let limitClass = "";
+
+
+    if (dailyLimit > 0) {
+
+        const difference =
+            dailyLimit - total;
+
+
+        if (difference > 0) {
+
+            limitMessage =
+                `Υπολείπονται ${money(difference)} ` +
+                `από το όριο των ${money(dailyLimit)}`;
+
+            limitClass =
+                "limit-ok";
+
+        } else if (difference === 0) {
+
+            limitMessage =
+                "Το ημερήσιο όριο επιτεύχθηκε";
+
+            limitClass =
+                "limit-achieved";
+
+        } else {
+
+            limitMessage =
+                `Υπέρβαση ορίου: ${money(
+                    Math.abs(difference)
+                )}`;
+
+            limitClass =
+                "limit-exceeded";
+        }
+    }
+
+
+    /* =====================================================
+       ΜΕΣΟΣ ΟΡΟΣ ΗΜΕΡΗΣΙΑΣ ΔΑΠΑΝΗΣ
+       ===================================================== */
+
+    const recordedExpenses =
+        Array.isArray(expenses)
+            ? expenses
+            : [];
+
+
+    const recordedDays =
+        new Set(
+            recordedExpenses
+                .filter(function(item) {
+
+                    return (
+                        item &&
+                        item.date
+                    );
+
+                })
+                .map(function(item) {
+
+                    return item.date;
+
+                })
+        );
+
+
+    let averageDaily = 0;
+
+
+    if (recordedDays.size > 0) {
+
+        const allExpensesTotal =
+            recordedExpenses.reduce(
+                function(sum, item) {
+
+                    return (
+                        sum +
+                        Number(
+                            item.amount || 0
+                        )
+                    );
+
+                },
+                0
+            );
+
+
+        averageDaily =
+            allExpensesTotal /
+            recordedDays.size;
+    }
+
+
+    let averageMessage = "";
+    let averageClass = "";
+
+
+    if (dailyLimit > 0 && recordedDays.size > 0) {
+
+        const averageDifference =
+            dailyLimit - averageDaily;
+
+
+        if (averageDifference > 0) {
+
+            averageMessage =
+                `Μέσος όρος: ${money(
+                    averageDaily
+                )}/ημέρα — ` +
+                `Υπολείπονται ${money(
+                    averageDifference
+                )}`;
+
+            averageClass =
+                "limit-ok";
+
+        } else if (
+            averageDifference === 0
+        ) {
+
+            averageMessage =
+                `Μέσος όρος: ${money(
+                    averageDaily
+                )}/ημέρα — ` +
+                "Το όριο επιτυγχάνεται κατά μέσο όρο";
+
+            averageClass =
+                "limit-achieved";
+
+        } else {
+
+            averageMessage =
+                `Μέσος όρος: ${money(
+                    averageDaily
+                )}/ημέρα — ` +
+                `Μέση ημερήσια υπέρβαση: ${money(
+                    Math.abs(averageDifference)
+                )}`;
+
+            averageClass =
+                "limit-exceeded";
+        }
+    }
 
 
     container.innerHTML = `
@@ -2076,9 +2232,38 @@ function renderDaySummary(
             </div>
 
         </div>
+
+
+        ${
+            dailyLimit > 0
+                ? `
+                    <div class="limit-summary ${limitClass}">
+
+                        <span>
+                            ${limitMessage}
+                        </span>
+
+                    </div>
+                  `
+                : ""
+        }
+
+
+        ${
+            averageMessage
+                ? `
+                    <div class="limit-summary ${averageClass}">
+
+                        <span>
+                            ${averageMessage}
+                        </span>
+
+                    </div>
+                  `
+                : ""
+        }
     `;
 }
-
 
 /* =========================================================
    EDIT
