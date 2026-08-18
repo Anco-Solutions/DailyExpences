@@ -2067,8 +2067,8 @@ function renderDaySummary(
         if (difference > 0) {
 
             limitMessage =
-                `Υπολείπονται ${money(difference)} ` +
-                `από το όριο των ${money(dailyLimit)}`;
+    `Υπολείπονται <strong>${money(difference)}</strong> ` +
+    `από το όριο των <strong>${money(dailyLimit)}</strong>`;
 
             limitClass =
                 "limit-ok";
