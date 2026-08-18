@@ -2084,9 +2084,9 @@ function renderDaySummary(
         } else {
 
             limitMessage =
-                `Υπέρβαση ορίου: ${money(
-                    Math.abs(difference)
-                )}`;
+    `Υπέρβαση ορίου: <strong>${money(
+        Math.abs(difference)
+    )}</strong>`;
 
             limitClass =
                 "limit-exceeded";
