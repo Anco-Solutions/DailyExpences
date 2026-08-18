@@ -289,6 +289,14 @@ function migrateSettings() {
 
     }
 
+if (
+    typeof settings.dailyLimit !== "number" ||
+    !Number.isFinite(settings.dailyLimit) ||
+    settings.dailyLimit < 0
+) {
+    settings.dailyLimit =
+        DEFAULT_SETTINGS.dailyLimit;
+}
 
     const arrays = [
         "categories",
