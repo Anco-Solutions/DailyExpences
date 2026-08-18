@@ -2188,14 +2188,14 @@ function renderDaySummary(
 
         } else {
 
-            averageMessage =
-    `Μέσος όρος: <strong>${money(
+averageMessage =
+    `Μέσος όρος: ${money(
         averageDaily
-    )}/ημέρα</strong> — ` +
-    `Μέση ημερήσια υπέρβαση:
-        <strong>${money(
-            Math.abs(averageDifference)
-        )}</strong>`;
+    )}/ημέρα` +
+    `<br>` +
+    `Μέση ημερήσια υπέρβαση: ${money(
+        Math.abs(averageDifference)
+    )}</strong>`;
 
             averageClass =
                 "limit-exceeded";
