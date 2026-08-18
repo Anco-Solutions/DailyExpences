@@ -1327,3 +1327,30 @@ input[type="number"]::-webkit-outer-spin-button {
             48px;
     }
 }
+
+/* =========================================================
+   ΗΜΕΡΗΣΙΟ ΥΠΟΛΟΙΠΟ
+   ========================================================= */
+
+.daily-balance {
+    margin-top: 8px;
+    margin-bottom: 18px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    line-height: 1.4;
+}
+
+.daily-balance strong {
+    font-weight: 750;
+}
+
+.daily-balance.limit-ok {
+    color: var(--success);
+}
+
+.daily-balance.limit-achieved,
+.daily-balance.limit-exceeded {
+    color: var(--danger);
+}
