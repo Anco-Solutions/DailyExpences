@@ -4819,6 +4819,19 @@ function setupEvents() {
             closeSettings
         );
 
+/* ΗΜΕΡΗΣΙΟ ΟΡΙΟ */
+
+$("dailyLimit")
+    ?.addEventListener(
+        "change",
+        function() {
+
+            saveSettings();
+
+            renderExpenses();
+
+        }
+    );
 
     /* ADD SETTINGS */
 
