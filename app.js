@@ -2093,6 +2093,48 @@ function renderDaySummary(
         }
     }
 
+    /* =====================================================
+       ΗΜΕΡΗΣΙΟ ΥΠΟΛΟΙΠΟ
+       ===================================================== */
+
+    const dailyBalance =
+        $("dailyBalance");
+
+    if (dailyBalance && dailyLimit > 0) {
+
+        const balanceDifference =
+            dailyLimit - total;
+
+
+        if (balanceDifference > 0) {
+
+            dailyBalance.className =
+                "daily-balance limit-ok";
+
+            dailyBalance.innerHTML =
+                `Ημερήσιο υπόλοιπο: <strong>${money(
+                    balanceDifference
+                )}</strong>`;
+
+        } else if (balanceDifference === 0) {
+
+            dailyBalance.className =
+                "daily-balance limit-achieved";
+
+            dailyBalance.innerHTML =
+                `Ημερήσιο όριο εξαντλήθηκε`;
+
+        } else {
+
+            dailyBalance.className =
+                "daily-balance limit-exceeded";
+
+            dailyBalance.innerHTML =
+                `Ημερήσιο όριο ξεπεράστηκε κατά <strong>${money(
+                    Math.abs(balanceDifference)
+                )}</strong>`;
+        }
+    }
 
     /* =====================================================
        ΜΕΣΟΣ ΟΡΟΣ ΗΜΕΡΗΣΙΑΣ ΔΑΠΑΝΗΣ
