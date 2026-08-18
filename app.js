@@ -2163,12 +2163,12 @@ function renderDaySummary(
         if (averageDifference > 0) {
 
             averageMessage =
-                `Μέσος όρος: ${money(
-                    averageDaily
-                )}/ημέρα — ` +
-                `Υπολείπονται ${money(
-                    averageDifference
-                )}`;
+    `Μέσος όρος: <strong>${money(
+        averageDaily
+    )}/ημέρα</strong> — ` +
+    `Υπολείπονται <strong>${money(
+        averageDifference
+    )}</strong>`;
 
             averageClass =
                 "limit-ok";
