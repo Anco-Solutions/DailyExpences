@@ -3541,6 +3541,11 @@ function generateReport() {
    ========================================================= */
 
 function renderSettings() {
+    
+    if ($("dailyLimit")) {
+    $("dailyLimit").value =
+        settings.dailyLimit ?? 33;
+}
 
     renderSimpleSettings(
         "categorySettings",
