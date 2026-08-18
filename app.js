@@ -2165,7 +2165,7 @@ function renderDaySummary(
             averageMessage =
     `Μέσος όρος: <strong>${money(
         averageDaily
-    )}/ημέρα</strong> — ` +
+    )}/ημέρα</strong> ; ` +
     `Υπολείπονται <strong>${money(
         averageDifference
     )}</strong>`;
