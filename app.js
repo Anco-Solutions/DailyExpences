@@ -234,7 +234,7 @@ function renderTopDailyBalance() {
             "top-daily-balance limit-achieved";
 
         element.innerHTML =
-            `Ημερήσιο όριο εξαντλήθηκε`;
+            `Το Ημερήσιο όριο εξαντλήθηκε`;
 
     } else {
 
@@ -242,7 +242,7 @@ function renderTopDailyBalance() {
             "top-daily-balance limit-exceeded";
 
         element.innerHTML =
-            `Ημερήσιο όριο ξεπεράστηκε κατά <strong>${money(
+            `Το Ημερήσιο όριο ξεπεράστηκε κατά <strong>${money(
                 Math.abs(difference)
             )}</strong>`;
     }
