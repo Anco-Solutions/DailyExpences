@@ -47,6 +47,8 @@ const DEFAULT_SETTINGS = {
         "Οικογένεια",
         "Άλλος"
     ],
+    
+    dailyLimit: 33,
 
     vehicles: []
 };
