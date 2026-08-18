@@ -2083,6 +2083,7 @@ function renderExpenses() {
     renderDaySummary(
         dayExpenses
     );
+    renderTopDailyBalance();
 }
 
 
