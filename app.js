@@ -174,6 +174,79 @@ function nowTime() {
     );
 }
 
+function renderTopDailyBalance() {
+
+    const element =
+        $("topDailyBalance");
+
+    if (!element) {
+        return;
+    }
+
+    const dailyLimit =
+        Number(settings.dailyLimit) || 0;
+
+    if (dailyLimit <= 0) {
+
+        element.innerHTML = "";
+
+        return;
+    }
+
+    const currentDate =
+        today();
+
+    const todayTotal =
+        expenses
+            .filter(function(item) {
+
+                return item.date ===
+                    currentDate;
+
+            })
+            .reduce(
+                function(total, item) {
+
+                    return total +
+                        Number(item.amount || 0);
+
+                },
+                0
+            );
+
+    const difference =
+        dailyLimit - todayTotal;
+
+
+    if (difference > 0) {
+
+        element.className =
+            "top-daily-balance limit-ok";
+
+        element.innerHTML =
+            `Ημερήσιο υπόλοιπο: <strong>${money(
+                difference
+            )}</strong>`;
+
+    } else if (difference === 0) {
+
+        element.className =
+            "top-daily-balance limit-achieved";
+
+        element.innerHTML =
+            `Ημερήσιο όριο εξαντλήθηκε`;
+
+    } else {
+
+        element.className =
+            "top-daily-balance limit-exceeded";
+
+        element.innerHTML =
+            `Ημερήσιο όριο ξεπεράστηκε κατά <strong>${money(
+                Math.abs(difference)
+            )}</strong>`;
+    }
+}
 
 function formatDate(value) {
 
