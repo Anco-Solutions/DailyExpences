@@ -2076,7 +2076,7 @@ function renderDaySummary(
         } else if (difference === 0) {
 
             limitMessage =
-                "Το ημερήσιο όριο επιτεύχθηκε";
+                "Το ημερήσιο όριο εξαντλήθηκε";
 
             limitClass =
                 "limit-achieved";
