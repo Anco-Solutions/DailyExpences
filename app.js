@@ -120,6 +120,20 @@ function saveExpenses() {
 
 function saveSettings() {
 
+    const dailyLimitInput = $("dailyLimit");
+
+    if (dailyLimitInput) {
+        const value =
+            parseFloat(dailyLimitInput.value);
+
+        if (
+            Number.isFinite(value) &&
+            value >= 0
+        ) {
+            settings.dailyLimit = value;
+        }
+    }
+
     localStorage.setItem(
         SETTINGS_KEY,
         JSON.stringify(settings)
