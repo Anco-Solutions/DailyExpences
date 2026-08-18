@@ -1354,3 +1354,30 @@ input[type="number"]::-webkit-outer-spin-button {
 .daily-balance.limit-exceeded {
     color: var(--danger);
 }
+
+/* =========================================================
+   ΕΠΑΝΩ ΗΜΕΡΗΣΙΟ ΥΠΟΛΟΙΠΟ
+   ========================================================= */
+
+.top-daily-balance {
+    margin-top: 8px;
+    margin-bottom: 18px;
+
+    font-size: 1.15rem;
+    font-weight: 600;
+
+    line-height: 1.4;
+}
+
+.top-daily-balance strong {
+    font-weight: 750;
+}
+
+.top-daily-balance.limit-ok {
+    color: var(--success);
+}
+
+.top-daily-balance.limit-achieved,
+.top-daily-balance.limit-exceeded {
+    color: var(--danger);
+}
