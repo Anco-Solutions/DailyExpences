@@ -5114,6 +5114,7 @@ function initialize() {
 
     renderExpenses();
 
+renderTopDailyBalance();
 
     updatePurchaseInterface();
 
