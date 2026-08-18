@@ -4804,6 +4804,7 @@ function setupEvents() {
         );
 
 
+
     /* SETTINGS */
 
     $("settingsButton")
