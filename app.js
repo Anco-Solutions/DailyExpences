@@ -2151,56 +2151,59 @@ function renderDaySummary(
 
 
     let averageMessage = "";
-    let averageClass = "";
+let averageClass = "";
 
 
-    if (dailyLimit > 0 && recordedDays.size > 0) {
+if (dailyLimit > 0 && recordedDays.size > 0) {
 
-        const averageDifference =
-            dailyLimit - averageDaily;
+    const averageDifference =
+        dailyLimit - averageDaily;
 
 
-        if (averageDifference > 0) {
+    if (averageDifference > 0) {
 
-            averageMessage =
-    `Μέσος όρος: <strong>${money(
-        averageDaily
-    )}/ημέρα</strong> ; +
-    `Υπολείπονται <strong>${money(
-        averageDifference
-    )}</strong>`;
+        averageMessage =
+            `Μέσος όρος: <strong>${money(
+                averageDaily
+            )}/ημέρα</strong>` +
+            `<br>` +
+            `Υπολείπονται <strong>${money(
+                averageDifference
+            )}</strong>`;
 
-            averageClass =
-                "limit-ok";
+        averageClass =
+            "limit-ok";
 
-        } else if (
-            averageDifference === 0
-        ) {
 
-            averageMessage =
-                `Μέσος όρος: ${money(
-                    averageDaily
-                )}/ημέρα — ` +
-                "Το όριο επιτυγχάνεται κατά μέσο όρο";
+    } else if (
+        averageDifference === 0
+    ) {
 
-            averageClass =
-                "limit-achieved";
+        averageMessage =
+            `Μέσος όρος: <strong>${money(
+                averageDaily
+            )}/ημέρα</strong>`;
 
-        } else {
+        averageClass =
+            "limit-achieved";
 
-averageMessage =
-    `Μέσος όρος: ${money(
-        averageDaily
-    )}/ημέρα` +
-    `<br>` +
-    `Μέση ημερήσια υπέρβαση: ${money(
-        Math.abs(averageDifference)
-    )}</strong>`;
 
-            averageClass =
-                "limit-exceeded";
-        }
+    } else {
+
+        averageMessage =
+            `Μέσος όρος: <strong>${money(
+                averageDaily
+            )}/ημέρα</strong>` +
+            `<br>` +
+            `Μέση ημερήσια υπέρβαση: <strong>${money(
+                Math.abs(averageDifference)
+            )}</strong>`;
+
+        averageClass =
+            "limit-exceeded";
     }
+}
+    
 
 
     container.innerHTML = `
